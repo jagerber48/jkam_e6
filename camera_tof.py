@@ -79,59 +79,13 @@ class GuppyWindow(QtWidgets.QMainWindow):
         self.init_figure()
         self.cam.captured.connect(self.on_capture)
 
-        self.setupUi()
-
     def closeEvent(self, event):
         self.cam.abort()
         self.cam.close()
 
-    # def setupUi(self):
-    #     self.setWindowTitle("Guppy TOF")
-    #     self.centralWidget = QtWidgets.QWidget(self)
-    #     self.setCentralWidget(self.centralWidget)
-    #     self.resize(1024, 768)
-    #     layout = QtWidgets.QVBoxLayout()
-    #
-    #     self.im_tof = pg.ImageView(self)
-    #     self.im_sig = pg.ImageView(self)
-    #     self.im_ref = pg.ImageView(self)
-    #     self.im_bkg = pg.ImageView(self)
-    #
-    #     for imView in (self.im_tof, self.im_sig, self.im_ref, self.im_bkg):
-    #         imView.ui.roiBtn.hide()
-    #         imView.ui.menuBtn.hide()
-    #         imView.setColorMap(cmap)
-    #
-    #     self.im_tof.setLevels(.4, 1.1)
-    #     self.im_histogram = self.im_tof.getHistogramWidget().item
-    #     self.im_histogram.setHistogramRange(.4, 1.1)
-    #
-    #     self.im_stack = QtWidgets.QTabWidget()
-    #     self.im_stack.addTab(self.im_tof, "Normalized")
-    #     self.im_stack.addTab(self.im_sig, "Signal")
-    #     self.im_stack.addTab(self.im_ref, "Reference")
-    #     self.im_stack.addTab(self.im_bkg, "Background")
-    #     self.im_stack.setTabPosition(QtWidgets.QTabWidget.South)
-    #
-    #     self.camera_button = QtWidgets.QPushButton('Start Camera')
-    #     self.camera_button.setCheckable(True)
-    #     self.camera_button.clicked.connect(self.toggleCamera)
-    #
-    #     self.scan_widget = ScanWidget('guppy', dataRoot, andorRoot)
-    #     self.history_widget = AbsorptionROI(cross_section=2.9e-9, pixel_size=1.46e-3, num_history=200)
-    #
-    #     layout.addWidget(self.camera_button)
-    #     layout.addWidget(self.im_stack)
-    #     layout.addWidget(self.scan_widget)
-    #     layout.addWidget(self.history_widget)
-    #     self.centralWidget.setLayout(layout)
-    #
-    #     self.initFigure()
-    #     self.cam.captured.connect(self.onCapture)
-
     def init_figure(self):
         self.data = np.array([])
-        self.history_widget.setupFigure(self.im_tof)
+        self.history_widget.setup_figure(self.im_tof)
 
     def toggle_camera(self):
         if self.camera_button.isChecked():
@@ -164,7 +118,7 @@ class GuppyWindow(QtWidgets.QMainWindow):
         self.timestamp = datetime.datetime.now()
 
         self.process_figure()
-        self.cam.start_frames(nFrames=3)
+        # self.cam.start_frames(nFrames=3)
 
     def process_figure(self):
         if self.data.size == 0:

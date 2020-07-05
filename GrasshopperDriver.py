@@ -8,6 +8,7 @@ import datetime
 
 system = PySpin.System.GetInstance()
 
+
 class GrasshopperObject(QObject):
     captured = pyqtSignal(object)
     new_frame = pyqtSignal()
@@ -37,8 +38,7 @@ class GrasshopperObject(QObject):
         self.cam.Init()
         self.nodemap = self.cam.GetNodeMap()
         PySpin.CEnumerationPtr(self.nodemap.GetNode('GainAuto')).SetIntValue(PySpin.GainAuto_Off)
-        PySpin.CEnumerationPtr(self.nodemap.GetNode('SharpnessAuto')).SetIntValue('EnumEntry_SharpnessAuto_Off')
-
+        # PySpin.CEnumerationPtr(self.nodemap.GetNode('SharpnessAuto')).SetIntValue('EnumEntry_SharpnessAuto_Off')
 
         self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
         self.cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
@@ -81,13 +81,12 @@ class GrasshopperObject(QObject):
             # input('Press enter for software trigger')
             time.sleep(2)
             self.cam.TriggerSoftware.Execute()
-            image_result = self.cam.GetNextImage(1000).GetNDArray()
+            image_result = 1.0*self.cam.GetNextImage(1000).GetNDArray()
             frames.append(image_result)
             # image_result.Release()
         self.cam.EndAcquisition()
         frames = np.stack(frames, axis=-1)
         self.captured.emit(frames)
-        # self.start_frames(nFrames)
 
     def abort(self):
         pass
@@ -108,4 +107,3 @@ class GrasshopperObject(QObject):
 # cam.EndAcquisition()
 # cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
 # cam.DeInit()
-
