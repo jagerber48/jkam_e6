@@ -4,22 +4,43 @@ import time
 import numpy as np
 
 
+class FrameGrabber(QObject):
+    captured = pyqtSignal(object)
+
+    def __init__(self, driver):
+        super(FrameGrabber, self).__init__()
+        self.driver = driver
+        self.thread = QThread()
+        self.moveToThread(self.thread)
+        self.thread.start()
+
+    def get_frame(self):
+        while self.driver.video_on:
+            self.driver.cam.TriggerSoftware.Execute()
+            image_result = self.driver.cam.GetNextImage(1000)
+            frame = image_result.GetNDArray()
+            time.sleep(0.050)
+            self.driver.captured.emit(frame)
+            image_result.Release()
+
+
 class GrasshopperObject(QObject):
     captured = pyqtSignal(object)
-    new_frame = pyqtSignal()
+    start_video = pyqtSignal()
 
     def __init__(self):
         super(GrasshopperObject, self).__init__()
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()
-        self.new_frame.connect(self.start_video)
         self.system = PySpin.System.GetInstance()
 
+        self.frame_grabber = FrameGrabber(self)
+        self.start_video.connect(self.frame_grabber.get_frame)
+        self.video_on = False
         self.cam = None
         self.open = False
         self.open_cam()
-        self.frame_num = 0
         print('inited')
 
     def open_cam(self):
@@ -32,13 +53,12 @@ class GrasshopperObject(QObject):
 
         device_serial_number = self.cam.TLDevice.DeviceSerialNumber.GetValue()
         print('Device serial number retrieved as %s...' % device_serial_number)
-
         self.cam.Init()
 
         self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
         self.cam.Gain.SetValue(0.0)
         self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-        self.cam.ExposureTime.SetValue(10000)
+        self.cam.ExposureTime.SetValue(1000)
         self.cam.Gamma.SetValue(1.0)
 
         self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
@@ -54,14 +74,8 @@ class GrasshopperObject(QObject):
             self.open_cam()
         self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
         self.cam.BeginAcquisition()
-
-    def start_video(self):
-        self.cam.TriggerSoftware.Execute()
-        image_result = self.cam.GetNextImage(1000)
-        frame = image_result.GetNDArray()
-        self.captured.emit(frame)
-        image_result.Release()
-        time.sleep(0.050)
+        self.video_on = True
+        self.start_video.emit()
 
     def start_frames(self, nFrames=3):
         if not self.open:
@@ -80,6 +94,8 @@ class GrasshopperObject(QObject):
 
     def close(self):
         print('closing')
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
+        self.video_on = False
+        time.sleep(0.25)
+        self.cam.EndAcquisition()
         self.cam.DeInit()
         self.open = False

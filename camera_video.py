@@ -10,30 +10,17 @@ from GrasshopperDriver import GrasshopperObject
 from AnalysisWidgets import IntegrateROI
 
 
-class PlotWorker(QtCore.QObject):
-	def __init__(self, window):
-		super(PlotWorker, self).__init__()
-		self.window = window
-		self.thread = QThread()
-		self.moveToThread(self.thread)
-		self.thread.start()
-
-	def plot(self, image):
-		self.window.im_widget.setImage(image, autoLevels=False, autoHistogramRange=False)
-
-
-class GuppyWindow(QtWidgets.QMainWindow):
+class CameraWindow(QtWidgets.QMainWindow):
 	video_signal = QtCore.pyqtSignal()
 
 	def __init__(self):
-		super(GuppyWindow, self).__init__()
+		super(CameraWindow, self).__init__()
 		self.thread = QThread()
 		self.moveToThread(self.thread)
 		self.thread.start()
 
-		self.plotworker = PlotWorker(self)
 		self.cam = GrasshopperObject()
-		self.video_signal.connect(self.cam.start_video)
+		# self.video_signal.connect(self.cam.start_video)
 		self.data = None
 		self.levels = (0, 1)
 
@@ -74,7 +61,6 @@ class GuppyWindow(QtWidgets.QMainWindow):
 		self.centralWidget.setLayout(layout)
 
 		self.init_figure()
-		# self.cam.captured.connect(self.plotworker.plot)
 		self.cam.captured.connect(self.on_capture)
 
 	def closeEvent(self, event):
@@ -85,10 +71,9 @@ class GuppyWindow(QtWidgets.QMainWindow):
 			try:
 				self.cam.init_video()
 				time.sleep(1)
-				self.video_signal.emit()
+				# self.video_signal.emit()
 				self.camera_button.setText('Camera Running')
 			except Exception:
-				self.cam.abort()
 				self.cam.close()
 				self.camera_button.setChecked(False)
 				raise
@@ -114,7 +99,7 @@ class GuppyWindow(QtWidgets.QMainWindow):
 def main():
 	app = QtWidgets.QApplication(sys.argv)
 	app.setWindowIcon(QIcon('favicon.ico'))
-	ex = GuppyWindow()
+	ex = CameraWindow()
 	ex.show()
 	app.exec_()
 

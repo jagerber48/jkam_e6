@@ -19,16 +19,17 @@ dataRoot = Path('C:/', 'users', 'justin', 'desktop', 'working', 'data')
 andorRoot = Path('C:/', 'users', 'justin', 'desktop', 'working', 'andor')
 
 
-class GuppyWindow(QtWidgets.QMainWindow):
-    captured = pyqtSignal()
+class CameraWindow(QtWidgets.QMainWindow):
+    get_frames = pyqtSignal(int)
 
     def __init__(self):
-        super(GuppyWindow, self).__init__()
+        super(CameraWindow, self).__init__()
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()
 
         self.cam = GrasshopperObject()
+        self.get_frames.connect(self.cam.start_frames)
         self.levels = (0, 1)
         self.data = None
         self.sig = None
@@ -80,7 +81,6 @@ class GuppyWindow(QtWidgets.QMainWindow):
         self.cam.captured.connect(self.on_capture)
 
     def closeEvent(self, event):
-        self.cam.abort()
         self.cam.close()
 
     def init_figure(self):
@@ -90,7 +90,8 @@ class GuppyWindow(QtWidgets.QMainWindow):
     def toggle_camera(self):
         if self.camera_button.isChecked():
             try:
-                self.cam.start_frames(nFrames=3)
+                # self.cam.start_frames(nFrames=3)
+                self.get_frames.emit(3)
                 self.camera_button.setText('Camera Running')
             except Exception:
                 self.cam.abort()
@@ -98,7 +99,6 @@ class GuppyWindow(QtWidgets.QMainWindow):
                 self.camera_button.setChecked(False)
                 raise
         else:
-            self.cam.abort()
             self.cam.close()
             self.camera_button.setText('Start Camera')
 
@@ -122,6 +122,8 @@ class GuppyWindow(QtWidgets.QMainWindow):
         self.timestamp = datetime.datetime.now()
 
         self.process_figure()
+        self.get_frames.emit(3)
+
         # self.cam.start_frames(nFrames=3)
 
     def process_figure(self):
@@ -160,7 +162,7 @@ def main():
 
     app = QtWidgets.QApplication(sys.argv)
     app.setWindowIcon(QIcon('favicon.ico'))
-    ex = GuppyWindow()
+    ex = CameraWindow()
     ex.show()
     app.exec_()
 
