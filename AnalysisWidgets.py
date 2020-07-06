@@ -155,7 +155,8 @@ class AbsorptionROI(QWidget):
 		self.roi = pg.RectROI((300, 10), (40, 25))
 		self.roi.addScaleHandle([1, 1], [0, 0])
 		self.roi.addScaleHandle([0, 0], [1, 1])
-		im_widget.addItem(self.roi)		
+		im_widget.addItem(self.roi)
+		print('roi added')
 		
 	def clear_history(self):
 		self.history[:] = 0
@@ -182,8 +183,11 @@ class AbsorptionROI(QWidget):
 
 		trans_min = .01
 		trans_max = 1.5
-		data[data > trans_max] = trans_max
-		data[data < trans_min] = trans_min
+		lesser_mask = np.less(data, trans_min, out=np.full_like(data, False, dtype=bool), where=~np.isnan(data))
+		greater_mask = np.greater(data, trans_max, out=np.full_like(data, False, dtype=bool), where=~np.isnan(data))
+
+		data[greater_mask] = trans_max
+		data[lesser_mask] = trans_min
 		data = -np.log(data)
 	
 		roi_data = self.roi.getArrayRegion(data, image_item)

@@ -112,8 +112,12 @@ class GuppyWindow(QtWidgets.QMainWindow):
         self.ref = images[:, :, 1]
         self.bkg = images[:, :, 2]
 
-        with np.errstate(divide='ignore', invalid='ignore'):
-            self.data = np.true_divide(self.sig - self.bkg, self.ref - self.bkg)
+        numerator = self.sig - self.bkg
+        denominator = self.ref - self.bkg
+
+        # Set output to nan when dividing by zero
+        self.data = np.true_divide(numerator, denominator,
+                                   out=np.nan * np.zeros_like(numerator), where=(denominator != 0))
 
         self.timestamp = datetime.datetime.now()
 
@@ -124,9 +128,13 @@ class GuppyWindow(QtWidgets.QMainWindow):
         if self.data.size == 0:
             return
 
+        print('setting TOF img')
         self.im_tof.setImage(np.fliplr(self.data), autoLevels=False, autoHistogramRange=False)
+        print('setting sig img')
         self.im_sig.setImage(np.fliplr(self.sig))
+        print('setting ref img')
         self.im_ref.setImage(np.fliplr(self.ref))
+        print('setting bg img')
         self.im_bkg.setImage(np.fliplr(self.bkg))
 
         self.history_widget.analyze(self, self.im_tof.getImageItem())
@@ -143,12 +151,12 @@ class GuppyWindow(QtWidgets.QMainWindow):
 
 def main():
     # Start Qt event loop unless running in interactive mode.
-    try:
-        import ctypes
-        myappid = u'ultracold.jkam'  # arbitrary string
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-    except:
-        pass
+    # try:
+    #     import ctypes
+    #     myappid = u'ultracold.jkam'  # arbitrary string
+    #     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    # except:
+    #     pass
 
     app = QtWidgets.QApplication(sys.argv)
     app.setWindowIcon(QIcon('favicon.ico'))

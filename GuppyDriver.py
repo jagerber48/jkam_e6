@@ -74,7 +74,6 @@ class GuppyObject(QtCore.QObject):
 		self.cam.ExposureMode = 'Timed'
 		self.cam.ExposureTime = exposure #microseconds
 		self.cam.Gain = gain
-		
 		self._start()
 		
 	def start_video(self, exposure=5000, gain=24):
