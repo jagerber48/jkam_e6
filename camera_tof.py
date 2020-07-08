@@ -130,18 +130,22 @@ class CameraWindow(QtWidgets.QMainWindow):
         if self.data.size == 0:
             return
 
+        cross_section = 2.91e-11
+        cam_pixel_size = 6.45e-6
+        magnification = 0.36
+        atom_num = -1 * (np.log(self.data, out=np.full_like(self.data, np.nan), where=self.data > 0) / cross_section) * (cam_pixel_size / magnification)**2
         print('setting TOF img')
-        self.im_tof.setImage(np.fliplr(self.data), autoLevels=False, autoHistogramRange=False)
+        self.im_tof.setImage(np.transpose(atom_num), autoRange=False, autoLevels=False, autoHistogramRange=False)
         print('setting sig img')
-        self.im_sig.setImage(np.fliplr(self.sig))
+        self.im_sig.setImage(np.transpose(self.sig), autoRange=False, autoLevels=False, autoHistogramRange=False)
         print('setting ref img')
-        self.im_ref.setImage(np.fliplr(self.ref))
+        self.im_ref.setImage(np.transpose(self.ref), autoRange=False, autoLevels=False, autoHistogramRange=False)
         print('setting bg img')
-        self.im_bkg.setImage(np.fliplr(self.bkg))
+        self.im_bkg.setImage(np.transpose(self.bkg), autoRange=False, autoLevels=False, autoHistogramRange=False)
 
         self.history_widget.analyze(self, self.im_tof.getImageItem())
 
-        self.scan_widget.saveData(self, self.timestamp)
+        # self.scan_widget.saveData(self, self.timestamp)
 
     # self.saveFig()
 

@@ -46,7 +46,7 @@ class GrasshopperObject(QObject):
     def open_cam(self):
         cam_list = self.system.GetCameras()
         try:
-            self.cam = cam_list[0]
+            self.cam = cam_list[1]
         except IndexError:
             print('No Cameras Found')
             return
@@ -58,12 +58,13 @@ class GrasshopperObject(QObject):
         self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
         self.cam.Gain.SetValue(0.0)
         self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-        self.cam.ExposureTime.SetValue(1000)
-        self.cam.Gamma.SetValue(1.0)
+        self.cam.ExposureTime.SetValue(20000)
+        # self.cam.Gamma.SetValue(1.0)
 
+        self.cam.TriggerActivation.SetValue(PySpin.TriggerActivation_RisingEdge)
         self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
-        # cam.TriggerSource.SetValue(PySpin.TriggerSource_Line0)
-        self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
+        self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Line0)
+        # self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
         self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
         self.cam.AcquisitionMode.SetValue(PySpin.AcquisitionMode_Continuous)
 
@@ -83,9 +84,9 @@ class GrasshopperObject(QObject):
         self.cam.BeginAcquisition()
         frames = []
         for nFrame in range(nFrames):
-            input('Press enter for software trigger')
-            self.cam.TriggerSoftware.Execute()
-            image_result = self.cam.GetNextImage(1000)
+            # input('Press enter for software trigger')
+            # self.cam.TriggerSoftware.Execute()
+            image_result = self.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
             frames.append(image_result.GetNDArray())
             image_result.Release()
         self.cam.EndAcquisition()
