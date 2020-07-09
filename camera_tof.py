@@ -9,7 +9,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QThread, pyqtSignal
 import pyqtgraph as pg
 
-from GrasshopperDriver import GrasshopperObject
+from GrasshopperDriver import GrasshopperDriver
 from AnalysisWidgets import AbsorptionROI
 from ScanWidget import ScanWidget
 
@@ -28,8 +28,8 @@ class CameraWindow(QtWidgets.QMainWindow):
         self.moveToThread(self.thread)
         self.thread.start()
 
-        self.cam = GrasshopperObject()
-        self.get_frames.connect(self.cam.start_frames)
+        self.cam_driver = GrasshopperDriver()
+        self.get_frames.connect(self.cam_driver.start_frames)
         self.levels = (0, 1)
         self.data = None
         self.sig = None
@@ -78,10 +78,10 @@ class CameraWindow(QtWidgets.QMainWindow):
         self.centralWidget.setLayout(layout)
 
         self.init_figure()
-        self.cam.captured.connect(self.on_capture)
+        self.cam_driver.captured.connect(self.on_capture)
 
     def closeEvent(self, event):
-        self.cam.close()
+        self.cam_driver.close()
 
     def init_figure(self):
         self.data = np.array([])
@@ -94,12 +94,12 @@ class CameraWindow(QtWidgets.QMainWindow):
                 self.get_frames.emit(3)
                 self.camera_button.setText('Camera Running')
             except Exception:
-                self.cam.abort()
-                self.cam.close()
+                self.cam_driver.abort()
+                self.cam_driver.close()
                 self.camera_button.setChecked(False)
                 raise
         else:
-            self.cam.close()
+            self.cam_driver.close()
             self.camera_button.setText('Start Camera')
 
     def set_levels(self):

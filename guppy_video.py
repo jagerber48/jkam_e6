@@ -29,7 +29,7 @@ import pyqtgraph as pg
 from false2 import cmap
 
 # from GuppyDriver import GuppyObject
-from GrasshopperDriver import GrasshopperObject
+from GrasshopperDriver import GrasshopperDriver
 from AnalysisWidgets import IntegrateROI
 
 class GuppyWindow(QMainWindow):
@@ -41,7 +41,7 @@ class GuppyWindow(QMainWindow):
 		self.moveToThread(self.thread)
 		self.thread.start()
 		
-		self.cam = GrasshopperObject()
+		self.cam = GrasshopperDriver()
 		self.video_signal.connect(self.cam.start_video)
 		self.setupUi(self)
 

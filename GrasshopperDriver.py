@@ -24,12 +24,12 @@ class FrameGrabber(QObject):
             image_result.Release()
 
 
-class GrasshopperObject(QObject):
+class GrasshopperDriver(QObject):
     captured = pyqtSignal(object)
     start_video = pyqtSignal()
 
     def __init__(self):
-        super(GrasshopperObject, self).__init__()
+        super(GrasshopperDriver, self).__init__()
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()
@@ -46,7 +46,7 @@ class GrasshopperObject(QObject):
     def open_cam(self):
         cam_list = self.system.GetCameras()
         try:
-            self.cam = cam_list[1]
+            self.cam = cam_list[0]
         except IndexError:
             print('No Cameras Found')
             return
@@ -54,12 +54,24 @@ class GrasshopperObject(QObject):
         device_serial_number = self.cam.TLDevice.DeviceSerialNumber.GetValue()
         print('Device serial number retrieved as %s...' % device_serial_number)
         self.cam.Init()
-
+        self.cam.DeviceReset()
+        print('Sleeping for 2s')
+        time.sleep(3)
+        self.system = PySpin.System.GetInstance()
+        self.cam = None
+        cam_list = self.system.GetCameras()
+        for camera in cam_list:
+            if camera.TLDevice.DeviceSerialNumber.GetValue() == device_serial_number:
+                self.cam = camera
+                print('Device serial number retrieved as %s...' % device_serial_number)
+            else:
+                print('No camera with serial number %s...' % device_serial_number)
+        self.cam.Init()
         self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
         self.cam.Gain.SetValue(0.0)
         self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
         self.cam.ExposureTime.SetValue(20000)
-        # self.cam.Gamma.SetValue(1.0)
+        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('GammaEnabled')).GetValue()
 
         self.cam.TriggerActivation.SetValue(PySpin.TriggerActivation_RisingEdge)
         self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
