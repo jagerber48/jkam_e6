@@ -20,7 +20,7 @@ class CameraWindow(QtWidgets.QMainWindow):
 		self.thread.start()
 
 		self.cam = GrasshopperDriver()
-		# self.video_signal.connect(self.cam.start_video)
+		self.video_signal.connect(self.cam.start_video)
 		self.data = None
 		self.levels = (0, 1)
 
@@ -91,7 +91,7 @@ class CameraWindow(QtWidgets.QMainWindow):
 		self.im_histogram.setHistogramRange(self.levels[0], self.levels[1])
 
 	def on_capture(self, image):
-		self.im_widget.setImage(image, autoRange=False, autoLevels=False, autoHistogramRange=False)
+		self.im_widget.setImage(np.transpose(image), autoRange=False, autoLevels=False, autoHistogramRange=False)
 		self.video_signal.emit()
 
 

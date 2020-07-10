@@ -17,7 +17,7 @@ class FrameGrabber(QObject):
     def get_frame(self):
         while self.driver.video_on:
             self.driver.cam.TriggerSoftware.Execute()
-            image_result = self.driver.cam.GetNextImage(1000)
+            image_result = self.driver.cam.GetNextImage(1000)  # PySpin.EVENT_TIMEOUT_INFINITE)
             frame = image_result.GetNDArray()
             time.sleep(0.050)
             self.driver.captured.emit(frame)
@@ -34,6 +34,7 @@ class GrasshopperDriver(QObject):
         self.moveToThread(self.thread)
         self.thread.start()
         self.system = PySpin.System.GetInstance()
+        self.cam_list = self.system.GetCameras()
 
         self.frame_grabber = FrameGrabber(self)
         self.start_video.connect(self.frame_grabber.get_frame)
@@ -43,35 +44,29 @@ class GrasshopperDriver(QObject):
         self.open_cam()
         print('inited')
 
-    def open_cam(self):
-        cam_list = self.system.GetCameras()
-        try:
-            self.cam = cam_list[0]
-        except IndexError:
-            print('No Cameras Found')
-            return
-
-        device_serial_number = self.cam.TLDevice.DeviceSerialNumber.GetValue()
-        print('Device serial number retrieved as %s...' % device_serial_number)
-        self.cam.Init()
-        self.cam.DeviceReset()
-        print('Sleeping for 2s')
-        time.sleep(3)
-        self.system = PySpin.System.GetInstance()
-        self.cam = None
-        cam_list = self.system.GetCameras()
-        for camera in cam_list:
-            if camera.TLDevice.DeviceSerialNumber.GetValue() == device_serial_number:
+    def find_camera(self, serial_number):
+        self.cam_list = self.system.GetCameras()
+        print(f'Searching for device with serial number: {serial_number}')
+        for camera in self.cam_list:
+            new_device_serial = camera.TLDevice.DeviceSerialNumber.GetValue()
+            print(f'Found device with serial number: {new_device_serial}')
+            if new_device_serial == serial_number:
                 self.cam = camera
-                print('Device serial number retrieved as %s...' % device_serial_number)
-            else:
-                print('No camera with serial number %s...' % device_serial_number)
+                print(f'Set current camera with serial number: {new_device_serial}')
+
+    def open_cam(self):
+        ser_target = '18431942'
+        self.find_camera(ser_target)
         self.cam.Init()
+        # self.cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
+        # self.cam.UserSetLoad()
+
         self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
         self.cam.Gain.SetValue(0.0)
         self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-        self.cam.ExposureTime.SetValue(20000)
-        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('GammaEnabled')).GetValue()
+        self.cam.ExposureTime.SetValue(1000)
+        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('GammaEnabled')).SetValue(False)
+        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('SharpnessEnabled')).SetValue(False)
 
         self.cam.TriggerActivation.SetValue(PySpin.TriggerActivation_RisingEdge)
         self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
@@ -86,16 +81,18 @@ class GrasshopperDriver(QObject):
         if not self.open:
             self.open_cam()
         self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
+        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
         self.cam.BeginAcquisition()
         self.video_on = True
         self.start_video.emit()
 
-    def start_frames(self, nFrames=3):
+    def start_frames(self, n_frames=3):
+        print(self.open)
         if not self.open:
             self.open_cam()
         self.cam.BeginAcquisition()
         frames = []
-        for nFrame in range(nFrames):
+        for nFrame in range(n_frames):
             # input('Press enter for software trigger')
             # self.cam.TriggerSoftware.Execute()
             image_result = self.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
@@ -108,7 +105,7 @@ class GrasshopperDriver(QObject):
     def close(self):
         print('closing')
         self.video_on = False
-        time.sleep(0.25)
+        self.open = False
+        time.sleep(1)
         self.cam.EndAcquisition()
         self.cam.DeInit()
-        self.open = False

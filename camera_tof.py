@@ -20,7 +20,8 @@ andorRoot = Path('C:/', 'users', 'justin', 'desktop', 'working', 'andor')
 
 
 class CameraWindow(QtWidgets.QMainWindow):
-    get_frames = pyqtSignal(int)
+    get_frames_signal = pyqtSignal(int)
+    close_camera_signal = pyqtSignal()
 
     def __init__(self):
         super(CameraWindow, self).__init__()
@@ -29,7 +30,8 @@ class CameraWindow(QtWidgets.QMainWindow):
         self.thread.start()
 
         self.cam_driver = GrasshopperDriver()
-        self.get_frames.connect(self.cam_driver.start_frames)
+        self.get_frames_signal.connect(self.cam_driver.start_frames)
+        self.close_camera_signal.connect(self.cam_driver.close)
         self.levels = (0, 1)
         self.data = None
         self.sig = None
@@ -57,6 +59,13 @@ class CameraWindow(QtWidgets.QMainWindow):
         self.im_histogram = self.im_tof.getHistogramWidget().item
         self.im_histogram.setHistogramRange(.4, 1.1)
 
+        self.im_sig.setLevels(0, 255)
+        self.im_sig.getHistogramWidget().item.setHistogramRange(0, 255)
+        self.im_ref.setLevels(0, 255)
+        self.im_ref.getHistogramWidget().item.setHistogramRange(0, 255)
+
+
+
         self.im_stack = QtWidgets.QTabWidget()
         self.im_stack.addTab(self.im_tof, "Normalized")
         self.im_stack.addTab(self.im_sig, "Signal")
@@ -81,7 +90,7 @@ class CameraWindow(QtWidgets.QMainWindow):
         self.cam_driver.captured.connect(self.on_capture)
 
     def closeEvent(self, event):
-        self.cam_driver.close()
+        self.close_camera_signal.emit()
 
     def init_figure(self):
         self.data = np.array([])
@@ -90,12 +99,10 @@ class CameraWindow(QtWidgets.QMainWindow):
     def toggle_camera(self):
         if self.camera_button.isChecked():
             try:
-                # self.cam.start_frames(nFrames=3)
-                self.get_frames.emit(3)
+                self.get_frames_signal.emit(3)
                 self.camera_button.setText('Camera Running')
             except Exception:
-                self.cam_driver.abort()
-                self.cam_driver.close()
+                self.close_camera_signal.emit()
                 self.camera_button.setChecked(False)
                 raise
         else:
@@ -122,9 +129,7 @@ class CameraWindow(QtWidgets.QMainWindow):
         self.timestamp = datetime.datetime.now()
 
         self.process_figure()
-        self.get_frames.emit(3)
-
-        # self.cam.start_frames(nFrames=3)
+        self.get_frames_signal.emit(3)
 
     def process_figure(self):
         if self.data.size == 0:
@@ -133,15 +138,16 @@ class CameraWindow(QtWidgets.QMainWindow):
         cross_section = 2.91e-11
         cam_pixel_size = 6.45e-6
         magnification = 0.36
-        atom_num = -1 * (np.log(self.data, out=np.full_like(self.data, np.nan), where=self.data > 0) / cross_section) * (cam_pixel_size / magnification)**2
+        atom_num = -1 * (np.log(self.data, out=np.full_like(self.data, np.nan), where=self.data > 0) / cross_section) \
+                      * (cam_pixel_size / magnification)**2
         print('setting TOF img')
-        self.im_tof.setImage(np.transpose(atom_num), autoRange=False, autoLevels=False, autoHistogramRange=False)
+        self.im_tof.setImage(np.transpose(atom_num), autoRange=True, autoLevels=False, autoHistogramRange=False)
         print('setting sig img')
-        self.im_sig.setImage(np.transpose(self.sig), autoRange=False, autoLevels=False, autoHistogramRange=False)
+        self.im_sig.setImage(np.transpose(self.sig), autoRange=True, autoLevels=False, autoHistogramRange=False)
         print('setting ref img')
-        self.im_ref.setImage(np.transpose(self.ref), autoRange=False, autoLevels=False, autoHistogramRange=False)
+        self.im_ref.setImage(np.transpose(self.ref), autoRange=True, autoLevels=False, autoHistogramRange=False)
         print('setting bg img')
-        self.im_bkg.setImage(np.transpose(self.bkg), autoRange=False, autoLevels=False, autoHistogramRange=False)
+        self.im_bkg.setImage(np.transpose(self.bkg), autoRange=True, autoLevels=False, autoHistogramRange=False)
 
         self.history_widget.analyze(self, self.im_tof.getImageItem())
 
