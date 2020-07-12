@@ -13,7 +13,7 @@ from GrasshopperDriver import GrasshopperDriver
 from AnalysisWidgets import AbsorptionROI
 from ScanWidget import ScanWidget
 
-from colormaps import cmap
+from colormaps import false2_cmap
 
 dataRoot = Path('C:/', 'users', 'justin', 'desktop', 'working', 'data')
 andorRoot = Path('C:/', 'users', 'justin', 'desktop', 'working', 'andor')
@@ -53,7 +53,7 @@ class CameraWindow(QtWidgets.QMainWindow):
         for imView in (self.im_tof, self.im_sig, self.im_ref, self.im_bkg):
             imView.ui.roiBtn.hide()
             imView.ui.menuBtn.hide()
-            imView.setColorMap(cmap)
+            imView.setColorMap(false2_cmap)
 
         self.im_tof.setLevels(.4, 1.1)
         self.im_histogram = self.im_tof.getHistogramWidget().item
@@ -63,8 +63,6 @@ class CameraWindow(QtWidgets.QMainWindow):
         self.im_sig.getHistogramWidget().item.setHistogramRange(0, 255)
         self.im_ref.setLevels(0, 255)
         self.im_ref.getHistogramWidget().item.setHistogramRange(0, 255)
-
-
 
         self.im_stack = QtWidgets.QTabWidget()
         self.im_stack.addTab(self.im_tof, "Normalized")

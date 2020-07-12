@@ -46,9 +46,12 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
         self.driver.captured_signal.connect(self.on_capture)
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
 
-    def abort(self):
-        self.stop(aborting=True)
-        self.disarm(aborting=True)
+    def on_capture(self, image):
+        if self.driver.acquiring:
+            self.data = image
+            self.imageview_widget.setImage(np.transpose(image), autoRange=False,
+                                           autoLevels=False, autoHistogramRange=False)
+            self.imageview_widget.show()
 
     def arm(self):
         serial_number = self.grasshopper_sn
@@ -124,10 +127,6 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
     def set_exposure(self):
         self.driver.set_exposure_time(self.exposure_time)
 
-    def init_figure(self):
-        self.data = np.array([])
-        self.history_widget.setup_figure(self.imageview_widget)
-
     def read_levels(self):
         try:
             level_min = float(self.min_lineEdit.text())
@@ -163,18 +162,19 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
         self.imageview_widget.setColorMap(cmap)
         self.im_histogram.gradient.showTicks(False)
 
-    def on_capture(self, image):
-        if self.driver.acquiring:
-            self.data = image
-            self.imageview_widget.setImage(np.transpose(image), autoRange=False,
-                                           autoLevels=False, autoHistogramRange=False)
-            self.imageview_widget.show()
+    def fit(self):
+        fit_gaussian2d(self.data, zoom=8)
+
+    def init_figure(self):
+        self.data = np.array([])
+        self.history_widget.setup_figure(self.imageview_widget)
+
+    def abort(self):
+        self.stop(aborting=True)
+        self.disarm(aborting=True)
 
     def closeEvent(self, event):
         self.driver.close_connection()
-
-    def fit(self):
-        fit_gaussian2d(self.data, zoom=8)
 
 
 # Start Qt event loop unless running in interactive mode.
