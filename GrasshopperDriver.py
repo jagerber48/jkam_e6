@@ -40,36 +40,40 @@ class GrasshopperDriver(QObject):
         self.frame_grabber = FrameGrabber(self)
         self.start_video_signal.connect(self.frame_grabber.get_frame)
 
-        self.system = PySpin.System.GetInstance()
-        self.cam_list = self.system.GetCameras()
+        # self.system = PySpin.System.GetInstance()
+        # self.cam_list = self.system.GetCameras()
         self.cam = None
         self.serial_number = ''
 
+        self.connected = False
         self.armed = False
         self.acquiring = False
 
+        self.open_connection()
+
+
     def find_camera(self, serial_number):
+        print(f'Attempting to find camera device with serial number: {serial_number}')
         self.cam = None
         for camera in self.cam_list:
-            new_device_serial = camera.TLDevice.DeviceSerialNumber.GetValue()
-            print(f'Found device with serial number: {new_device_serial}')
-            if new_device_serial == serial_number:
+            cam_sn = camera.TLDevice.DeviceSerialNumber.GetValue()
+            print(f'Found device with serial number: {cam_sn}')
+            if cam_sn == serial_number:
                 self.cam = camera
                 self.serial_number = serial_number
-                print(f'Set current camera with serial number: {new_device_serial}')
+                print(f'SUCCESS set current camera with serial number: {cam_sn}')
+        if self.cam is None:
+            print(f'FAILED to find camera with serial number: {serial_number}')
 
     def arm_camera(self, serial_number):
-        print(f'Attempting to ARM camera with serial number: {serial_number}')
+        if not self.connected:
+            self.open_connection()
         self.find_camera(serial_number)
-        try:
-            self.cam.Init()
-            self.load_default_settings()
-            self.armed = True
-            print(f'ARMED Camera with serial number: {serial_number}')
-        except AttributeError as e:
-            print(f'\nError while attempting to ARM camera with serial number: {serial_number}\n'
-                  'Check connection with camera.')
-            print(e)
+        self.cam.Init()
+        self.load_default_settings()
+        self.armed = True
+        print(f'ARMED Camera with serial number: {serial_number}')
+
 
     def disarm_camera(self):
         if self.acquiring:
@@ -111,14 +115,21 @@ class GrasshopperDriver(QObject):
         frames = np.stack(frames, axis=-1)
         self.captured_signal.emit(frames)
 
+    def open_connection(self):
+        self.system = PySpin.System.GetInstance()
+        self.cam_list = self.system.GetCameras()
+        self.connected = True
+        print('Connected to PySpin System')
+
     def close_connection(self):
-        print('Closing connection')
         if self.armed:
             self.disarm_camera()
         del self.cam
         self.cam = None
         self.cam_list.Clear()
         self.system.ReleaseInstance()
+        self.connected = False
+        print('Connection CLOSED')
 
     def load_default_settings(self):
         self.cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)

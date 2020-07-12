@@ -1,25 +1,19 @@
 import sys
-import time
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
 import pyqtgraph as pg
 from false2 import cmap
 from GrasshopperDriver import GrasshopperDriver
-from AnalysisWidgets import IntegrateROI
 from camerawindow_ui import Ui_CameraWindow
 
 
 class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
-	video_signal = QtCore.pyqtSignal()
-	close_camera_signal = QtCore.pyqtSignal()
 	grasshopper_sn = '17491535'
 
 	def __init__(self):
 		super(CameraWindow, self).__init__()
-		self.cam_driver = GrasshopperDriver()
-		self.close_camera_signal.connect(self.cam_driver.close_connection)
-		# self.video_signal.connect(self.cam_driver.start_video)
+		self.driver = GrasshopperDriver()
 		self.data = None
 		self.levels = (0, 1)
 
@@ -44,25 +38,39 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 		self.imageview_widget.setColorMap(cmap)
 
 		self.init_figure()
-		self.cam_driver.captured_signal.connect(self.on_capture)
+		self.driver.captured_signal.connect(self.on_capture)
+
+	def abort(self):
+		self.stop(aborting=True)
+		self.disarm(aborting=True)
 
 	def arm(self):
-		self.cam_driver.arm_camera(self.grasshopper_sn)
-		self.arm_pushButton.setChecked(True)
-		self.arm_pushButton.setText('Disarm Camera')
-		self.start_pushButton.setEnabled(True)
-		self.armed = True
+		try:
+			self.driver.arm_camera(self.grasshopper_sn)
+			self.arm_pushButton.setChecked(True)
+			self.arm_pushButton.setText('Disarm Camera')
+			self.start_pushButton.setEnabled(True)
+			self.armed = True
+		except Exception as e:
+			print('Error while trying to ARM camera')
+			print(e)
+			self.abort()
 
-	def disarm(self):
-		self.cam_driver.disarm_camera()
+	def disarm(self, aborting=False):
+		if not aborting:
+			try:
+				self.driver.disarm_camera()
+			except Exception as e:
+				print('Error while trying to DISARM camera')
+				print(e)
+				self.abort()
 		self.arm_pushButton.setChecked(False)
 		self.arm_pushButton.setText('Arm Camera')
 		self.start_pushButton.setEnabled(False)
 		self.armed = False
 
 	def toggle_arm(self):
-		armed = not(self.arm_pushButton.isChecked())
-		if not armed:
+		if not self.armed:
 			self.arm()
 		else:
 			if self.started:
@@ -70,12 +78,23 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 			self.disarm()
 
 	def start(self):
-		self.cam_driver.start_video()
-		self.start_pushButton.setText('Stop Camera')
-		self.started = True
+		try:
+			self.driver.start_video()
+			self.start_pushButton.setText('Stop Camera')
+			self.started = True
+		except Exception as e:
+			print('Error while trying to START video')
+			print(e)
+			self.abort()
 
-	def stop(self):
-		self.cam_driver.stop_video()
+	def stop(self, aborting=False):
+		if not aborting:
+			try:
+				self.driver.stop_video()
+			except Exception as e:
+				print('Error while trying to STOP video')
+				print(e)
+				self.abort()
 		self.start_pushButton.setText('Start Camera')
 		self.started = False
 
@@ -95,12 +114,14 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 		self.im_histogram.setHistogramRange(self.levels[0], self.levels[1])
 
 	def on_capture(self, image):
-		if self.cam_driver.acquiring:
+		if self.driver.acquiring:
+			self.data = image
 			self.imageview_widget.setImage(np.transpose(image), autoRange=False, autoLevels=False, autoHistogramRange=False)
 			self.imageview_widget.show()
 
 	def closeEvent(self, event):
-		self.cam_driver.close_connection()
+		self.driver.close_connection()
+
 
 # Start Qt event loop unless running in interactive mode.
 def main():
