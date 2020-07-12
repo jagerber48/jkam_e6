@@ -40,17 +40,14 @@ class GrasshopperDriver(QObject):
         self.frame_grabber = FrameGrabber(self)
         self.start_video_signal.connect(self.frame_grabber.get_frame)
 
-        # self.system = PySpin.System.GetInstance()
-        # self.cam_list = self.system.GetCameras()
+        self.system = PySpin.System.GetInstance()
+        self.cam_list = self.system.GetCameras()
         self.cam = None
         self.serial_number = ''
 
         self.connected = False
         self.armed = False
         self.acquiring = False
-
-        self.open_connection()
-
 
     def find_camera(self, serial_number):
         print(f'Attempting to find camera device with serial number: {serial_number}')
@@ -66,14 +63,11 @@ class GrasshopperDriver(QObject):
             print(f'FAILED to find camera with serial number: {serial_number}')
 
     def arm_camera(self, serial_number):
-        if not self.connected:
-            self.open_connection()
         self.find_camera(serial_number)
         self.cam.Init()
         self.load_default_settings()
         self.armed = True
         print(f'ARMED Camera with serial number: {serial_number}')
-
 
     def disarm_camera(self):
         if self.acquiring:
@@ -115,12 +109,6 @@ class GrasshopperDriver(QObject):
         frames = np.stack(frames, axis=-1)
         self.captured_signal.emit(frames)
 
-    def open_connection(self):
-        self.system = PySpin.System.GetInstance()
-        self.cam_list = self.system.GetCameras()
-        self.connected = True
-        print('Connected to PySpin System')
-
     def close_connection(self):
         if self.armed:
             self.disarm_camera()
@@ -130,6 +118,17 @@ class GrasshopperDriver(QObject):
         self.system.ReleaseInstance()
         self.connected = False
         print('Connection CLOSED')
+
+    def set_exposure_time(self, exposure_time):
+        """
+        exposure_time parameter is exposure time in ms. Grasshopper spinnaker/GENICAM API uses
+        exposure times in us.
+        """
+        converted_exposure_time = exposure_time * 1e3
+        self.cam.ExposureTime.SetValue(converted_exposure_time)
+        exposure_time_result = self.cam.ExposureTime.GetValue() * 1e-3
+        print(f'EXPOSURE TIME set to {exposure_time_result} ms')
+        return exposure_time_result
 
     def load_default_settings(self):
         self.cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>619</width>
+    <width>622</width>
     <height>625</height>
    </rect>
   </property>
@@ -73,13 +73,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="autoscale_pushButton">
-        <property name="text">
-         <string>Auto Scale</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="serial_label">
         <property name="text">
          <string>Serial Number: xxxxxxxx</string>
@@ -99,12 +92,12 @@
          <widget class="QLineEdit" name="exposure_lineEdit">
           <property name="maximumSize">
            <size>
-            <width>30</width>
+            <width>60</width>
             <height>16777215</height>
            </size>
           </property>
           <property name="text">
-           <string>20</string>
+           <string>10</string>
           </property>
          </widget>
         </item>
@@ -118,25 +111,45 @@
        </widget>
       </item>
       <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="autoscale_pushButton">
+        <property name="text">
+         <string>Auto Scale</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="fullscale_pushButton">
+        <property name="text">
+         <string>Full Scale</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="customscale_pushButton">
+        <property name="text">
+         <string>Custom Scale</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QFormLayout" name="plot_formLayout">
         <item row="0" column="0">
          <widget class="QLabel" name="max_label">
           <property name="text">
            <string>Max</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="min_label">
-          <property name="text">
-           <string>Min</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="cmap_label">
-          <property name="text">
-           <string>Color Map</string>
           </property>
          </widget>
         </item>
@@ -147,6 +160,16 @@
             <width>50</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="min_label">
+          <property name="text">
+           <string>Min</string>
           </property>
          </widget>
         </item>
@@ -159,11 +182,18 @@
            </size>
           </property>
           <property name="text">
-           <string/>
+           <string>255</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="3" column="0">
+         <widget class="QLabel" name="cmap_label">
+          <property name="text">
+           <string>Color Map</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
          <widget class="QComboBox" name="cmap_comboBox">
           <item>
            <property name="text">
@@ -184,19 +214,6 @@
         </item>
        </layout>
       </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </item>
    </layout>
@@ -206,8 +223,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>619</width>
-     <height>21</height>
+     <width>622</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>

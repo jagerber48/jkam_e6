@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 import pyqtgraph as pg
 from false2 import cmap
@@ -23,7 +23,11 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 		self.setupUi(self)
 		self.arm_pushButton.clicked.connect(self.toggle_arm)
 		self.start_pushButton.clicked.connect(self.toggle_start)
-		self.autoscale_pushButton.clicked.connect(self.set_levels)
+		self.autoscale_pushButton.clicked.connect(self.set_autoscale)
+		self.fullscale_pushButton.clicked.connect(self.set_fullscale)
+		self.exposure_pushButton.clicked.connect(self.set_exposure)
+		self.customscale_pushButton.clicked.connect(self.set_customscale)
+		self.exposure_lineEdit.editingFinished.connect(self.update_exposure)
 
 		self.imageview_widget.ui.roiBtn.hide()
 		self.imageview_widget.ui.menuBtn.hide()
@@ -39,14 +43,17 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 
 		self.init_figure()
 		self.driver.captured_signal.connect(self.on_capture)
+		self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
 
 	def abort(self):
 		self.stop(aborting=True)
 		self.disarm(aborting=True)
 
 	def arm(self):
+		serial_number = self.grasshopper_sn
 		try:
-			self.driver.arm_camera(self.grasshopper_sn)
+			self.driver.arm_camera(serial_number)
+			self.serial_label.setText(f'Serial Number: {serial_number}')
 			self.arm_pushButton.setChecked(True)
 			self.arm_pushButton.setText('Disarm Camera')
 			self.start_pushButton.setEnabled(True)
@@ -64,6 +71,7 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 				print('Error while trying to DISARM camera')
 				print(e)
 				self.abort()
+		self.serial_label.setText(f'Serial Number: xxxxxxxx')
 		self.arm_pushButton.setChecked(False)
 		self.arm_pushButton.setText('Arm Camera')
 		self.start_pushButton.setEnabled(False)
@@ -104,14 +112,49 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 		else:
 			self.stop()
 
+	def update_exposure(self):
+		exposure_input = self.exposure_lineEdit.text()
+		try:
+			self.exposure_time = round(float(exposure_input), 2)
+		except ValueError:
+			print(f'{exposure_input} invalid input for exposure time')
+			self.exposure_lineEdit.setText(f'{self.exposure_time:.2f}')
+
+	def set_exposure(self):
+		self.driver.set_exposure_time(self.exposure_time)
+
 	def init_figure(self):
 		self.data = np.array([])
 		self.history_widget.setup_figure(self.imageview_widget)
 
-	def set_levels(self):
+	def read_levels(self):
+		try:
+			level_min = float(self.min_lineEdit.text())
+			level_max = float(self.max_lineEdit.text())
+			self.levels = (level_min, level_max)
+			return self.levels
+		except ValueError:
+			print('Invalid input for custom scale')
+			self.write_levels()
+
+	def write_levels(self):
+		self.min_lineEdit.setText(f'{self.levels[0]:.2f}')
+		self.max_lineEdit.setText(f'{self.levels[1]:.2f}')
+
+	def set_customscale(self):
+		self.read_levels()
+		self.imageview_widget.setLevels(min=self.levels[0], max=self.levels[1])
+
+	def set_autoscale(self):
 		self.levels = (self.data.min(), self.data.max())
 		self.imageview_widget.setLevels(min=self.levels[0], max=self.levels[1])
+		self.write_levels()
+
+	def set_fullscale(self):
+		self.levels = (0, 255)
+		self.imageview_widget.setLevels(min=self.levels[0], max=self.levels[1])
 		self.im_histogram.setHistogramRange(self.levels[0], self.levels[1])
+		self.write_levels()
 
 	def on_capture(self, image):
 		if self.driver.acquiring:
