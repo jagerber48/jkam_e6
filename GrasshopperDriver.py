@@ -18,11 +18,11 @@ class FrameGrabber(QObject):
     def get_frame(self):
         while self.driver.acquiring:
             try:
-                image_result = self.driver.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)  # PySpin.EVENT_TIMEOUT_INFINITE)
+                image_result = self.driver.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
                 frame = image_result.GetNDArray()
                 self.driver.captured_signal.emit(frame)
                 image_result.Release()
-                time.sleep(1/30)
+                time.sleep(1/30)  # Slow down frame rate to 30 fps to give GUI time to update
             except PySpin.SpinnakerException:
                 pass
 
@@ -36,17 +36,17 @@ class GrasshopperDriver(QObject):
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()
-        # self.cam_list = self.system.GetCameras()
-        self.system = PySpin.System.GetInstance()
-        self.cam_list = self.system.GetCameras()
+
         self.frame_grabber = FrameGrabber(self)
         self.start_video_signal.connect(self.frame_grabber.get_frame)
+
+        self.system = PySpin.System.GetInstance()
+        self.cam_list = self.system.GetCameras()
         self.cam = None
+        self.serial_number = ''
+
         self.armed = False
         self.acquiring = False
-        self.serial_number = ''
-        # self.open_cam()
-        print('inited')
 
     def find_camera(self, serial_number):
         self.cam = None
