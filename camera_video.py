@@ -6,6 +6,7 @@ import pyqtgraph as pg
 from colormaps import cmap_dict
 from GrasshopperDriver import GrasshopperDriver
 from camerawindow_ui import Ui_CameraWindow
+from E6py import fit_gaussian2d
 
 
 class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
@@ -29,6 +30,7 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
         self.fullscale_pushButton.clicked.connect(self.set_fullscale)
         self.customscale_pushButton.clicked.connect(self.set_customscale)
         self.cmap_comboBox.activated.connect(self.set_cmap)
+        self.gaussfit_pushButton.clicked.connect(self.fit)
 
         self.imageview_widget.ui.roiBtn.hide()
         self.imageview_widget.ui.menuBtn.hide()
@@ -40,7 +42,6 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
         hLine = pg.InfiniteLine(angle=0, movable=True)
         self.imageview_widget.addItem(vLine, ignoreBounds=True)
         self.imageview_widget.addItem(hLine, ignoreBounds=True)
-
         self.init_figure()
         self.driver.captured_signal.connect(self.on_capture)
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
@@ -171,6 +172,9 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 
     def closeEvent(self, event):
         self.driver.close_connection()
+
+    def fit(self):
+        fit_gaussian2d(self.data, zoom=8)
 
 
 # Start Qt event loop unless running in interactive mode.
