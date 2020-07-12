@@ -1,8 +1,8 @@
-import PySpin
-from PyQt5.QtCore import QObject, QThread, pyqtSignal, QTimer
 import time
 import numpy as np
-import threading
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, QTimer
+import PySpin
+
 
 
 class FrameGrabber(QObject):

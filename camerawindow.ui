@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>CameraWindow</class>
+ <widget class="QMainWindow" name="CameraWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
-    <height>615</height>
+    <width>619</width>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>jkam</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -54,12 +54,18 @@
         <property name="text">
          <string>Arm Camera</string>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="start_pushButton">
         <property name="text">
          <string>Start Camera</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -197,8 +203,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>562</width>
-     <height>21</height>
+     <width>619</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -208,7 +214,7 @@
   <customwidget>
    <class>ImageView</class>
    <extends>QWidget</extends>
-   <header>imageview</header>
+   <header>pyqtgraph</header>
    <container>1</container>
   </customwidget>
   <customwidget>
