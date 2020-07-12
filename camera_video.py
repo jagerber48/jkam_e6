@@ -3,7 +3,6 @@ import time
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QThread
 import pyqtgraph as pg
 from false2 import cmap
 from GrasshopperDriver import GrasshopperDriver
@@ -12,15 +11,13 @@ from AnalysisWidgets import IntegrateROI
 
 class CameraWindow(QtWidgets.QMainWindow):
 	video_signal = QtCore.pyqtSignal()
+	close_camera_signal = QtCore.pyqtSignal()
 
 	def __init__(self):
 		super(CameraWindow, self).__init__()
-		self.thread = QThread()
-		self.moveToThread(self.thread)
-		self.thread.start()
-
-		self.cam = GrasshopperDriver()
-		self.video_signal.connect(self.cam.start_video)
+		self.cam_driver = GrasshopperDriver(self)
+		self.close_camera_signal.connect(self.cam_driver.close)
+		# self.video_signal.connect(self.cam_driver.start_video)
 		self.data = None
 		self.levels = (0, 1)
 
@@ -61,24 +58,25 @@ class CameraWindow(QtWidgets.QMainWindow):
 		self.centralWidget.setLayout(layout)
 
 		self.init_figure()
-		self.cam.captured.connect(self.on_capture)
+		self.cam_driver.captured.connect(self.on_capture)
 
 	def closeEvent(self, event):
-		self.cam.close()
+		self.cam_driver.close()
 
 	def toggle_camera(self):
 		if self.camera_button.isChecked():
 			try:
-				self.cam.init_video()
+				self.cam_driver.init_video()
 				time.sleep(1)
 				# self.video_signal.emit()
 				self.camera_button.setText('Camera Running')
 			except Exception:
-				self.cam.close()
+				self.close_camera_signal.emit()
+				# self.cam_driver.close()
 				self.camera_button.setChecked(False)
 				raise
 		else:
-			self.cam.close()
+			self.cam_driver.close()
 			self.camera_button.setText('Start Camera')
 
 	def init_figure(self):
@@ -91,8 +89,11 @@ class CameraWindow(QtWidgets.QMainWindow):
 		self.im_histogram.setHistogramRange(self.levels[0], self.levels[1])
 
 	def on_capture(self, image):
-		self.im_widget.setImage(np.transpose(image), autoRange=False, autoLevels=False, autoHistogramRange=False)
-		self.video_signal.emit()
+		if self.cam_driver.video_on:
+			self.im_widget.setImage(np.transpose(image), autoRange=False, autoLevels=False, autoHistogramRange=False)
+			self.im_widget.show()
+		# self.cam_driver.frame_grabber.get_frame()
+		# self.video_signal.emit()
 
 
 # Start Qt event loop unless running in interactive mode.
