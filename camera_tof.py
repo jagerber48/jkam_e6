@@ -13,7 +13,7 @@ from GrasshopperDriver import GrasshopperDriver
 from AnalysisWidgets import AbsorptionROI
 from ScanWidget import ScanWidget
 
-from false2 import cmap
+from colormaps import cmap
 
 dataRoot = Path('C:/', 'users', 'justin', 'desktop', 'working', 'data')
 andorRoot = Path('C:/', 'users', 'justin', 'desktop', 'working', 'andor')

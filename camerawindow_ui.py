@@ -99,6 +99,7 @@ class Ui_CameraWindow(object):
         self.cmap_comboBox.addItem("")
         self.cmap_comboBox.addItem("")
         self.cmap_comboBox.addItem("")
+        self.cmap_comboBox.addItem("")
         self.plot_formLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.cmap_comboBox)
         self.settings_verticalLayout.addLayout(self.plot_formLayout)
         self.gridLayout.addLayout(self.settings_verticalLayout, 0, 1, 1, 1)
@@ -131,9 +132,10 @@ class Ui_CameraWindow(object):
         self.min_label.setText(_translate("CameraWindow", "Min"))
         self.min_lineEdit.setText(_translate("CameraWindow", "255"))
         self.cmap_label.setText(_translate("CameraWindow", "Color Map"))
-        self.cmap_comboBox.setItemText(0, _translate("CameraWindow", "Jet"))
-        self.cmap_comboBox.setItemText(1, _translate("CameraWindow", "Black and White"))
-        self.cmap_comboBox.setItemText(2, _translate("CameraWindow", "Andor FALSE2"))
+        self.cmap_comboBox.setItemText(0, _translate("CameraWindow", "jet"))
+        self.cmap_comboBox.setItemText(1, _translate("CameraWindow", "gray"))
+        self.cmap_comboBox.setItemText(2, _translate("CameraWindow", "viridis"))
+        self.cmap_comboBox.setItemText(3, _translate("CameraWindow", "false2"))
 from AnalysisWidgets import IntegrateROI
 from pyqtgraph import ImageView
 

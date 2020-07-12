@@ -197,17 +197,22 @@
          <widget class="QComboBox" name="cmap_comboBox">
           <item>
            <property name="text">
-            <string>Jet</string>
+            <string>jet</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Black and White</string>
+            <string>gray</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Andor FALSE2</string>
+            <string>viridis</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>false2</string>
            </property>
           </item>
          </widget>

@@ -19,7 +19,7 @@ import pyqtgraph as pg
 import AndorCamera as andor
 from AndorDriver import AndorObject, AndorConfig, Status
 from AnalysisWidgets import IntegrateROI
-from false2 import cmap
+from colormaps import cmap
 
 class AndorWindow(QMainWindow):
 	

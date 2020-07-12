@@ -158,6 +158,5 @@ class GrasshopperDriver(QObject):
         self.cam.TriggerActivation.SetValue(PySpin.TriggerActivation_RisingEdge)
         self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
         self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Line0)
-        # self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
         self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
         self.cam.AcquisitionMode.SetValue(PySpin.AcquisitionMode_Continuous)

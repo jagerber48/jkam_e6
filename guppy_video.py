@@ -26,7 +26,7 @@ QtCore.Signal = QtCore.pyqtSignal
 import numpy as np
 import pyqtgraph as pg
 
-from false2 import cmap
+from colormaps import cmap
 
 # from GuppyDriver import GuppyObject
 from GrasshopperDriver import GrasshopperDriver

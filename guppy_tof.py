@@ -25,7 +25,7 @@ from GuppyDriver import GuppyObject
 from AnalysisWidgets import AbsorptionROI
 from ScanWidget import ScanWidget
 
-from false2 import cmap
+from colormaps import cmap
 
 dataRoot = 'E:\\Data\\'
 andorRoot = 'E:\\Andor\\'
