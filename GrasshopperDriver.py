@@ -81,41 +81,6 @@ class GrasshopperDriver(QObject):
         self.armed = False
         print(f'DISARMED Camera with serial number: {self.serial_number}')
 
-    # def opedn_cam(self):
-    #     # ser_target = '18431942'
-    #     ser_target = '17491535'
-    #     self.find_camera(ser_target)
-    #     self.cam.Init()
-    #     self.cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
-    #     self.cam.UserSetLoad()
-    #
-    #     self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
-    #     self.cam.Gain.SetValue(0.0)
-    #     self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-    #     self.cam.ExposureTime.SetValue(5000)
-    #     PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('GammaEnabled')).SetValue(False)
-    #     PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('SharpnessEnabled')).SetValue(False)
-    #     node = PySpin.CEnumerationPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateAuto'))
-    #     val = node.GetEntryByName('Off')
-    #     node.SetIntValue(val.GetValue())
-    #     # PySpin.CEnumerationPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateAuto')).SetValue('EnumEntry_AcquisitionFrameRateAuto_Off')
-    #     PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateEnabled')).SetValue(True)
-    #     self.cam.AcquisitionFrameRate.SetValue(25)
-    #
-    #     s_node_map = self.cam.GetTLStreamNodeMap()
-    #     handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
-    #     handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
-    #     handling_mode.SetIntValue(handling_mode_entry.GetValue())
-    #
-    #     self.cam.TriggerActivation.SetValue(PySpin.TriggerActivation_RisingEdge)
-    #     self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
-    #     self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Line0)
-    #     # self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
-    #     self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
-    #     self.cam.AcquisitionMode.SetValue(PySpin.AcquisitionMode_Continuous)
-    #
-    #     self.armed = True
-
     def start_video(self):
         self.cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
         self.cam.BeginAcquisition()
@@ -127,7 +92,6 @@ class GrasshopperDriver(QObject):
         self.cam.EndAcquisition()
         self.acquiring = False
         print(f'STOPPED camera VIDEO with serial number: {self.serial_number}')
-
 
     def start_frames(self, n_frames=3):
         print(self.armed)
@@ -148,14 +112,9 @@ class GrasshopperDriver(QObject):
         self.captured_signal.emit(frames)
 
     def close_connection(self):
-        print('closing')
-        self.armed = False
-        self.thread.sleep(2)
-        print('cont')
-        if self.acquiring:
-            self.cam.EndAcquisition()
-            self.acquiring = False
-        self.cam.DeInit()
+        print('Closing connection')
+        if self.armed:
+            self.disarm_camera()
         del self.cam
         self.cam = None
         self.cam_list.Clear()
