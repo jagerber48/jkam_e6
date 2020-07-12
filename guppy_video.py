@@ -42,7 +42,7 @@ class GuppyWindow(QMainWindow):
 		self.thread.start()
 		
 		self.cam = GrasshopperDriver()
-		self.video_signal.connect(self.cam.start_video)
+		self.video_signal.connect(self.cam.start_video_signal)
 		self.setupUi(self)
 
 	def closeEvent(self, event):
@@ -85,12 +85,12 @@ class GuppyWindow(QMainWindow):
 		self.centralWidget.setLayout(layout)
 
 		self.initFigure()
-		self.cam.captured.connect(self.onCapture)
+		self.cam.captured_signal.connect(self.onCapture)
 		
 	def toggleCamera(self):
 		if self.camera_button.isChecked():
 			try:
-				self.cam.init_video()
+				self.cam.start_video()
 				time.sleep(1)
 				self.video_signal.emit()
 				self.camera_button.setText('Camera Running')

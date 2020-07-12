@@ -62,7 +62,7 @@ class AcquisitionMonitor(QtCore.QThread):
 					raise Exception('Unexpected camera status ''{}'''.format(status))
 
 				images = self.interface.get_acquisition()
-				self.interface.captured.emit(images)
+				self.interface.captured_signal.emit(images)
 				
 				if self.running:
 					self.interface.cam.start_acquisition()

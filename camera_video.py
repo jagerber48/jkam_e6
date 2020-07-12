@@ -13,16 +13,18 @@ from camerawindow_ui import Ui_CameraWindow
 class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 	video_signal = QtCore.pyqtSignal()
 	close_camera_signal = QtCore.pyqtSignal()
+	grasshopper_sn = '17491535'
 
 	def __init__(self):
 		super(CameraWindow, self).__init__()
-		self.cam_driver = GrasshopperDriver(self)
-		self.close_camera_signal.connect(self.cam_driver.close)
+		self.cam_driver = GrasshopperDriver()
+		self.close_camera_signal.connect(self.cam_driver.close_connection)
 		# self.video_signal.connect(self.cam_driver.start_video)
 		self.data = None
 		self.levels = (0, 1)
 
 		self.setupUi(self)
+		self.arm_pushButton.clicked.connect(self.toggle_arm)
 		self.start_pushButton.clicked.connect(self.toggle_camera)
 		self.autoscale_pushButton.clicked.connect(self.set_levels)
 
@@ -39,25 +41,42 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 		self.imageview_widget.setColorMap(cmap)
 
 		self.init_figure()
-		self.cam_driver.captured.connect(self.on_capture)
+		self.cam_driver.captured_signal.connect(self.on_capture)
+
+	def toggle_arm(self):
+		armed = not(self.arm_pushButton.isChecked())
+		if not armed:
+			self.cam_driver.arm_camera(self.grasshopper_sn)
+			self.arm_pushButton.setChecked(True)
+			self.arm_pushButton.setText('Disarm Camera')
+			self.start_pushButton.setEnabled(True)
+		else:
+			self.cam_driver.disarm_camera()
+			self.arm_pushButton.setChecked(False)
+			self.arm_pushButton.setText('Arm Camera')
+			self.start_pushButton.setEnabled(False)
+
+	def arm_camera(self):
+		grasshopper_sn = '17491535'
+		self.cam_driver.arm_camera(grasshopper_sn)
 
 	def closeEvent(self, event):
-		self.cam_driver.close()
+		self.cam_driver.close_connection()
 
 	def toggle_camera(self):
 		if self.start_pushButton.isChecked():
 			try:
-				self.cam_driver.init_video()
-				time.sleep(1)
-				# self.video_signal.emit()
-				self.start_pushButton.setText('Camera Running')
+				self.cam_driver.start_video()
+				self.start_pushButton.setText('Stop Camera')
 			except Exception:
 				self.close_camera_signal.emit()
+				time.sleep(5/30)
 				# self.cam_driver.close()
 				self.start_pushButton.setChecked(False)
 				raise
 		else:
-			self.cam_driver.close()
+			self.cam_driver.stop_video()
+			# self.cam_driver.close()
 			self.start_pushButton.setText('Start Camera')
 
 	def init_figure(self):
@@ -70,12 +89,9 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 		self.im_histogram.setHistogramRange(self.levels[0], self.levels[1])
 
 	def on_capture(self, image):
-		if self.cam_driver.video_on:
+		if self.cam_driver.acquiring:
 			self.imageview_widget.setImage(np.transpose(image), autoRange=False, autoLevels=False, autoHistogramRange=False)
 			self.imageview_widget.show()
-		# self.cam_driver.frame_grabber.get_frame()
-		# self.video_signal.emit()
-
 
 # Start Qt event loop unless running in interactive mode.
 def main():

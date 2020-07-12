@@ -87,7 +87,7 @@ class CameraWindow(QtWidgets.QMainWindow):
         self.centralWidget.setLayout(layout)
 
         self.init_figure()
-        self.cam_driver.captured.connect(self.on_capture)
+        self.cam_driver.captured_signal.connect(self.on_capture)
 
     def closeEvent(self, event):
         self.close_camera_signal.emit()

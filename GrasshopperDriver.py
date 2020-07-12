@@ -1,8 +1,7 @@
 import time
 import numpy as np
-from PyQt5.QtCore import QObject, QThread, pyqtSignal, QTimer
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import PySpin
-
 
 
 class FrameGrabber(QObject):
@@ -17,51 +16,37 @@ class FrameGrabber(QObject):
         self.frame_num = 0
 
     def get_frame(self):
-        while self.driver.video_on:
-            # self.frame_num += 1
-            # print(f'frame: {self.frame_num}')
-            image_result = self.driver.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)  # PySpin.EVENT_TIMEOUT_INFINITE)
-            frame = image_result.GetNDArray()
-            self.driver.captured.emit(frame)
-            # self.driver.window.im_widget.setImage(frame, autoRange=False,
-            #                                       autoLevels=False, autoHistogramRange=False)
-            # self.driver.window.on_capture(frame)
-            image_result.Release()
-            time.sleep(1/30)
+        while self.driver.acquiring:
+            try:
+                image_result = self.driver.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)  # PySpin.EVENT_TIMEOUT_INFINITE)
+                frame = image_result.GetNDArray()
+                self.driver.captured_signal.emit(frame)
+                image_result.Release()
+                time.sleep(1/30)
+            except PySpin.SpinnakerException:
+                pass
 
 
 class GrasshopperDriver(QObject):
-    captured = pyqtSignal(object)
-    start_video = pyqtSignal()
+    captured_signal = pyqtSignal(object)
+    start_video_signal = pyqtSignal()
 
-    def __init__(self, window):
+    def __init__(self):
         super(GrasshopperDriver, self).__init__()
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()
         # self.cam_list = self.system.GetCameras()
-        self.window = window
         self.system = PySpin.System.GetInstance()
         self.cam_list = self.system.GetCameras()
         self.frame_grabber = FrameGrabber(self)
-        self.start_video.connect(self.frame_grabber.get_frame)
-        self.video_on = False
+        self.start_video_signal.connect(self.frame_grabber.get_frame)
         self.cam = None
         self.armed = False
         self.acquiring = False
-        self.open_cam()
+        self.serial_number = ''
+        # self.open_cam()
         print('inited')
-
-    def arm_camera(self, serial_number):
-        print(f'Attempting connection with camera with serial number: {serial_number}')
-        self.find_camera(serial_number)
-        try:
-            self.cam.Init()
-            self.load_default_settings()
-            self.armed = True
-        except AttributeError:
-            print('Error while attempting to arm camera with serial number {serial_number}\n'
-                  'Check connection with camera.')
 
     def find_camera(self, serial_number):
         self.cam = None
@@ -70,53 +55,79 @@ class GrasshopperDriver(QObject):
             print(f'Found device with serial number: {new_device_serial}')
             if new_device_serial == serial_number:
                 self.cam = camera
+                self.serial_number = serial_number
                 print(f'Set current camera with serial number: {new_device_serial}')
 
-    def open_cam(self):
-        # ser_target = '18431942'
-        ser_target = '17491535'
-        self.find_camera(ser_target)
-        self.cam.Init()
-        self.cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
-        self.cam.UserSetLoad()
+    def arm_camera(self, serial_number):
+        print(f'Attempting to ARM camera with serial number: {serial_number}')
+        self.find_camera(serial_number)
+        try:
+            self.cam.Init()
+            self.load_default_settings()
+            self.armed = True
+            print(f'ARMED Camera with serial number: {serial_number}')
+        except AttributeError as e:
+            print(f'\nError while attempting to ARM camera with serial number: {serial_number}\n'
+                  'Check connection with camera.')
+            print(e)
 
-        self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
-        self.cam.Gain.SetValue(0.0)
-        self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-        self.cam.ExposureTime.SetValue(5000)
-        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('GammaEnabled')).SetValue(False)
-        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('SharpnessEnabled')).SetValue(False)
-        node = PySpin.CEnumerationPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateAuto'))
-        val = node.GetEntryByName('Off')
-        node.SetIntValue(val.GetValue())
-        # PySpin.CEnumerationPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateAuto')).SetValue('EnumEntry_AcquisitionFrameRateAuto_Off')
-        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateEnabled')).SetValue(True)
-        self.cam.AcquisitionFrameRate.SetValue(25)
+    def disarm_camera(self):
+        if self.acquiring:
+            self.cam.EndAcquisition()
+            self.acquiring = False
+        self.cam.DeInit()
+        del self.cam
+        self.cam = None
+        self.armed = False
+        print(f'DISARMED Camera with serial number: {self.serial_number}')
 
-        s_node_map = self.cam.GetTLStreamNodeMap()
-        handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
-        handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
-        handling_mode.SetIntValue(handling_mode_entry.GetValue())
+    # def opedn_cam(self):
+    #     # ser_target = '18431942'
+    #     ser_target = '17491535'
+    #     self.find_camera(ser_target)
+    #     self.cam.Init()
+    #     self.cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
+    #     self.cam.UserSetLoad()
+    #
+    #     self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
+    #     self.cam.Gain.SetValue(0.0)
+    #     self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
+    #     self.cam.ExposureTime.SetValue(5000)
+    #     PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('GammaEnabled')).SetValue(False)
+    #     PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('SharpnessEnabled')).SetValue(False)
+    #     node = PySpin.CEnumerationPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateAuto'))
+    #     val = node.GetEntryByName('Off')
+    #     node.SetIntValue(val.GetValue())
+    #     # PySpin.CEnumerationPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateAuto')).SetValue('EnumEntry_AcquisitionFrameRateAuto_Off')
+    #     PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateEnabled')).SetValue(True)
+    #     self.cam.AcquisitionFrameRate.SetValue(25)
+    #
+    #     s_node_map = self.cam.GetTLStreamNodeMap()
+    #     handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
+    #     handling_mode_entry = handling_mode.GetEntryByName('NewestOnly')
+    #     handling_mode.SetIntValue(handling_mode_entry.GetValue())
+    #
+    #     self.cam.TriggerActivation.SetValue(PySpin.TriggerActivation_RisingEdge)
+    #     self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
+    #     self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Line0)
+    #     # self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
+    #     self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
+    #     self.cam.AcquisitionMode.SetValue(PySpin.AcquisitionMode_Continuous)
+    #
+    #     self.armed = True
 
-        self.cam.TriggerActivation.SetValue(PySpin.TriggerActivation_RisingEdge)
-        self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
-        self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Line0)
-        # self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
-        self.cam.AcquisitionMode.SetValue(PySpin.AcquisitionMode_Continuous)
-
-        self.armed = True
-
-    def init_video(self):
-        if not self.armed:
-            self.open_cam()
-        # self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
-        # self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
+    def start_video(self):
         self.cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
         self.cam.BeginAcquisition()
         self.acquiring = True
-        self.video_on = True
-        self.start_video.emit()
+        self.start_video_signal.emit()
+        print(f'STARTED camera VIDEO with serial number: {self.serial_number}')
+
+    def stop_video(self):
+        self.cam.EndAcquisition()
+        self.acquiring = False
+        print(f'STOPPED camera VIDEO with serial number: {self.serial_number}')
+
 
     def start_frames(self, n_frames=3):
         print(self.armed)
@@ -134,11 +145,10 @@ class GrasshopperDriver(QObject):
         self.cam.EndAcquisition()
         self.acquiring = False
         frames = np.stack(frames, axis=-1)
-        self.captured.emit(frames)
+        self.captured_signal.emit(frames)
 
-    def close(self):
+    def close_connection(self):
         print('closing')
-        self.video_on = False
         self.armed = False
         self.thread.sleep(2)
         print('cont')
@@ -147,10 +157,14 @@ class GrasshopperDriver(QObject):
             self.acquiring = False
         self.cam.DeInit()
         del self.cam
+        self.cam = None
         self.cam_list.Clear()
         self.system.ReleaseInstance()
 
     def load_default_settings(self):
+        self.cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
+        self.cam.UserSetLoad()
+
         self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
         self.cam.Gain.SetValue(0.0)
 
