@@ -7,7 +7,7 @@ import pyqtgraph as pg
 
 class IntegrateROI(QWidget):
 
-    def __init__(self, subtract_bkg=False, num_history=200, parent=None):
+    def __init__(self, parent=None, subtract_bkg=False, num_history=200):
         super(IntegrateROI, self).__init__(parent)
         self.subtract_bkg = subtract_bkg
         self.num_history = num_history
@@ -38,15 +38,21 @@ class IntegrateROI(QWidget):
         self.min_button = QPushButton('Set Background', self)
         self.clear_button = QPushButton('Clear History', self)
         self.max_button = QPushButton('Reset Max', self)
+        self.analyze_on_checkbox = QCheckBox(self)
 
         self.min_button.clicked.connect(self.set_min)
         self.clear_button.clicked.connect(self.clear_history)
         self.max_button.clicked.connect(self.set_max)
+        self.analyze_on_checkbox.stateChanged.connect(self.toggle_on_off)
+        self.analyze_on_checkbox.setChecked(False)
+
+        self.analyze_on = False
 
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.min_button)
         button_layout.addWidget(self.clear_button)
         button_layout.addWidget(self.max_button)
+        button_layout.addWidget(self.analyze_on_checkbox)
 
         layout.addWidget(self.history_widget)
         layout.addLayout(button_layout)
@@ -70,14 +76,16 @@ class IntegrateROI(QWidget):
         self.history_max = self.history.max()
         self.history_widget.setYRange(self.history_min, self.history_max)
 
+    def toggle_on_off(self):
+        self.analyze_on = self.analyze_on_checkbox.isChecked()
+
     def analyze(self, capture, image_item):
+        if not self.analyze_on:
+            return
 
         data = capture.data.astype(float)
         data[data == np.inf] = np.nan
         data[data == -np.inf] = np.nan
-
-        total = np.nansum(data)
-        total_num = capture.data.size
 
         roi_data = self.roi.getArrayRegion(data, image_item)
 
@@ -85,6 +93,8 @@ class IntegrateROI(QWidget):
         roi_num = roi_data.size
 
         if self.subtract_bkg:
+            total = np.nansum(data)
+            total_num = capture.data.size
             bkg = (total - roi_total) / (total_num - roi_num)
             roi_sig = roi_total - roi_num * bkg
         else:
