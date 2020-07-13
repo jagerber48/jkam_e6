@@ -2,31 +2,11 @@ import sys
 import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QObject, QThread
 import pyqtgraph as pg
 from colormaps import cmap_dict
 from GrasshopperDriver import GrasshopperDriver
 from camerawindow_ui import Ui_CameraWindow
 from E6py import fit_gaussian2d
-
-
-class Plotter(QObject):
-    def __init__(self, camerawindow):
-        super(Plotter, self).__init__()
-        self.thread = QThread()
-        self.moveToThread(self.thread)
-        self.thread.start()
-        self.camerawindow = camerawindow
-
-    def plot(self, image):
-        if self.camerawindow.driver.acquiring:
-            self.camerawindow.driver.captured_signal.disconnect(self.plot)
-            self.camerawindow.data = image
-            self.camerawindow.imageview_widget.setImage(np.transpose(image), autoRange=False,
-                                                        autoLevels=False, autoHistogramRange=False)
-            self.camerawindow.history_widget.analyze(self.camerawindow,
-                                                     self.camerawindow.imageview_widget.getImageItem())
-            self.camerawindow.driver.captured_signal.connect(self.plot)
 
 
 class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
@@ -45,9 +25,7 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
         self.im_histogram = None
         self.configure_widgets()
         self.connect_ui_signals()
-        self.plotter = Plotter(self)
-        self.driver.captured_signal.connect(self.plotter.plot)
-        # self.driver.captured_signal.connect(self.on_capture)
+        self.driver.captured_signal.connect(self.on_capture)
 
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
 
@@ -79,10 +57,12 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 
     def on_capture(self, image):
         if self.driver.acquiring:
-            self.data = image
-            self.imageview_widget.setImage(np.transpose(image), autoRange=False,
+            self.driver.captured_signal.disconnect(self.on_capture)
+            self.data = np.transpose(image)
+            self.imageview_widget.setImage(self.data, autoRange=False,
                                            autoLevels=False, autoHistogramRange=False)
             self.history_widget.analyze(self, self.imageview_widget.getImageItem())
+            self.driver.captured_signal.connect(self.on_capture)
 
     def arm(self):
         serial_number = self.grasshopper_sn

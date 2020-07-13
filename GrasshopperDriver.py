@@ -22,7 +22,7 @@ class FrameGrabber(QObject):
                 frame = image_result.GetNDArray()
                 self.driver.captured_signal.emit(frame)
                 image_result.Release()
-                # time.sleep(1/10)  # Slow down frame rate to 15 fps to give GUI time to update
+                time.sleep(1/30)  # Slow down frame rate to 15 fps to give GUI time to update
             except PySpin.SpinnakerException:
                 pass
 
