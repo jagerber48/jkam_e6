@@ -22,7 +22,7 @@ class FrameGrabber(QObject):
                 frame = image_result.GetNDArray()
                 self.driver.captured_signal.emit(frame)
                 image_result.Release()
-                time.sleep(1/30)  # Slow down frame rate to 30 fps to give GUI time to update
+                time.sleep(2/30)  # Slow down frame rate to 15 fps to give GUI time to update
             except PySpin.SpinnakerException:
                 pass
 
@@ -109,6 +109,16 @@ class GrasshopperDriver(QObject):
         frames = np.stack(frames, axis=-1)
         self.captured_signal.emit(frames)
 
+    def set_exposure_time(self, exposure_time):
+        """
+        exposure_time parameter is exposure time in ms. Grasshopper spinnaker/GENICAM API uses
+        exposure times in us.
+        """
+        converted_exposure_time = exposure_time * 1e3
+        self.cam.ExposureTime.SetValue(converted_exposure_time)
+        exposure_time_result = self.cam.ExposureTime.GetValue() * 1e-3
+        print(f'EXPOSURE TIME set to {exposure_time_result:.4f} ms')
+
     def close_connection(self):
         if self.armed:
             self.disarm_camera()
@@ -118,17 +128,6 @@ class GrasshopperDriver(QObject):
         self.system.ReleaseInstance()
         self.connected = False
         print('Connection CLOSED')
-
-    def set_exposure_time(self, exposure_time):
-        """
-        exposure_time parameter is exposure time in ms. Grasshopper spinnaker/GENICAM API uses
-        exposure times in us.
-        """
-        converted_exposure_time = exposure_time * 1e3
-        self.cam.ExposureTime.SetValue(converted_exposure_time)
-        exposure_time_result = self.cam.ExposureTime.GetValue() * 1e-3
-        print(f'EXPOSURE TIME set to {exposure_time_result} ms')
-        return exposure_time_result
 
     def load_default_settings(self):
         self.cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)

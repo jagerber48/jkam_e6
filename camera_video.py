@@ -16,12 +16,35 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
         super(CameraWindow, self).__init__()
         self.driver = GrasshopperDriver()
         self.data = None
-        self.levels = (0, 1)
+        self.levels = [0, 255]
 
         self.armed = False
         self.started = False
 
         self.setupUi(self)
+        self.im_histogram = None
+        self.configure_widgets()
+        self.connect_ui_signals()
+        self.driver.captured_signal.connect(self.on_capture)
+
+        self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
+
+    def configure_widgets(self):
+        self.imageview_widget.ui.roiBtn.hide()
+        self.imageview_widget.ui.menuBtn.hide()
+        vLine = pg.InfiniteLine(angle=90, movable=True)
+        hLine = pg.InfiniteLine(angle=0, movable=True)
+        self.imageview_widget.addItem(vLine, ignoreBounds=True)
+        self.imageview_widget.addItem(hLine, ignoreBounds=True)
+
+        self.im_histogram = self.imageview_widget.getHistogramWidget().item
+        self.im_histogram.setHistogramRange(0, 255)
+        self.im_histogram.setLevels(0, 255)
+        self.set_cmap()
+
+        self.history_widget.setup_figure(self.imageview_widget)
+
+    def connect_ui_signals(self):
         self.arm_pushButton.clicked.connect(self.toggle_arm)
         self.start_pushButton.clicked.connect(self.toggle_start)
         self.exposure_lineEdit.editingFinished.connect(self.update_exposure)
@@ -31,20 +54,6 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
         self.customscale_pushButton.clicked.connect(self.set_customscale)
         self.cmap_comboBox.activated.connect(self.set_cmap)
         self.gaussfit_pushButton.clicked.connect(self.fit)
-
-        self.imageview_widget.ui.roiBtn.hide()
-        self.imageview_widget.ui.menuBtn.hide()
-        self.im_histogram = self.imageview_widget.getHistogramWidget().item
-        self.im_histogram.setHistogramRange(0, 255)
-        self.im_histogram.setLevels(0, 255)
-
-        vLine = pg.InfiniteLine(angle=90, movable=True)
-        hLine = pg.InfiniteLine(angle=0, movable=True)
-        self.imageview_widget.addItem(vLine, ignoreBounds=True)
-        self.imageview_widget.addItem(hLine, ignoreBounds=True)
-        self.init_figure()
-        self.driver.captured_signal.connect(self.on_capture)
-        self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
 
     def on_capture(self, image):
         if self.driver.acquiring:
@@ -61,6 +70,7 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
             self.arm_pushButton.setChecked(True)
             self.arm_pushButton.setText('Disarm Camera')
             self.start_pushButton.setEnabled(True)
+            self.set_exposure()
             self.armed = True
         except Exception as e:
             print('Error while trying to ARM camera')
@@ -132,7 +142,6 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
             level_min = float(self.min_lineEdit.text())
             level_max = float(self.max_lineEdit.text())
             self.levels = (level_min, level_max)
-            return self.levels
         except ValueError:
             print('Invalid input for custom scale')
             self.write_levels()
@@ -141,20 +150,20 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
         self.min_lineEdit.setText(f'{self.levels[0]:.2f}')
         self.max_lineEdit.setText(f'{self.levels[1]:.2f}')
 
-    def set_customscale(self):
-        self.read_levels()
-        self.imageview_widget.setLevels(min=self.levels[0], max=self.levels[1])
-
     def set_autoscale(self):
         self.levels = (self.data.min(), self.data.max())
         self.imageview_widget.setLevels(min=self.levels[0], max=self.levels[1])
         self.write_levels()
 
     def set_fullscale(self):
-        self.levels = (0, 255)
+        self.levels = [0, 255]
         self.imageview_widget.setLevels(min=self.levels[0], max=self.levels[1])
         self.im_histogram.setHistogramRange(self.levels[0], self.levels[1])
         self.write_levels()
+
+    def set_customscale(self):
+        self.read_levels()
+        self.imageview_widget.setLevels(min=self.levels[0], max=self.levels[1])
 
     def set_cmap(self):
         cmap_name = self.cmap_comboBox.currentText().lower()
@@ -164,10 +173,6 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
 
     def fit(self):
         fit_gaussian2d(self.data, zoom=8)
-
-    def init_figure(self):
-        self.data = np.array([])
-        self.history_widget.setup_figure(self.imageview_widget)
 
     def abort(self):
         self.stop(aborting=True)
