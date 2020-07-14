@@ -58,10 +58,11 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
     def on_capture(self, image):
         if self.driver.acquiring:
             self.driver.captured_signal.disconnect(self.on_capture)
-            self.data = np.transpose(image)
+            self.data = image
             self.imageview_widget.setImage(self.data, autoRange=False,
                                            autoLevels=False, autoHistogramRange=False)
-            self.history_widget.analyze(self, self.imageview_widget.getImageItem())
+            self.history_widget.analyze_signal.emit(self, self.imageview_widget.getImageItem())
+            # self.history_widget.analyze(self, self.imageview_widget.getImageItem())
             self.driver.captured_signal.connect(self.on_capture)
 
     def arm(self):

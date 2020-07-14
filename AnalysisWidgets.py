@@ -1,11 +1,49 @@
 import numpy as np
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import *
-QtCore.Signal = QtCore.pyqtSignal
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import QThread, QObject, pyqtSignal
 import pyqtgraph as pg
 
 
-class IntegrateROI(QWidget):
+class IntegrationAnalyzer(QObject):
+    analysis_complete_signal = pyqtSignal(object)
+
+    def __init__(self, widget):
+        super(IntegrationAnalyzer, self).__init__()
+        self.thread = QThread()
+        self.moveToThread(self.thread)
+        self.thread.start()
+        self.widget = widget
+
+    def analyze(self, capture, image_item):
+        if not self.widget.analyze_on:
+            return
+        self.widget.analyze_signal.disconnect(self.analyze)
+        data = capture.data.astype(float)
+        data[data == np.inf] = np.nan
+        data[data == -np.inf] = np.nan
+
+        roi_data = self.widget.roi.getArrayRegion(data, image_item)
+
+        roi_total = np.nansum(roi_data)
+        roi_num = roi_data.size
+
+        if self.widget.subtract_bkg:
+            total = np.nansum(data)
+            total_num = capture.data.size
+            bkg = (total - roi_total) / (total_num - roi_num)
+            roi_sig = roi_total - roi_num * bkg
+        else:
+            roi_sig = roi_total
+
+        self.widget.history = np.roll(self.widget.history, -1)
+        self.widget.history[-1] = roi_sig
+        self.widget.history_max = max(self.widget.history_max, self.widget.history.max())
+        self.analysis_complete_signal.emit(roi_sig)
+        self.widget.analyze_signal.connect(self.analyze)
+
+
+class IntegrateROI(QtWidgets.QWidget):
+    analyze_signal = pyqtSignal(object, object)
 
     def __init__(self, parent=None, subtract_bkg=False, num_history=200):
         super(IntegrateROI, self).__init__(parent)
@@ -18,7 +56,11 @@ class IntegrateROI(QWidget):
         self.history_max = self.history.max()
         self.roi = None
 
-        layout = QVBoxLayout()
+        self.analyzer = IntegrationAnalyzer(self)
+        self.analyze_signal.connect(self.analyzer.analyze, )
+        self.analyzer.analysis_complete_signal.connect(self.plot)
+
+        layout = QtWidgets.QVBoxLayout()
 
         self.history_widget = pg.PlotWidget(self)
         self.history_widget.disableAutoRange()
@@ -35,10 +77,10 @@ class IntegrateROI(QWidget):
 
         # self.history_widget.setYRange(self.history_min, self.history_max)
 
-        self.min_button = QPushButton('Set Background', self)
-        self.clear_button = QPushButton('Clear History', self)
-        self.max_button = QPushButton('Reset Max', self)
-        self.analyze_on_checkbox = QCheckBox(self)
+        self.min_button = QtWidgets.QPushButton('Set Background', self)
+        self.clear_button = QtWidgets.QPushButton('Clear History', self)
+        self.max_button = QtWidgets.QPushButton('Reset Max', self)
+        self.analyze_on_checkbox = QtWidgets.QCheckBox(self)
 
         self.min_button.clicked.connect(self.set_min)
         self.clear_button.clicked.connect(self.clear_history)
@@ -48,7 +90,7 @@ class IntegrateROI(QWidget):
 
         self.analyze_on = False
 
-        button_layout = QHBoxLayout()
+        button_layout = QtWidgets.QHBoxLayout()
         button_layout.addWidget(self.min_button)
         button_layout.addWidget(self.clear_button)
         button_layout.addWidget(self.max_button)
@@ -78,6 +120,10 @@ class IntegrateROI(QWidget):
 
     def toggle_on_off(self):
         self.analyze_on = self.analyze_on_checkbox.isChecked()
+
+    def plot(self):
+        self.history_plot.setData(self.history)
+        self.history_widget.setYRange(self.history_min, self.history_max)
 
     def analyze(self, capture, image_item):
         if not self.analyze_on:
@@ -109,7 +155,7 @@ class IntegrateROI(QWidget):
         self.history_widget.setYRange(self.history_min, self.history_max)
 
 
-class AbsorptionROI(QWidget):
+class AbsorptionROI(QtWidgets.QWidget):
 
     def __init__(self, cross_section, pixel_size, magnification=1, num_history=200, threshold=None, parent=None):
         super(AbsorptionROI, self).__init__(parent)
@@ -126,7 +172,7 @@ class AbsorptionROI(QWidget):
         self.history_max = np.nanmax(self.history)
         self.roi = None
 
-        layout = QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
 
         self.history_widget = pg.PlotWidget(self)
         self.history_widget.disableAutoRange()
@@ -144,15 +190,15 @@ class AbsorptionROI(QWidget):
 
         # self.history_widget.setYRange(self.history_min, self.history_max)
 
-        self.min_button = QPushButton('Set Background', self)
-        self.clear_button = QPushButton('Clear History', self)
-        self.max_button = QPushButton('Reset Max', self)
+        self.min_button = QtWidgets.QPushButton('Set Background', self)
+        self.clear_button = QtWidgets.QPushButton('Clear History', self)
+        self.max_button = QtWidgets.QPushButton('Reset Max', self)
 
         self.min_button.clicked.connect(self.set_min)
         self.clear_button.clicked.connect(self.clear_history)
         self.max_button.clicked.connect(self.set_max)
 
-        button_layout = QHBoxLayout()
+        button_layout = QtWidgets.QHBoxLayout()
         button_layout.addWidget(self.min_button)
         button_layout.addWidget(self.clear_button)
         button_layout.addWidget(self.max_button)
