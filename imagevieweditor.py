@@ -43,8 +43,8 @@ class ImageViewEditor(QWidget, Ui_ImageViewEditor):
         self.max_lineEdit.setText(f'{self.levels[1]:.2f}')
 
     def set_autoscale(self):
-        self.levels = (self.data.min(), self.data.max())
-        self.imageview.setLevels(min=self.levels[0], max=self.levels[1])
+        self.imageview.autoLevels()
+        self.levels = (self.imageview.levelMin, self.imageview.levelMax)
         self.write_levels()
 
     def set_fullscale(self):

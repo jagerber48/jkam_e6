@@ -61,6 +61,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         try:
             self.driver.start_video()
             self.start_pushButton.setText('Stop Camera')
+            self.video_radioButton.setEnabled(False)
+            self.absorption_radioButton.setEnabled(False)
             self.started = True
         except Exception as e:
             print('Error while trying to START video')
@@ -76,6 +78,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
                 print(e)
                 self.abort()
         self.start_pushButton.setText('Start Camera')
+        self.video_radioButton.setEnabled(True)
+        self.absorption_radioButton.setEnabled(True)
         self.started = False
 
     def toggle_start(self):
@@ -98,6 +102,3 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def abort(self):
         self.stop(aborting=True)
         self.disarm(aborting=True)
-
-    def closeEvent(self, event):
-        self.driver.close_connection()

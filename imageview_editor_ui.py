@@ -15,6 +15,11 @@ class Ui_ImageViewEditor(object):
     def setupUi(self, ImageViewEditor):
         ImageViewEditor.setObjectName("ImageViewEditor")
         ImageViewEditor.resize(565, 422)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(ImageViewEditor.sizePolicy().hasHeightForWidth())
+        ImageViewEditor.setSizePolicy(sizePolicy)
         self.gridLayout = QtWidgets.QGridLayout(ImageViewEditor)
         self.gridLayout.setObjectName("gridLayout")
         self.settings_verticalLayout = QtWidgets.QVBoxLayout()

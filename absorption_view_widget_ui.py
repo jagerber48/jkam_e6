@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_AbsorptionViewWidget(object):
     def setupUi(self, AbsorptionViewWidget):
         AbsorptionViewWidget.setObjectName("AbsorptionViewWidget")
-        AbsorptionViewWidget.resize(819, 673)
+        AbsorptionViewWidget.resize(615, 493)
         self.gridLayout = QtWidgets.QGridLayout(AbsorptionViewWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.tabWidget = QtWidgets.QTabWidget(AbsorptionViewWidget)
@@ -24,6 +24,7 @@ class Ui_AbsorptionViewWidget(object):
         self.gridLayout_2 = QtWidgets.QGridLayout(self.N_tab)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.N_ImageView = ImageViewEditor(self.N_tab)
+        self.N_ImageView.setMinimumSize(QtCore.QSize(565, 422))
         self.N_ImageView.setObjectName("N_ImageView")
         self.gridLayout_2.addWidget(self.N_ImageView, 0, 0, 1, 1)
         self.tabWidget.addTab(self.N_tab, "")

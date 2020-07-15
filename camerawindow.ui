@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>596</width>
-    <height>676</height>
+    <width>587</width>
+    <height>702</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="0" colspan="2">
+    <item row="1" column="0">
      <widget class="IntegrateROI" name="history_widget" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -31,7 +31,29 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item row="1" column="1">
+     <widget class="CameraControlWidget" name="camera_control_widget" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>203</width>
+        <height>200</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>203</width>
+        <height>200</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
      <widget class="QStackedWidget" name="view_stackedWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -41,12 +63,12 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>400</width>
-        <height>400</height>
+        <width>565</width>
+        <height>422</height>
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="imageview_page">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -64,220 +86,6 @@
       </widget>
      </widget>
     </item>
-    <item row="1" column="1">
-     <layout class="QVBoxLayout" name="settings_verticalLayout">
-      <item>
-       <widget class="QPushButton" name="arm_pushButton">
-        <property name="text">
-         <string>Arm Camera</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="start_pushButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Start Camera</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="serial_label">
-        <property name="text">
-         <string>Serial Number: xxxxxxxx</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QFormLayout" name="exposure_formLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="exposure_label">
-          <property name="text">
-           <string>Exposure Time (ms):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="exposure_lineEdit">
-          <property name="maximumSize">
-           <size>
-            <width>60</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>10</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="QPushButton" name="exposure_pushButton">
-        <property name="text">
-         <string>Update Exposure Time</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="absorption_radioButton">
-        <property name="text">
-         <string>Absorption</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">cam_mode_buttonGroup</string>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="video_radioButton">
-        <property name="text">
-         <string>Video</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">cam_mode_buttonGroup</string>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="gaussfit_pushButton">
-        <property name="text">
-         <string>Gaussian Fit</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="autoscale_pushButton">
-        <property name="text">
-         <string>Auto Scale</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="fullscale_pushButton">
-        <property name="text">
-         <string>Full Scale</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="customscale_pushButton">
-        <property name="text">
-         <string>Custom Scale</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QFormLayout" name="plot_formLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="max_label">
-          <property name="text">
-           <string>Max</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="max_lineEdit">
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>0</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="min_label">
-          <property name="text">
-           <string>Min</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="min_lineEdit">
-          <property name="maximumSize">
-           <size>
-            <width>50</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>255</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="cmap_label">
-          <property name="text">
-           <string>Color Map</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QComboBox" name="cmap_comboBox">
-          <item>
-           <property name="text">
-            <string>jet</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>gray</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>viridis</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>false2</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -285,7 +93,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>596</width>
+     <width>587</width>
      <height>26</height>
     </rect>
    </property>
@@ -309,6 +117,12 @@
    <class>ImageViewEditor</class>
    <extends>QWidget</extends>
    <header>imagevieweditor</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CameraControlWidget</class>
+   <extends>QWidget</extends>
+   <header>cameracontrolwidget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
