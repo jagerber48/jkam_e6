@@ -9,11 +9,11 @@ cam_pixel_size = 6.45e-6
 magnification = 0.36
 
 
-class CameraWindow(QMainWindow, Ui_CameraWindow):
+class JKamWindow(QMainWindow, Ui_CameraWindow):
     grasshopper_sn = '17491535'
 
     def __init__(self):
-        super(CameraWindow, self).__init__()
+        super(JKamWindow, self).__init__()
         self.setupUi(self)
 
         self.driver = self.camera_control_widget.driver
@@ -115,7 +115,7 @@ class CameraWindow(QMainWindow, Ui_CameraWindow):
 def main():
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon('favicon.ico'))
-    ex = CameraWindow()
+    ex = JKamWindow()
     ex.show()
     app.exec_()
 
