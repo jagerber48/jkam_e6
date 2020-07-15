@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>606</width>
-    <height>615</height>
+    <width>596</width>
+    <height>676</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,23 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="ImageView" name="imageview_widget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>1</horstretch>
-        <verstretch>2</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>400</width>
-        <height>400</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="2">
+    <item row="3" column="0" colspan="2">
      <widget class="IntegrateROI" name="history_widget" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -47,7 +31,40 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
+    <item row="1" column="0">
+     <widget class="QStackedWidget" name="view_stackedWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>1</horstretch>
+        <verstretch>2</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>400</width>
+        <height>400</height>
+       </size>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="imageview_page">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="ImageViewEditor" name="imageview_widget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="absorption_view_page">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="AbsorptionViewWidget" name="absorption_view_widget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="1">
      <layout class="QVBoxLayout" name="settings_verticalLayout">
       <item>
        <widget class="QPushButton" name="arm_pushButton">
@@ -106,8 +123,28 @@
       <item>
        <widget class="QPushButton" name="exposure_pushButton">
         <property name="text">
-         <string>Update Exposure</string>
+         <string>Update Exposure Time</string>
         </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="absorption_radioButton">
+        <property name="text">
+         <string>Absorption</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">cam_mode_buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="video_radioButton">
+        <property name="text">
+         <string>Video</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">cam_mode_buttonGroup</string>
+        </attribute>
        </widget>
       </item>
       <item>
@@ -206,14 +243,14 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="cmap_label">
           <property name="text">
            <string>Color Map</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="2" column="1">
          <widget class="QComboBox" name="cmap_comboBox">
           <item>
            <property name="text">
@@ -248,7 +285,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>606</width>
+     <width>596</width>
      <height>26</height>
     </rect>
    </property>
@@ -257,18 +294,27 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ImageView</class>
-   <extends>QWidget</extends>
-   <header>pyqtgraph</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>IntegrateROI</class>
    <extends>QWidget</extends>
    <header>AnalysisWidgets</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>AbsorptionViewWidget</class>
+   <extends>QWidget</extends>
+   <header>absorption_view_widget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ImageViewEditor</class>
+   <extends>QWidget</extends>
+   <header>imagevieweditor</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="cam_mode_buttonGroup"/>
+ </buttongroups>
 </ui>

@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 import pyqtgraph as pg
 from colormaps import cmap_dict
-from GrasshopperDriver import GrasshopperDriver
+from grasshopperdriver import GrasshopperDriver
 from camerawindow_ui import Ui_CameraWindow
 from E6py import fit_gaussian2d
 
@@ -22,6 +22,7 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
         self.started = False
 
         self.setupUi(self)
+        self.imageview_widget = self.imageview_widget.imageview
         self.im_histogram = None
         self.configure_widgets()
         self.connect_ui_signals()
