@@ -2,6 +2,7 @@ import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QThread, QObject, pyqtSignal
 import pyqtgraph as pg
+from plothistorywidget_ui import Ui_PlotHistoryWidget
 
 
 class IntegrationAnalyzer(QObject):
@@ -42,11 +43,12 @@ class IntegrationAnalyzer(QObject):
         self.widget.analyze_signal.connect(self.analyze)
 
 
-class IntegrateROI(QtWidgets.QWidget):
+class IntegrateROI(QtWidgets.QWidget, Ui_PlotHistoryWidget):
     analyze_signal = pyqtSignal(object, object)
 
     def __init__(self, parent=None, subtract_bkg=False, num_history=200):
         super(IntegrateROI, self).__init__(parent)
+        self.setupUi(self)
         self.subtract_bkg = subtract_bkg
         self.num_history = num_history
 
@@ -60,43 +62,42 @@ class IntegrateROI(QtWidgets.QWidget):
         self.analyze_signal.connect(self.analyzer.analyze, )
         self.analyzer.analysis_complete_signal.connect(self.plot)
 
-        layout = QtWidgets.QVBoxLayout()
-
-        self.history_widget = pg.PlotWidget(self)
-        self.history_widget.disableAutoRange()
-        self.history_plot = self.history_widget.plot()
+        # layout = QtWidgets.QVBoxLayout()
+        #
+        # self.history_widget = pg.PlotWidget(self)
+        self.history_PlotWidget.disableAutoRange()
+        self.history_plot = self.history_PlotWidget.plot()
         self.history_plot.setPen(width=2)
-        self.history_widget.setXRange(0, self.num_history)
+        self.history_PlotWidget.setXRange(0, self.num_history)
 
-        plot_item = self.history_widget.getPlotItem()
+        plot_item = self.history_PlotWidget.getPlotItem()
         plot_item.showGrid(x=True, y=True)
         plot_item.getAxis('bottom').setGrid(255)
         plot_item.getAxis('left').setGrid(255)
         plot_item.setLabel('bottom', text='Frame')
         plot_item.setLabel('left', text='Fluorescent counts')
 
-        self.min_button = QtWidgets.QPushButton('Set Background', self)
-        self.clear_button = QtWidgets.QPushButton('Clear History', self)
-        self.max_button = QtWidgets.QPushButton('Reset Max', self)
-        self.analyze_on_checkbox = QtWidgets.QCheckBox(self)
+        # self.min_button = QtWidgets.QPushButton('Set Background', self)
+        # self.clear_button = QtWidgets.QPushButton('Clear History', self)
+        # self.max_button = QtWidgets.QPushButton('Reset Max', self)
+        # self.analyze_on_checkbox = QtWidgets.QCheckBox(self)
 
-        self.min_button.clicked.connect(self.set_min)
-        self.clear_button.clicked.connect(self.clear_history)
-        self.max_button.clicked.connect(self.set_max)
-        self.analyze_on_checkbox.stateChanged.connect(self.toggle_on_off)
-        self.analyze_on_checkbox.setChecked(False)
-
+        self.set_min_pushButton.clicked.connect(self.set_min)
+        self.clear_pushButton.clicked.connect(self.clear_history)
+        self.set_max_pushButton.clicked.connect(self.set_max)
+        self.activate_checkBox.setChecked(False)
+        self.activate_checkBox.stateChanged.connect(self.toggle_on_off)
         self.analyze_on = False
 
-        button_layout = QtWidgets.QHBoxLayout()
-        button_layout.addWidget(self.min_button)
-        button_layout.addWidget(self.clear_button)
-        button_layout.addWidget(self.max_button)
-        button_layout.addWidget(self.analyze_on_checkbox)
-
-        layout.addWidget(self.history_widget)
-        layout.addLayout(button_layout)
-        self.setLayout(layout)
+        # button_layout = QtWidgets.QHBoxLayout()
+        # button_layout.addWidget(self.min_button)
+        # button_layout.addWidget(self.clear_button)
+        # button_layout.addWidget(self.max_button)
+        # button_layout.addWidget(self.analyze_on_checkbox)
+        #
+        # layout.addWidget(self.history_widget)
+        # layout.addLayout(button_layout)
+        # self.setLayout(layout)
 
     def setup_figure(self, im_widget):
         del self.roi
@@ -111,18 +112,18 @@ class IntegrateROI(QtWidgets.QWidget):
 
     def set_min(self):
         self.history_min = self.history.min()
-        self.history_widget.setYRange(self.history_min, self.history_max)
+        self.history_PlotWidget.setYRange(self.history_min, self.history_max)
 
     def set_max(self):
         self.history_max = self.history.max()
-        self.history_widget.setYRange(self.history_min, self.history_max)
+        self.history_PlotWidget.setYRange(self.history_min, self.history_max)
 
     def toggle_on_off(self):
-        self.analyze_on = self.analyze_on_checkbox.isChecked()
+        self.analyze_on = self.activate_checkBox.isChecked()
 
     def plot(self):
         self.history_plot.setData(self.history)
-        self.history_widget.setYRange(self.history_min, self.history_max)
+        self.history_PlotWidget.setYRange(self.history_min, self.history_max)
 
 
 class AbsorptionROI(QtWidgets.QWidget):
