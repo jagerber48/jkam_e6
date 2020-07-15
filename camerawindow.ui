@@ -73,7 +73,7 @@
       <widget class="QWidget" name="imageview_page">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
-         <widget class="ImageViewEditor" name="imageview_widget" native="true"/>
+         <widget class="ImageViewEditor" name="videovieweditor" native="true"/>
         </item>
        </layout>
       </widget>

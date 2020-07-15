@@ -99,6 +99,7 @@ class IntegrateROI(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def setup_figure(self, im_widget):
+        del self.roi
         self.roi = pg.RectROI((200, 200), (200, 200))
         self.roi.addScaleHandle([1, 1], [0, 0])
         self.roi.addScaleHandle([0, 0], [1, 1])

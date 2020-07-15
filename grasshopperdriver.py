@@ -24,6 +24,7 @@ class FrameGrabber(QObject):
                 self.driver.captured_signal.emit(frame)
                 image_result.Release()
                 time.sleep(1/50)  # Slow down frame rate to 50 fps to give GUI time to update
+                time.sleep(1)
             except PySpin.SpinnakerException:
                 pass
 

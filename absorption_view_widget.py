@@ -7,11 +7,11 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
     def __init__(self, parent=None):
         super(AbsorptionViewWidget, self).__init__(parent=parent)
         self.setupUi(self)
-        self.editor_list = [self.N_ImageView,
-                                self.OD_ImageView,
-                                self.atom_ImageView,
-                                self.bright_ImageView,
-                                self.dark_ImageView]
+        self.editor_list = [self.N_view_editor,
+                                self.OD_view_editor,
+                                self.atom_view_editor,
+                                self.bright_view_editor,
+                                self.dark_view_editor]
 
         for editor in self.editor_list:
             image_view = editor.imageview
