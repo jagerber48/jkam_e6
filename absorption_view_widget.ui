@@ -25,14 +25,7 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
-        <widget class="ImageViewEditor" name="N_view_editor" native="true">
-         <property name="minimumSize">
-          <size>
-           <width>565</width>
-           <height>422</height>
-          </size>
-         </property>
-        </widget>
+        <widget class="ImageViewEditor" name="N_view_editor" native="true"/>
        </item>
       </layout>
      </widget>

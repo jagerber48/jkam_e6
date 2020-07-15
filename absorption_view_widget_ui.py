@@ -24,7 +24,6 @@ class Ui_AbsorptionViewWidget(object):
         self.gridLayout_2 = QtWidgets.QGridLayout(self.N_tab)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.N_view_editor = ImageViewEditor(self.N_tab)
-        self.N_view_editor.setMinimumSize(QtCore.QSize(565, 422))
         self.N_view_editor.setObjectName("N_view_editor")
         self.gridLayout_2.addWidget(self.N_view_editor, 0, 0, 1, 1)
         self.tabWidget.addTab(self.N_tab, "")

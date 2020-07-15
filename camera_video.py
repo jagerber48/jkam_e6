@@ -105,6 +105,7 @@ class CameraWindow(QMainWindow, Ui_CameraWindow):
         self.optical_density_frame = -1 * np.log(ratio, out=np.full_like(numerator, np.nan, dtype=float), where=ratio > 0)
         self.atom_number_frame = (self.optical_density_frame / cross_section
                                   * (cam_pixel_size / magnification) ** 2)
+        self.data = self.atom_number_frame
 
     def closeEvent(self, event):
         self.driver.close_connection()
