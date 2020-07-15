@@ -75,8 +75,6 @@ class IntegrateROI(QtWidgets.QWidget):
         plot_item.setLabel('bottom', text='Frame')
         plot_item.setLabel('left', text='Fluorescent counts')
 
-        # self.history_widget.setYRange(self.history_min, self.history_max)
-
         self.min_button = QtWidgets.QPushButton('Set Background', self)
         self.clear_button = QtWidgets.QPushButton('Clear History', self)
         self.max_button = QtWidgets.QPushButton('Reset Max', self)
@@ -123,35 +121,6 @@ class IntegrateROI(QtWidgets.QWidget):
 
     def plot(self):
         self.history_plot.setData(self.history)
-        self.history_widget.setYRange(self.history_min, self.history_max)
-
-    def analyze(self, capture, image_item):
-        if not self.analyze_on:
-            return
-
-        data = capture.data.astype(float)
-        data[data == np.inf] = np.nan
-        data[data == -np.inf] = np.nan
-
-        roi_data = self.roi.getArrayRegion(data, image_item)
-
-        roi_total = np.nansum(roi_data)
-        roi_num = roi_data.size
-
-        if self.subtract_bkg:
-            total = np.nansum(data)
-            total_num = capture.data.size
-            bkg = (total - roi_total) / (total_num - roi_num)
-            roi_sig = roi_total - roi_num * bkg
-        else:
-            roi_sig = roi_total
-
-        self.history = np.roll(self.history, -1)
-        self.history[-1] = roi_sig
-
-        self.history_plot.setData(self.history)
-
-        self.history_max = max(self.history_max, self.history.max())
         self.history_widget.setYRange(self.history_min, self.history_max)
 
 

@@ -1,12 +1,7 @@
 import sys
-import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
-import pyqtgraph as pg
-from colormaps import cmap_dict
-from grasshopperdriver import GrasshopperDriver
 from camerawindow_ui import Ui_CameraWindow
-from E6py import fit_gaussian2d
 
 
 class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
@@ -31,11 +26,7 @@ class CameraWindow(QtWidgets.QMainWindow, Ui_CameraWindow):
             self.imageview_widget.setImage(self.data, autoRange=False,
                                            autoLevels=False, autoHistogramRange=False)
             self.history_widget.analyze_signal.emit(self, self.imageview_widget.getImageItem())
-            # self.history_widget.analyze(self, self.imageview_widget.getImageItem())
             self.driver.captured_signal.connect(self.on_capture)
-
-    # def fit(self):
-    #     fit_gaussian2d(self.data, zoom=8)
 
     def closeEvent(self, event):
         self.driver.close_connection()
