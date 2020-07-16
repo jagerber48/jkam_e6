@@ -5,6 +5,7 @@ from grasshopperdriver import GrasshopperDriver
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     grasshopper_sn = '17491535'
+    grasshopper_sn = '18431942'
 
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
@@ -59,7 +60,11 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
 
     def start(self):
         try:
-            self.driver.start_video()
+            if self.video_radioButton.isChecked():
+                self.driver.trigger_off()
+            elif self.absorption_radioButton.isChecked():
+                self.driver.trigger_on()
+            self.driver.start_acquisition()
             self.start_pushButton.setText('Stop Camera')
             self.video_radioButton.setEnabled(False)
             self.absorption_radioButton.setEnabled(False)
@@ -72,7 +77,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def stop(self, aborting=False):
         if not aborting:
             try:
-                self.driver.stop_video()
+                self.driver.stop_acquisition()
             except Exception as e:
                 print('Error while trying to STOP video')
                 print(e)

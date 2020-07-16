@@ -4,13 +4,12 @@ from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtGui import QIcon
 from camerawindow_ui import Ui_CameraWindow
 
-cross_section = 2.91e-11
+cross_section = 2.91e-13
 cam_pixel_size = 6.45e-6
 magnification = 0.36
 
 
 class JKamWindow(QMainWindow, Ui_CameraWindow):
-    grasshopper_sn = '17491535'
 
     def __init__(self):
         super(JKamWindow, self).__init__()

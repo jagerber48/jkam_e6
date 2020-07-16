@@ -90,7 +90,7 @@ class GuppyWindow(QMainWindow):
 	def toggleCamera(self):
 		if self.camera_button.isChecked():
 			try:
-				self.cam.start_video()
+				self.cam.start_acquisition()
 				time.sleep(1)
 				self.video_signal.emit()
 				self.camera_button.setText('Camera Running')

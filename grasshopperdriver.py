@@ -24,7 +24,6 @@ class FrameGrabber(QObject):
                 self.driver.captured_signal.emit(frame)
                 image_result.Release()
                 time.sleep(1/50)  # Slow down frame rate to 50 fps to give GUI time to update
-                time.sleep(1)
             except PySpin.SpinnakerException:
                 pass
 
@@ -81,35 +80,35 @@ class GrasshopperDriver(QObject):
         self.armed = False
         print(f'DISARMED Camera with serial number: {self.serial_number}')
 
-    def start_video(self):
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
+    def start_acquisition(self):
+        # self.cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
         self.cam.BeginAcquisition()
         self.acquiring = True
         self.start_video_signal.emit()
         print(f'STARTED camera VIDEO with serial number: {self.serial_number}')
 
-    def stop_video(self):
+    def stop_acquisition(self):
         self.cam.EndAcquisition()
         self.acquiring = False
         print(f'STOPPED camera VIDEO with serial number: {self.serial_number}')
 
-    def start_frames(self, n_frames=3):
-        print(self.armed)
-        if not self.armed:
-            self.open_cam()
-        self.cam.BeginAcquisition()
-        self.acquiring = True
-        frames = []
-        for nFrame in range(n_frames):
-            # input('Press enter for software trigger')
-            # self.cam.TriggerSoftware.Execute()
-            image_result = self.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
-            frames.append(image_result.GetNDArray())
-            image_result.Release()
-        self.cam.EndAcquisition()
-        self.acquiring = False
-        frames = np.stack(frames, axis=-1)
-        self.captured_signal.emit(frames)
+    # def start_frames(self, n_frames=3):
+    #     print(self.armed)
+    #     if not self.armed:
+    #         self.open_cam()
+    #     self.cam.BeginAcquisition()
+    #     self.acquiring = True
+    #     frames = []
+    #     for nFrame in range(n_frames):
+    #         # input('Press enter for software trigger')
+    #         # self.cam.TriggerSoftware.Execute()
+    #         image_result = self.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
+    #         frames.append(image_result.GetNDArray())
+    #         image_result.Release()
+    #     self.cam.EndAcquisition()
+    #     self.acquiring = False
+    #     frames = np.stack(frames, axis=-1)
+    #     self.captured_signal.emit(frames)
 
     def set_exposure_time(self, exposure_time):
         """
@@ -120,6 +119,12 @@ class GrasshopperDriver(QObject):
         self.cam.ExposureTime.SetValue(converted_exposure_time)
         exposure_time_result = self.cam.ExposureTime.GetValue() * 1e-3
         print(f'EXPOSURE TIME set to {exposure_time_result:.4f} ms')
+
+    def trigger_on(self):
+        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
+
+    def trigger_off(self):
+        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
 
     def close_connection(self):
         if self.armed:
