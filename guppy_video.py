@@ -42,7 +42,7 @@ class GuppyWindow(QMainWindow):
 		self.thread.start()
 		
 		self.cam = GrasshopperDriver()
-		self.video_signal.connect(self.cam.start_video_signal)
+		self.video_signal.connect(self.cam.start_acquisition_signal)
 		self.setupUi(self)
 
 	def closeEvent(self, event):

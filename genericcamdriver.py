@@ -2,6 +2,7 @@ import time
 import numpy as np
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import PySpin
+import abc
 
 
 class FrameGrabber(QObject):
@@ -28,71 +29,83 @@ class FrameGrabber(QObject):
                 pass
 
 
-class GrasshopperDriver(QObject):
-    captured_signal = pyqtSignal(object)
-    start_acquisition_signal = pyqtSignal()
+class CameraDriver(abc.ABC, QObject):
+    @property
+    @abc.abstractmethod
+    def captured_signal(self):
+        """
+        pyqtSignal object which emits an object, implementation example:
 
-    def __init__(self):
-        super(GrasshopperDriver, self).__init__()
-        self.thread = QThread()
-        self.moveToThread(self.thread)
-        self.thread.start()
+        self.captured_signal = pyqtSignal(object)
 
-        self.frame_grabber = FrameGrabber(self)
-        self.start_acquisition_signal.connect(self.frame_grabber.get_frame)
+        This signal is connected in the jkam_window.py script. After any frame is
+        captured this signal emits the frame.
+        """
+        pass
 
-        self.system = PySpin.System.GetInstance()
-        self.cam_list = self.system.GetCameras()
-        self.cam = None
-        self.serial_number = ''
+    # def __init__(self):
+    #     super(CameraDriver, self).__init__()
+    #     self.thread = QThread()
+    #     self.moveToThread(self.thread)
+    #     self.thread.start()
+    #
+    #     self.frame_grabber = FrameGrabber(self)
+    #     self.start_video_signal.connect(self.frame_grabber.get_frame)
+    #
+    #     self.system = PySpin.System.GetInstance()
+    #     self.cam_list = self.system.GetCameras()
+    #     self.cam = None
+    #     self.serial_number = ''
+    #
+    #     self.connected = False
+    #     self.armed = False
+    #     self.acquiring = False
 
-        self.connected = False
-        self.armed = False
-        self.acquiring = False
+    # def find_camera(self, serial_number):
+    #     print(f'Attempting to find camera device with serial number: {serial_number}')
+    #     self.cam = None
+    #     for camera in self.cam_list:
+    #         cam_sn = camera.TLDevice.DeviceSerialNumber.GetValue()
+    #         print(f'Found device with serial number: {cam_sn}')
+    #         if cam_sn == serial_number:
+    #             self.cam = camera
+    #             self.serial_number = serial_number
+    #             print(f'SUCCESS set current camera with serial number: {cam_sn}')
+    #     if self.cam is None:
+    #         print(f'FAILED to find camera with serial number: {serial_number}')
 
-    def find_camera(self, serial_number):
-        print(f'Attempting to find camera device with serial number: {serial_number}')
-        self.cam = None
-        for camera in self.cam_list:
-            cam_sn = camera.TLDevice.DeviceSerialNumber.GetValue()
-            print(f'Found device with serial number: {cam_sn}')
-            if cam_sn == serial_number:
-                self.cam = camera
-                self.serial_number = serial_number
-                print(f'SUCCESS set current camera with serial number: {cam_sn}')
-        if self.cam is None:
-            print(f'FAILED to find camera with serial number: {serial_number}')
-
+    @abc.abstractmethod
     def arm_camera(self, serial_number):
         """
-        Establish communication with camera and initialize for acquisition
-        """
-        self.find_camera(serial_number)
-        self.cam.Init()
-        self.load_default_settings()
-        self.armed = True
+        Initialize camera with serial_number in preparation for modification of camera settings and camera acquisition
+        Recommend printing the following statement after successful arm:
         print(f'ARMED Camera with serial number: {serial_number}')
+        """
+        raise NotImplementedError
 
+    @abc.abstractmethod
     def disarm_camera(self):
-        if self.acquiring:
-            self.cam.EndAcquisition()
-            self.acquiring = False
-        self.cam.DeInit()
-        del self.cam
-        self.cam = None
-        self.armed = False
+        """
+        Disarm the camera to allow the program to access another camera or for shutdown.
+        Recommend printing the following statement after successful disarm:
         print(f'DISARMED Camera with serial number: {self.serial_number}')
+        """
+        raise NotImplementedError
 
     def start_acquisition(self):
-        self.cam.BeginAcquisition()
-        self.acquiring = True
-        self.start_acquisition_signal.emit()
-        print(f'STARTED camera with serial number: {self.serial_number}')
+        """
+        Begin camera acquisition. Once acquisition has begun any frames which are captured, either after triggering
+        or automatic acquisition, should be emitted by self.captured_signal as numpy arrays.
+        """
+        raise NotImplementedError
 
     def stop_acquisition(self):
+        """
+        End camera acquisition
+        """
         self.cam.EndAcquisition()
         self.acquiring = False
-        print(f'STOPPED camera with serial number: {self.serial_number}')
+        print(f'STOPPED camera VIDEO with serial number: {self.serial_number}')
 
     # def start_frames(self, n_frames=3):
     #     print(self.armed)

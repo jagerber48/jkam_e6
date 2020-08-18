@@ -5,7 +5,7 @@ from grasshopperdriver import GrasshopperDriver
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     grasshopper_sn = '17491535'
-    grasshopper_sn = '18431942'
+    # grasshopper_sn = '18431942'
 
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
