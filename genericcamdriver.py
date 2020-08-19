@@ -22,7 +22,7 @@ class FrameGrabber(QObject):
                 image_result = self.driver.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
                 frame = image_result.GetNDArray()
                 frame = np.transpose(frame)
-                self.driver.captured_signal.emit(frame)
+                self.driver.frame_captured_signal.emit(frame)
                 image_result.Release()
                 time.sleep(1/50)  # Slow down frame rate to 50 fps to give GUI time to update
             except PySpin.SpinnakerException:

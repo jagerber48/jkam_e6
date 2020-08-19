@@ -1,4 +1,6 @@
+import datetime
 from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import pyqtSignal
 from cameracontrolwidget_ui import Ui_CameraControlWidget
 from grasshopperdriver import GrasshopperDriver
 
@@ -6,6 +8,7 @@ from grasshopperdriver import GrasshopperDriver
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     grasshopper_sn = '17491535'
     # grasshopper_sn = '18431942'
+    frame_received_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
@@ -20,6 +23,21 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.start_pushButton.clicked.connect(self.toggle_start)
         self.exposure_lineEdit.editingFinished.connect(self.update_exposure)
         self.exposure_pushButton.clicked.connect(self.set_exposure)
+
+        self.driver.frame_captured_signal.connect(self.frame_received_signal.emit)
+
+    # def receive_frame(self, frame):
+    #     # if self.driver.acquiring:
+    #         # if True:
+    #         #     curr_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    #         #     print(f'{curr_time} -- Frame Received')
+    #     self.frame_received_signal.emit(frame)
+    #
+    # def capture_on(self):
+    #     self.driver.frame_captured_signal.connect(self.receive_frame)
+    #
+    # def capture_off(self):
+    #     self.driver.frame_captured_signal.disconnect(self.receive_frame)
 
     def arm(self):
         serial_number = self.grasshopper_sn
@@ -107,3 +125,6 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def abort(self):
         self.stop(aborting=True)
         self.disarm(aborting=True)
+
+    def close(self):
+        self.driver.close_connection()

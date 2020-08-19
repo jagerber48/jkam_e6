@@ -19,7 +19,9 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.data = None
 
         self.history_image_view = None
-        self.camera_control_widget.start_pushButton.clicked.connect(self.set_mode)
+        self.camera_control_widget.absorption_radioButton.clicked.connect(self.set_mode)
+        self.camera_control_widget.video_radioButton.clicked.connect(self.set_mode)
+        self.set_mode()
 
         self.absorption_frame_count = 0
         self.atom_frame = None
@@ -30,11 +32,11 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def set_mode(self):
         try:
-            self.driver.captured_signal.disconnect(self.capture_absorption)
+            self.camera_control_widget.frame_received_signal.disconnect(self.capture_video)
         except TypeError:
             pass
         try:
-            self.driver.captured_signal.disconnect(self.capture_video)
+            self.camera_control_widget.frame_received_signal.disconnect(self.capture_absorption)
         except TypeError:
             pass
 
@@ -47,22 +49,22 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.view_stackedWidget.setCurrentIndex(0)
             self.history_image_view = self.videovieweditor.imageview
             self.history_widget.setup_figure(self.history_image_view)
-            self.driver.captured_signal.connect(self.capture_video)
+            self.camera_control_widget.frame_received_signal.connect(self.capture_video)
         elif self.camera_control_widget.absorption_radioButton.isChecked():
-            self.driver.captured_signal.connect(self.capture_absorption)
             self.history_image_view = self.absorption_view_widget.N_view_editor.imageview
             self.history_widget.setup_figure(self.history_image_view)
             self.view_stackedWidget.setCurrentIndex(1)
+            self.camera_control_widget.frame_received_signal.connect(self.capture_absorption)
 
     def capture_video(self, image):
         if self.driver.acquiring:
-            self.driver.captured_signal.disconnect(self.capture_video)
+            self.camera_control_widget.frame_received_signal.disconnect(self.capture_video)
             self.data = image
             image_view = self.videovieweditor.imageview
             image_view.setImage(self.data, autoRange=False,
-                                           autoLevels=False, autoHistogramRange=False)
+                                autoLevels=False, autoHistogramRange=False)
             self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
-            self.driver.captured_signal.connect(self.capture_video)
+            self.camera_control_widget.frame_received_signal.connect(self.capture_video)
 
     def capture_absorption(self, image):
         self.absorption_frame_count += 1
@@ -107,7 +109,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.data = self.atom_number_frame
 
     def closeEvent(self, event):
-        self.driver.close_connection()
+        self.camera_control_widget.close()
 
 
 # Start Qt event loop unless running in interactive mode.

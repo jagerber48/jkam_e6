@@ -85,7 +85,7 @@ class GuppyWindow(QMainWindow):
 		self.centralWidget.setLayout(layout)
 
 		self.initFigure()
-		self.cam.captured_signal.connect(self.onCapture)
+		self.cam.frame_captured_signal.connect(self.onCapture)
 		
 	def toggleCamera(self):
 		if self.camera_button.isChecked():

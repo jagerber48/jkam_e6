@@ -21,7 +21,7 @@ class FrameGrabber(QObject):
                 image_result = self.driver.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
                 frame = image_result.GetNDArray()
                 frame = np.transpose(frame)
-                self.driver.captured_signal.emit(frame)
+                self.driver.frame_captured_signal.emit(frame)
                 image_result.Release()
                 time.sleep(1/50)  # Slow down frame rate to 50 fps to give GUI time to update
             except PySpin.SpinnakerException:
@@ -29,7 +29,7 @@ class FrameGrabber(QObject):
 
 
 class GrasshopperDriver(QObject):
-    captured_signal = pyqtSignal(object)
+    frame_captured_signal = pyqtSignal(object)
     start_acquisition_signal = pyqtSignal()
 
     def __init__(self):
@@ -90,27 +90,10 @@ class GrasshopperDriver(QObject):
         print(f'STARTED camera with serial number: {self.serial_number}')
 
     def stop_acquisition(self):
+        print('STOPPING')
         self.cam.EndAcquisition()
         self.acquiring = False
         print(f'STOPPED camera with serial number: {self.serial_number}')
-
-    # def start_frames(self, n_frames=3):
-    #     print(self.armed)
-    #     if not self.armed:
-    #         self.open_cam()
-    #     self.cam.BeginAcquisition()
-    #     self.acquiring = True
-    #     frames = []
-    #     for nFrame in range(n_frames):
-    #         # input('Press enter for software trigger')
-    #         # self.cam.TriggerSoftware.Execute()
-    #         image_result = self.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
-    #         frames.append(image_result.GetNDArray())
-    #         image_result.Release()
-    #     self.cam.EndAcquisition()
-    #     self.acquiring = False
-    #     frames = np.stack(frames, axis=-1)
-    #     self.captured_signal.emit(frames)
 
     def set_exposure_time(self, exposure_time):
         """
