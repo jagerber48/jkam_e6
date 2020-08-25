@@ -15,6 +15,11 @@ class Ui_PlotHistoryWidget(object):
     def setupUi(self, PlotHistoryWidget):
         PlotHistoryWidget.setObjectName("PlotHistoryWidget")
         PlotHistoryWidget.resize(822, 307)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(PlotHistoryWidget.sizePolicy().hasHeightForWidth())
+        PlotHistoryWidget.setSizePolicy(sizePolicy)
         self.gridLayout = QtWidgets.QGridLayout(PlotHistoryWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.clear_pushButton = QtWidgets.QPushButton(PlotHistoryWidget)

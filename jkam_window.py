@@ -15,7 +15,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         super(JKamWindow, self).__init__()
         self.setupUi(self)
 
-        self.driver = self.camera_control_widget.driver
         self.data = None
 
         self.history_image_view = None
@@ -57,14 +56,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.camera_control_widget.frame_received_signal.connect(self.capture_absorption)
 
     def capture_video(self, image):
-        if self.driver.acquiring:
-            self.camera_control_widget.frame_received_signal.disconnect(self.capture_video)
-            self.data = image
-            image_view = self.videovieweditor.imageview
-            image_view.setImage(self.data, autoRange=False,
-                                autoLevels=False, autoHistogramRange=False)
-            self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
-            self.camera_control_widget.frame_received_signal.connect(self.capture_video)
+        self.camera_control_widget.frame_received_signal.disconnect(self.capture_video)
+        self.data = image
+        image_view = self.videovieweditor.imageview
+        image_view.setImage(self.data, autoRange=False,
+                            autoLevels=False, autoHistogramRange=False)
+        self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
+        self.camera_control_widget.frame_received_signal.connect(self.capture_video)
 
     def capture_absorption(self, image):
         self.absorption_frame_count += 1
@@ -103,7 +101,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         # Set output to nan when dividing by zero
         ratio = np.true_divide(numerator, denominator,
                                out=np.full_like(numerator, 0, dtype=float), where=(denominator != 0))
-        self.optical_density_frame = -1 * np.log(ratio, out=np.full_like(numerator, np.nan, dtype=float), where=ratio > 0)
+        self.optical_density_frame = -1 * np.log(ratio, out=np.full_like(numerator, np.nan, dtype=float),
+                                                 where=ratio > 0)
         self.atom_number_frame = (self.optical_density_frame / cross_section
                                   * (cam_pixel_size / magnification) ** 2)
         self.data = self.atom_number_frame

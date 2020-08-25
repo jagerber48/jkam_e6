@@ -6,44 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>203</width>
-    <height>200</height>
+    <width>231</width>
+    <height>260</height>
    </rect>
   </property>
-  <property name="minimumSize">
-   <size>
-    <width>203</width>
-    <height>200</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>203</width>
-    <height>200</height>
-   </size>
-  </property>
-  <property name="windowTitle">
-   <string>Form</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
+   <item row="5" column="0" colspan="2">
     <widget class="QLabel" name="serial_label">
      <property name="text">
       <string>Serial Number: xxxxxxxx</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QPushButton" name="arm_pushButton">
-     <property name="text">
-      <string>Arm Camera</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="2">
-    <widget class="QPushButton" name="exposure_pushButton">
-     <property name="text">
-      <string>Update Exposure Time</string>
      </property>
     </widget>
    </item>
@@ -54,27 +25,16 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
-    <widget class="QRadioButton" name="absorption_radioButton">
-     <property name="text">
-      <string>Absorption</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QRadioButton" name="video_radioButton">
-     <property name="text">
-      <string>Video</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2">
+   <item row="4" column="0" colspan="2">
     <layout class="QFormLayout" name="exposure_formLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="exposure_label">
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="text">
         <string>Exposure Time (ms)</string>
        </property>
@@ -94,6 +54,50 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="8" column="0" colspan="2">
+    <widget class="QPushButton" name="exposure_pushButton">
+     <property name="text">
+      <string>Update Exposure Time</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QRadioButton" name="video_radioButton">
+     <property name="text">
+      <string>Video</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QPushButton" name="arm_pushButton">
+     <property name="text">
+      <string>Arm Camera</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QRadioButton" name="absorption_radioButton">
+     <property name="text">
+      <string>Absorption</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
