@@ -65,6 +65,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.camera_control_widget.frame_received_signal.connect(self.capture_video)
 
     def capture_absorption(self, image):
+        self.camera_control_widget.frame_received_signal.disconnect(self.capture_absorption)
         self.absorption_frame_count += 1
         if self.absorption_frame_count == 1:
             self.atom_frame = image
@@ -93,6 +94,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.bright_frame = None
             self.dark_frame = None
             self.absorption_frame_count = 0
+        self.camera_control_widget.frame_received_signal.connect(self.capture_absorption)
 
     def process_absorption(self):
         numerator = self.atom_frame - self.dark_frame

@@ -12,6 +12,8 @@ if platform.system() == "Windows":
 	if platform.architecture()[0] == "32bit":
 		library_path = "atmcd32d.dll"
 		if not path.exists(library_path):
+			library_path = "C:\\Program Files (x86)\\Andor SOLIS\\atmcd32d.dll"
+		if not path.exists(library_path):
 			library_path = "C:\\Program Files\\Andor iXon\\atmcd32d.dll"
 		if not path.exists(library_path):
 			library_path = "C:\\Program Files\\Andor iXon 4.9\\atmcd32d.dll"
@@ -90,8 +92,8 @@ class AndorCamera(object):
 			
 		print('Initializing Camera...')
 		error = dll.Initialize(path.dirname(__file__))
-		if ERROR_CODE[error] != 'DRV_SUCCESS':
-			raise Exception(ERROR_CODE[error])	
+		# if ERROR_CODE[error] != 'DRV_SUCCESS':
+		# 	raise Exception(ERROR_CODE[error])
 		print('Done Initializing')
 		
 		self.info = AndorInfo()

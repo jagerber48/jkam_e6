@@ -3,20 +3,12 @@ from shutil import copyfile
 from os import path
 import datetime
 
-try:
-	from qtpy import QtCore
-	from qtpy.QtWidgets import *
-	from qtpy.QtGui import QIcon
-except:
-	try:
-		from PyQt5 import QtCore
-		from PyQt5.QtWidgets import *
-		from PyQt5.QtGui import QIcon
-		QtCore.Signal = QtCore.pyqtSignal
-	except:
-		from PyQt4 import QtCore
-		from PyQt4.QtGui import *
-		QtCore.Signal = QtCore.pyqtSignal
+
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon
+QtCore.Signal = QtCore.pyqtSignal
+
 		
 import numpy as np
 import pyqtgraph as pg
@@ -25,7 +17,7 @@ from AndorDriver import AndorObject, AndorConfig, Status
 from AnalysisWidgets import AbsorptionROI
 from ScanWidget import ScanWidget
 
-from colormaps import cmap
+# from colormaps import cmap
 
 dataRoot = 'E:\\Data\\'
 andorRoot = 'E:\\Andor\\'
@@ -72,7 +64,7 @@ class AndorWindow(QMainWindow):
 		for imView in (self.im_tof,self.im_sig,self.im_ref,self.im_bkg):
 			imView.ui.roiBtn.hide()
 			imView.ui.menuBtn.hide()
-			imView.setColorMap(cmap)
+			# imView.setColorMap(cmap)
 		
 		self.im_tof.setLevels(.4, 1.1)
 		self.im_histogram = self.im_tof.getHistogramWidget().item
