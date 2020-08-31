@@ -1,4 +1,4 @@
-from absorption_view_widget_ui import Ui_AbsorptionViewWidget
+from ui_components.absorption_view_widget_ui import Ui_AbsorptionViewWidget
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QTimer
 import pyqtgraph as pg

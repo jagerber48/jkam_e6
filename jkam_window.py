@@ -2,7 +2,7 @@ import numpy as np
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtGui import QIcon
-from camerawindow_ui import Ui_CameraWindow
+from ui_components.camerawindow_ui import Ui_CameraWindow
 
 cross_section = 2.91e-13
 cam_pixel_size = 6.45e-6

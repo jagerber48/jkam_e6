@@ -9,7 +9,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QThread, pyqtSignal
 import pyqtgraph as pg
 
-from grasshopperdriver import GrasshopperDriver
+from grasshopperdriver_3 import GrasshopperDriver
 from AnalysisWidgets import AbsorptionROI
 from ScanWidget import ScanWidget
 

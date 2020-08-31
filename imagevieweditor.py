@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget
 import pyqtgraph as pg
-from imageview_editor_ui import Ui_ImageViewEditor
+from ui_components.imageview_editor_ui import Ui_ImageViewEditor
 from colormaps import cmap_dict
 
 

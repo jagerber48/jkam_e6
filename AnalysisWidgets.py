@@ -2,7 +2,7 @@ import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QThread, QObject, pyqtSignal
 import pyqtgraph as pg
-from plothistorywidget_ui import Ui_PlotHistoryWidget
+from ui_components.plothistorywidget_ui import Ui_PlotHistoryWidget
 
 
 class IntegrationAnalyzer(QObject):

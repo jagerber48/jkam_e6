@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
-from cameracontrolwidget_ui import Ui_CameraControlWidget
+from ui_components.cameracontrolwidget_ui import Ui_CameraControlWidget
 # from grasshopperdriver import GrasshopperDriver
-from grasshopperdriver_2 import GrasshopperDriver
+from grasshopperdriver import GrasshopperDriver
 
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
