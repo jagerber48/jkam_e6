@@ -1,18 +1,14 @@
-import numpy as np
-import enum as Enum
+from enum import Enum
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtGui import QIcon
 from ui_components.camerawindow_ui import Ui_CameraWindow
-#
-# cross_section = 2.91e-13
-# cam_pixel_size = 6.45e-6
-# magnification = 0.36
 
 
 class ImagingMode(Enum):
     VIDEO = 0
     ABSORPTION = 1
+
 
 class JKamWindow(QMainWindow, Ui_CameraWindow):
 
@@ -88,100 +84,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         image_view = self.absorption_view_widget.N_view_editor.imageview
         self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
 
-    def process_absorption(self, frame):
-        self.absorption_frame_count += 1
-        if self.absorption_frame_count == 1:
-            self.atom_frame = frame
-            image_view = self.absorption_view_widget.atom_view_editor.imageview
-            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
-        elif self.absorption_frame_count == 2:
-            self.bright_frame = frame
-            image_view = self.absorption_view_widget.bright_view_editor.imageview
-            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
-        elif self.absorption_frame_count == 3:
-            self.dark_frame = frame
-            image_view = self.absorption_view_widget.dark_view_editor.imageview
-            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
-            self.process_absorption()
-            image_view = self.absorption_view_widget.OD_view_editor.imageview
-            image_view.setImage(self.optical_density_frame, autoRange=False, autoLevels=False,
-                                autoHistogramRange=False)
-            image_view = self.absorption_view_widget.N_view_editor.imageview
-            image_view.setImage(self.atom_number_frame, autoRange=False, autoLevels=False,
-                                autoHistogramRange=False)
-            self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
-            self.absorption_frame_count = 0
-        else:
-            print('ERROR: too many frames')
-            self.atom_frame = None
-            self.bright_frame = None
-            self.dark_frame = None
-            self.absorption_frame_count = 0
-
-    def capture_video(self, image):
-        self.frame_received_signal.disconnect(self.capture_video)
-        self.data = image
-        image_view = self.videovieweditor.imageview
-        image_view.setImage(self.data, autoRange=False,
-                            autoLevels=False, autoHistogramRange=False)
-        self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
-        self.frame_received_signal.connect(self.capture_video)
-
-    def capture_absorption(self, image):
-        self.frame_received_signal.disconnect(self.capture_absorption)
-        self.absorption_frame_count += 1
-        if self.absorption_frame_count == 1:
-            self.atom_frame = image
-            image_view = self.absorption_view_widget.atom_view_editor.imageview
-            image_view.setImage(image, autoRange=False, autoLevels=False, autoHistogramRange=False)
-        elif self.absorption_frame_count == 2:
-            self.bright_frame = image
-            image_view = self.absorption_view_widget.bright_view_editor.imageview
-            image_view.setImage(image, autoRange=False, autoLevels=False, autoHistogramRange=False)
-        elif self.absorption_frame_count == 3:
-            self.dark_frame = image
-            image_view = self.absorption_view_widget.dark_view_editor.imageview
-            image_view.setImage(image, autoRange=False, autoLevels=False, autoHistogramRange=False)
-            self.process_absorption()
-            image_view = self.absorption_view_widget.OD_view_editor.imageview
-            image_view.setImage(self.optical_density_frame, autoRange=False, autoLevels=False,
-                                autoHistogramRange=False)
-            image_view = self.absorption_view_widget.N_view_editor.imageview
-            image_view.setImage(self.atom_number_frame, autoRange=False, autoLevels=False,
-                                autoHistogramRange=False)
-            self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
-            self.absorption_frame_count = 0
-        else:
-            print('ERROR: too many frames')
-            self.atom_frame = None
-            self.bright_frame = None
-            self.dark_frame = None
-            self.absorption_frame_count = 0
-        self.camera_control_widget.connect(self.capture_absorption)
-
-    def process_absorption(self):
-        numerator = self.atom_frame - self.dark_frame
-        denominator = self.bright_frame - self.dark_frame
-
-        # Set output to nan when dividing by zero
-        ratio = np.true_divide(numerator, denominator,
-                               out=np.full_like(numerator, 0, dtype=float), where=(denominator != 0))
-        self.optical_density_frame = -1 * np.log(ratio, out=np.full_like(numerator, np.nan, dtype=float),
-                                                 where=ratio > 0)
-        self.atom_number_frame = (self.optical_density_frame / cross_section
-                                  * (cam_pixel_size / magnification) ** 2)
-        self.data = self.atom_number_frame
-
     def closeEvent(self, event):
         self.camera_control_widget.close()
-
-
-# class ImagingSystem:
-#     def __init__(self, driver_type='Grasshopper', serial='', magnification=1, px_size=6.5e-6):
-#         self.driver_type = driver_type
-#         self.serial = serial
-#         self.magnification = magnification
-#         self.px_size = px_size
 
 
 # Start Qt event loop unless running in interactive mode.
