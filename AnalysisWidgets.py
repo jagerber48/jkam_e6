@@ -14,7 +14,7 @@ class AbsorptionAnalyzer(QObject):
     RB_D2_FREQUENCY = 2 * np.pi * 384.230e12
 
     SIDE_IMAGING_MAGNIFICATION = 0.77
-    GRASSHOPPER_PIXEL_SIZE = 6.45e-6
+    GRASSHOPPER_PIXEL_AREA = 6.45e-6**2
     GRASSHOPPER_GTOT = (2**-8 / 0.37) * 0.38
     # Multiply incident photon number by quantum efficiency = 0.38, divide by ADU gain: 0.37 e-/ADU and
     # truncate 8 least significant bits to turn 16-bit camera output to 8-bit data received at computer
@@ -41,9 +41,9 @@ class AbsorptionAnalyzer(QObject):
         """
         transmissivity = np.true_divide(atom_counts, bright_counts,
                                         out=np.full_like(atom_counts, 0, dtype=float),
-                                        where=atom_counts > 0 and bright_counts > 0)
+                                        where=np.logical_and(atom_counts > 0, bright_counts > 0))
         optical_density = -1 * np.log(transmissivity, out=np.full_like(atom_counts, np.nan, dtype=float),
-                                      where=0 < transmissivity <= 1)
+                                      where=np.logical_and(0 < transmissivity, transmissivity <= 1))
         return optical_density
 
     @staticmethod
@@ -61,7 +61,7 @@ class AbsorptionAnalyzer(QObject):
     @staticmethod
     def atom_count_analysis_below_sat(optical_density, cross_section=RB_CROSS_SECTION,
                                       detuning=0, gamma=RB_LINEWIDTH,
-                                      pixel_size=GRASSHOPPER_PIXEL_SIZE,
+                                      pixel_size=GRASSHOPPER_PIXEL_AREA,
                                       magnification=SIDE_IMAGING_MAGNIFICATION):
         detuning_factor = 1 + (2 * detuning / gamma)**2
         column_density_below_sat = (detuning_factor / cross_section) * optical_density
@@ -72,7 +72,7 @@ class AbsorptionAnalyzer(QObject):
     @staticmethod
     def atom_count_analysis_above_sat(atom_counts, bright_counts, image_pulse_time=100e-6,
                                       imaging_frequency=RB_D2_FREQUENCY,
-                                      pixel_size=GRASSHOPPER_PIXEL_SIZE,
+                                      pixel_size=GRASSHOPPER_PIXEL_AREA,
                                       magnification=SIDE_IMAGING_MAGNIFICATION,
                                       efficiency_path=1.0,
                                       camera_gain=GRASSHOPPER_GTOT,
@@ -113,11 +113,11 @@ class IntegrationAnalyzer(QObject):
         self.thread.start()
         self.widget = widget
 
-    def analyze(self, capture, image_item):
+    def analyze(self, data, image_item):
         if not self.widget.analyze_on:
             return
         self.widget.analyze_signal.disconnect(self.analyze)
-        data = capture.data.astype(float)
+        data = data.astype(float)
         data[data == np.inf] = np.nan
         data[data == -np.inf] = np.nan
 
@@ -128,7 +128,7 @@ class IntegrationAnalyzer(QObject):
 
         if self.widget.subtract_bkg:
             total = np.nansum(data)
-            total_num = capture.data.size
+            total_num = data.size
             bkg = (total - roi_total) / (total_num - roi_num)
             roi_sig = roi_total - roi_num * bkg
         else:

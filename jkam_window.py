@@ -36,18 +36,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def set_mode(self):
         try:
-            self.frame_received_signal.disconnect(self.capture_video)
-        except TypeError:
-            pass
-        try:
-            self.frame_received_signal.disconnect(self.capture_absorption)
-        except TypeError:
-            pass
-        try:
-            self.frame_received_signal.disconnect(self.on_capture)
-        except TypeError:
-            pass
-        try:
             self.history_image_view.removeItem(self.history_widget.roi)
         except AttributeError:
             pass
@@ -57,13 +45,11 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.history_image_view = self.videovieweditor.imageview
             self.history_widget.setup_figure(self.history_image_view)
             self.imaging_mode = ImagingMode.VIDEO
-            self.frame_received_signal.connect(self.capture_video)
         elif self.camera_control_widget.absorption_radioButton.isChecked():
             self.history_image_view = self.absorption_view_widget.N_view_editor.imageview
             self.history_widget.setup_figure(self.history_image_view)
             self.view_stackedWidget.setCurrentIndex(1)
             self.imaging_mode = ImagingMode.ABSORPTION
-            self.frame_received_signal.connect(self.capture_absorption)
 
     def on_capture(self, frame):
         self.frame_received_signal.disconnect(self.on_capture)
@@ -77,12 +63,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         image_view = self.videovieweditor.imageview
         image_view.setImage(frame, autoRange=False,
                             autoLevels=False, autoHistogramRange=False)
-        self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
+        self.history_widget.analyze_signal.emit(frame, image_view.getImageItem())
 
     def display_absorption_frame(self, frame):
         self.absorption_view_widget.process_frame(frame)
         image_view = self.absorption_view_widget.N_view_editor.imageview
-        self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
+        data = self.absorption_view_widget.number_frame
+        self.history_widget.analyze_signal.emit(data, image_view.getImageItem())
 
     def closeEvent(self, event):
         self.camera_control_widget.close()

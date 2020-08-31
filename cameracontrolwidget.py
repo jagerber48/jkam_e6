@@ -10,8 +10,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     settings such as camera state (arm/disarm, start/stop acquisition), trigger mode, and exposure time. It also
     receives and passes frames through the frame_received_signal signal.
     """
-    grasshopper_sn = '17491535'  # Spare Camera for testing
-    # grasshopper_sn = '18431942'  # Side Imaging
+    # grasshopper_sn = '17491535'  # Spare Camera for testing
+    grasshopper_sn = '18431942'  # Side Imaging
     frame_received_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
@@ -61,8 +61,6 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.arm_pushButton.setText('Arm Camera')
         self.start_pushButton.setEnabled(False)
         self.exposure_pushButton.setEnabled(False)
-        self.video_radioButton.clicked.disconnect(self.set_mode)
-        self.absorption_radioButton.clicked.disconnect(self.set_mode)
 
     def toggle_arm(self):
         if not self.driver.armed:
@@ -71,10 +69,11 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.disarm()
 
     def set_mode(self):
-        if self.video_radioButton.isChecked():
-            self.driver.trigger_off()
-        elif self.absorption_radioButton.isChecked():
-            self.driver.trigger_on()
+        if self.driver.armed:
+            if self.video_radioButton.isChecked():
+                self.driver.trigger_off()
+            elif self.absorption_radioButton.isChecked():
+                self.driver.trigger_on()
 
     def start(self):
         try:

@@ -60,7 +60,7 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
             image_view = self.N_view_editor.imageview
             image_view.setImage(self.number_frame, autoRange=False, autoLevels=False,
                                 autoHistogramRange=False)
-            self.absorption_frame_count = 0
+            self.frame_count = 0
         else:
             print('ERROR: too many frames')
             self.atom_frame = None
@@ -68,4 +68,4 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
             self.dark_frame = None
             self.od_frame = None
             self.number_frame = None
-            self.absorption_frame_count = 0
+            self.frame_count = 0
