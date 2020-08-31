@@ -29,7 +29,7 @@ import pyqtgraph as pg
 from colormaps import cmap
 
 # from GuppyDriver import GuppyObject
-from grasshopperdriver_3 import GrasshopperDriver
+from old.grasshopperdriver_3 import GrasshopperDriver
 from AnalysisWidgets import IntegrateROI
 
 class GuppyWindow(QMainWindow):

@@ -1,13 +1,18 @@
 import numpy as np
+import enum as Enum
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtGui import QIcon
 from ui_components.camerawindow_ui import Ui_CameraWindow
+#
+# cross_section = 2.91e-13
+# cam_pixel_size = 6.45e-6
+# magnification = 0.36
 
-cross_section = 2.91e-13
-cam_pixel_size = 6.45e-6
-magnification = 0.36
 
+class ImagingMode(Enum):
+    VIDEO = 0
+    ABSORPTION = 1
 
 class JKamWindow(QMainWindow, Ui_CameraWindow):
 
@@ -18,7 +23,10 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.data = None
 
         self.frame_received_signal = self.camera_control_widget.frame_received_signal
+        self.frame_received_signal.connect(self.on_capture)
+
         self.history_image_view = None
+        self.imaging_mode = None
         self.camera_control_widget.absorption_radioButton.clicked.connect(self.set_mode)
         self.camera_control_widget.video_radioButton.clicked.connect(self.set_mode)
         self.set_mode()
@@ -39,7 +47,10 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.frame_received_signal.disconnect(self.capture_absorption)
         except TypeError:
             pass
-
+        try:
+            self.frame_received_signal.disconnect(self.on_capture)
+        except TypeError:
+            pass
         try:
             self.history_image_view.removeItem(self.history_widget.roi)
         except AttributeError:
@@ -49,12 +60,63 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.view_stackedWidget.setCurrentIndex(0)
             self.history_image_view = self.videovieweditor.imageview
             self.history_widget.setup_figure(self.history_image_view)
+            self.imaging_mode = ImagingMode.VIDEO
             self.frame_received_signal.connect(self.capture_video)
         elif self.camera_control_widget.absorption_radioButton.isChecked():
             self.history_image_view = self.absorption_view_widget.N_view_editor.imageview
             self.history_widget.setup_figure(self.history_image_view)
             self.view_stackedWidget.setCurrentIndex(1)
+            self.imaging_mode = ImagingMode.ABSORPTION
             self.frame_received_signal.connect(self.capture_absorption)
+
+    def on_capture(self, frame):
+        self.frame_received_signal.disconnect(self.on_capture)
+        if self.imaging_mode == ImagingMode.VIDEO:
+            self.display_video_frame(frame)
+        elif self.imaging_mode == ImagingMode.ABSORPTION:
+            self.display_absorption_frame(frame)
+        self.frame_received_signal.connect(self.on_capture)
+
+    def display_video_frame(self, frame):
+        image_view = self.videovieweditor.imageview
+        image_view.setImage(frame, autoRange=False,
+                            autoLevels=False, autoHistogramRange=False)
+        self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
+
+    def display_absorption_frame(self, frame):
+        self.absorption_view_widget.process_frame(frame)
+        image_view = self.absorption_view_widget.N_view_editor.imageview
+        self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
+
+    def process_absorption(self, frame):
+        self.absorption_frame_count += 1
+        if self.absorption_frame_count == 1:
+            self.atom_frame = frame
+            image_view = self.absorption_view_widget.atom_view_editor.imageview
+            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+        elif self.absorption_frame_count == 2:
+            self.bright_frame = frame
+            image_view = self.absorption_view_widget.bright_view_editor.imageview
+            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+        elif self.absorption_frame_count == 3:
+            self.dark_frame = frame
+            image_view = self.absorption_view_widget.dark_view_editor.imageview
+            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+            self.process_absorption()
+            image_view = self.absorption_view_widget.OD_view_editor.imageview
+            image_view.setImage(self.optical_density_frame, autoRange=False, autoLevels=False,
+                                autoHistogramRange=False)
+            image_view = self.absorption_view_widget.N_view_editor.imageview
+            image_view.setImage(self.atom_number_frame, autoRange=False, autoLevels=False,
+                                autoHistogramRange=False)
+            self.history_widget.analyze_signal.emit(self, image_view.getImageItem())
+            self.absorption_frame_count = 0
+        else:
+            print('ERROR: too many frames')
+            self.atom_frame = None
+            self.bright_frame = None
+            self.dark_frame = None
+            self.absorption_frame_count = 0
 
     def capture_video(self, image):
         self.frame_received_signal.disconnect(self.capture_video)
@@ -114,12 +176,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.camera_control_widget.close()
 
 
-class ImagingSystem():
-    def __init__(self, driver_type='Grasshopper', serial='', magnification=1, px_size=6.5e-6):
-        self.driver_type = driver_type
-        self.serial = serial
-        self.magnification = magnification
-        self.px_size = px_size
+# class ImagingSystem:
+#     def __init__(self, driver_type='Grasshopper', serial='', magnification=1, px_size=6.5e-6):
+#         self.driver_type = driver_type
+#         self.serial = serial
+#         self.magnification = magnification
+#         self.px_size = px_size
+
 
 # Start Qt event loop unless running in interactive mode.
 def main():

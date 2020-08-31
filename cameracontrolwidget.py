@@ -1,16 +1,15 @@
-from enum import Enum
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 from ui_components.cameracontrolwidget_ui import Ui_CameraControlWidget
 from grasshopperdriver import GrasshopperDriver
 
 
-class CamMode(Enum):
-    VIDEO = 0
-    ABSORPTION = 1
-
-
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
+    """
+    This widget essentially serves as a ui for a jkamgendriver. It handles receiving user inputs to change camera
+    settings such as camera state (arm/disarm, start/stop acquisition), trigger mode, and exposure time. It also
+    receives and passes frames through the frame_received_signal signal.
+    """
     grasshopper_sn = '17491535'  # Spare Camera for testing
     # grasshopper_sn = '18431942'  # Side Imaging
     frame_received_signal = pyqtSignal(object)
@@ -21,7 +20,6 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.driver = GrasshopperDriver()
 
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
-        self.cam_mode = None
 
         self.arm_pushButton.clicked.connect(self.toggle_arm)
         self.start_pushButton.clicked.connect(self.toggle_start)
@@ -75,10 +73,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def set_mode(self):
         if self.video_radioButton.isChecked():
             self.driver.trigger_off()
-            self.cam_mode = CamMode.VIDEO
         elif self.absorption_radioButton.isChecked():
             self.driver.trigger_on()
-            self.cam_mode = CamMode.ABSORPTION
 
     def start(self):
         try:
