@@ -71,7 +71,6 @@ class GrasshopperDriver(QObject):
         self.cam.Init()
         self.load_default_settings()
         self.armed = True
-        print(f'ARMED Camera with serial number: {serial_number}')
 
     def disarm_camera(self):
         if self.acquiring:
@@ -81,19 +80,15 @@ class GrasshopperDriver(QObject):
         del self.cam
         self.cam = None
         self.armed = False
-        print(f'DISARMED Camera with serial number: {self.serial_number}')
 
     def start_acquisition(self):
         self.cam.BeginAcquisition()
         self.acquiring = True
         self.start_acquisition_signal.emit()
-        print(f'STARTED camera with serial number: {self.serial_number}')
 
     def stop_acquisition(self):
-        print('STOPPING')
         self.cam.EndAcquisition()
         self.acquiring = False
-        print(f'STOPPED camera with serial number: {self.serial_number}')
 
     def set_exposure_time(self, exposure_time):
         """

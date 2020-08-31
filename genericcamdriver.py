@@ -1,145 +1,195 @@
 import time
-import numpy as np
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
-import PySpin
-import abc
 
 
 class FrameGrabber(QObject):
     captured = pyqtSignal(object)
 
-    def __init__(self, driver):
+    def __init__(self, driver, max_fps=50):
         super(FrameGrabber, self).__init__()
         self.driver = driver
+        self.max_fps = max_fps
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()
-        self.frame_num = 0
 
-    def get_frame(self):
+    def grab_frames(self):
         while self.driver.acquiring:
-            try:
-                image_result = self.driver.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
-                frame = image_result.GetNDArray()
-                frame = np.transpose(frame)
-                self.driver.frame_captured_signal.emit(frame)
-                image_result.Release()
-                time.sleep(1/50)  # Slow down frame rate to 50 fps to give GUI time to update
-            except PySpin.SpinnakerException:
-                pass
+            self.driver.grab_frame()
+            time.sleep(1 / self.max_fps)  # Slow down frame rate to self.max_fps to give GUI time to update
 
 
-class CameraDriver(abc.ABC, QObject):
-    @property
-    @abc.abstractmethod
-    def captured_signal(self):
+class CameraDriver(QObject):
+    frame_captured_signal = pyqtSignal(object)
+    start_acquisition_signal = pyqtSignal()
+
+    def __init__(self):
+        super(CameraDriver, self).__init__()
+        self.thread = QThread()
+        self.moveToThread(self.thread)
+        self.thread.start()
+
+        self.frame_grabber = FrameGrabber(self)
+        self.start_acquisition_signal.connect(self.frame_grabber.grab_frames)
+
+        self._connect()
+        self.cam_list = self._get_cam_list()
+        self.cam = None
+        self.serial_number = ''
+        self.exposure_time = 0
+
+        self.connected = False
+        self.armed = False
+        self.acquiring = False
+
+    def _connect(self):
         """
-        pyqtSignal object which emits an object, implementation example:
-
-        self.captured_signal = pyqtSignal(object)
-
-        This signal is connected in the jkam_window.py script. After any frame is
-        captured this signal emits the frame.
-        """
-        pass
-
-    # def __init__(self):
-    #     super(CameraDriver, self).__init__()
-    #     self.thread = QThread()
-    #     self.moveToThread(self.thread)
-    #     self.thread.start()
-    #
-    #     self.frame_grabber = FrameGrabber(self)
-    #     self.start_video_signal.connect(self.frame_grabber.get_frame)
-    #
-    #     self.system = PySpin.System.GetInstance()
-    #     self.cam_list = self.system.GetCameras()
-    #     self.cam = None
-    #     self.serial_number = ''
-    #
-    #     self.connected = False
-    #     self.armed = False
-    #     self.acquiring = False
-
-    # def find_camera(self, serial_number):
-    #     print(f'Attempting to find camera device with serial number: {serial_number}')
-    #     self.cam = None
-    #     for camera in self.cam_list:
-    #         cam_sn = camera.TLDevice.DeviceSerialNumber.GetValue()
-    #         print(f'Found device with serial number: {cam_sn}')
-    #         if cam_sn == serial_number:
-    #             self.cam = camera
-    #             self.serial_number = serial_number
-    #             print(f'SUCCESS set current camera with serial number: {cam_sn}')
-    #     if self.cam is None:
-    #         print(f'FAILED to find camera with serial number: {serial_number}')
-
-    @abc.abstractmethod
-    def arm_camera(self, serial_number):
-        """
-        Initialize camera with serial_number in preparation for modification of camera settings and camera acquisition
-        Recommend printing the following statement after successful arm:
-        print(f'ARMED Camera with serial number: {serial_number}')
+        Create connection to camera interface system for camera device under control
         """
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def disarm_camera(self):
+    def _disconnect(self):
+        """
+        Close connection to camera interface system
+        """
+        raise NotImplementedError
+
+    def _get_cam_list(self):
+        """
+        Return list of of accessible cameras
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _get_cam_serial(cam):
+        """
+        Return serial number of cam as a string
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _arm_camera(cam):
+        """
+        Establish communication with cam and initialize for acquisition
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _disarm_camera(cam):
         """
         Disarm the camera to allow the program to access another camera or for shutdown.
-        Recommend printing the following statement after successful disarm:
-        print(f'DISARMED Camera with serial number: {self.serial_number}')
         """
         raise NotImplementedError
 
-    def start_acquisition(self):
+    @staticmethod
+    def _start_acquisition(cam):
         """
-        Begin camera acquisition. Once acquisition has begun any frames which are captured, either after triggering
-        or automatic acquisition, should be emitted by self.captured_signal as numpy arrays.
+        Begin camera acquisition so that camera is ready to receive triggers and send frames
         """
         raise NotImplementedError
 
-    def stop_acquisition(self):
+    @staticmethod
+    def _stop_acquisition(cam):
         """
         End camera acquisition
         """
-        self.cam.EndAcquisition()
+        raise NotImplementedError
+
+    @staticmethod
+    def _set_exposure_time(cam, exposure_time):
+        """
+        Set cam exposure time to exposure_time. exposure_time in ms
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _trigger_on(cam):
+        """
+        enable hardware trigger
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _trigger_off(cam):
+        """
+        disable hardware trigger
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _grab_frame(cam):
+        """
+        Grab a single frame from cam. Return numpy array containing frame
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _load_default_settings(cam):
+        """
+        Configure cam with default settings. This may include setting exposure time, setting gain to fixed value,
+        disabling automatic exposure, gain, gamma or sharpness settings. It may also include configuring the camera
+        to accept a hardware trigger with a rising edge and any other camera specific details.
+        """
+        raise NotImplementedError
+
+    def find_camera(self, serial_number):
+        print(f'Attempting to find camera device with serial number: {serial_number}')
+        self.cam = None
+        for camera in self.cam_list:
+            cam_serial = self._get_cam_serial(camera)
+            print(f'Found device with serial number: {cam_serial}')
+            if cam_serial == serial_number:
+                self.cam = camera
+                self.serial_number = cam_serial
+                print(f'SUCCESS set current camera with serial number: {self.serial_number}')
+        if self.cam is None:
+            print(f'FAILED to find camera with serial number: {serial_number}')
+
+    def arm_camera(self, serial_number):
+        """
+        Establish communication with camera and initialize for acquisition
+        """
+        self.find_camera(serial_number)
+        self._arm_camera(self.cam)
+        self._load_default_settings(self.cam)
+        self.armed = True
+        print(f'ARMED Camera with serial number: {self.serial_number}')
+
+    def disarm_camera(self):
+        if self.acquiring:
+            self.stop_acquisition()
+        self._disarm_camera(self.cam)
+        del self.cam
+        self.cam = None
+        self.armed = False
+        print(f'DISARMED Camera with serial number: {self.serial_number}')
+        self.serial_number = ''
+
+    def start_acquisition(self):
+        self._start_acquisition(self.cam)
+        self.acquiring = True
+        self.start_acquisition_signal.emit()
+        print(f'STARTED camera with serial number: {self.serial_number}')
+
+    def stop_acquisition(self):
+        self._stop_acquisition(self.cam)
         self.acquiring = False
         print(f'STOPPED camera VIDEO with serial number: {self.serial_number}')
 
-    # def start_frames(self, n_frames=3):
-    #     print(self.armed)
-    #     if not self.armed:
-    #         self.open_cam()
-    #     self.cam.BeginAcquisition()
-    #     self.acquiring = True
-    #     frames = []
-    #     for nFrame in range(n_frames):
-    #         # input('Press enter for software trigger')
-    #         # self.cam.TriggerSoftware.Execute()
-    #         image_result = self.cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
-    #         frames.append(image_result.GetNDArray())
-    #         image_result.Release()
-    #     self.cam.EndAcquisition()
-    #     self.acquiring = False
-    #     frames = np.stack(frames, axis=-1)
-    #     self.captured_signal.emit(frames)
-
     def set_exposure_time(self, exposure_time):
         """
-        exposure_time parameter is exposure time in ms. Grasshopper spinnaker/GENICAM API uses
-        exposure times in us.
+        Set camera exposure time to exposure_time. exposure_time express in ms
         """
-        converted_exposure_time = exposure_time * 1e3
-        self.cam.ExposureTime.SetValue(converted_exposure_time)
-        exposure_time_result = self.cam.ExposureTime.GetValue() * 1e-3
-        print(f'EXPOSURE TIME set to {exposure_time_result:.4f} ms')
+        self.exposure_time = self._set_exposure_time(self.cam, exposure_time)
+        print(f'EXPOSURE TIME set to {self.exposure_time:.4f} ms')
 
     def trigger_on(self):
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
+        self._trigger_on(self.cam)
+        print('Hardware trigger enabled')
 
     def trigger_off(self):
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
+        self._trigger_off(self.cam)
+        print('Hardware trigger disabled')
 
     def close_connection(self):
         if self.armed:
@@ -147,37 +197,11 @@ class CameraDriver(abc.ABC, QObject):
         del self.cam
         self.cam = None
         self.cam_list.Clear()
-        self.system.ReleaseInstance()
+        self._disconnect()
         self.connected = False
         print('Connection CLOSED')
 
-    def load_default_settings(self):
-        self.cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
-        self.cam.UserSetLoad()
-
-        self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
-        self.cam.Gain.SetValue(0.0)
-
-        self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-        self.cam.ExposureTime.SetValue(5000)
-
-        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('GammaEnabled')).SetValue(False)
-
-        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('SharpnessEnabled')).SetValue(False)
-
-        frame_rate_node = PySpin.CEnumerationPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateAuto'))
-        frame_rate_off = frame_rate_node.GetEntryByName('Off')
-        frame_rate_node.SetIntValue(frame_rate_off.GetValue())
-        PySpin.CBooleanPtr(self.cam.GetNodeMap().GetNode('AcquisitionFrameRateEnabled')).SetValue(True)
-        self.cam.AcquisitionFrameRate.SetValue(25)
-
-        s_node_map = self.cam.GetTLStreamNodeMap()
-        handling_mode = PySpin.CEnumerationPtr(s_node_map.GetNode('StreamBufferHandlingMode'))
-        handling_mode_NewestOnly = handling_mode.GetEntryByName('NewestOnly')
-        handling_mode.SetIntValue(handling_mode_NewestOnly.GetValue())
-
-        self.cam.TriggerActivation.SetValue(PySpin.TriggerActivation_RisingEdge)
-        self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
-        self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Line0)
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
-        self.cam.AcquisitionMode.SetValue(PySpin.AcquisitionMode_Continuous)
+    def grab_frame(self):
+        frame = self._grab_frame(self.cam)
+        if frame is not None:
+            self.frame_captured_signal.emit(frame)

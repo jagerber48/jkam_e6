@@ -1,13 +1,13 @@
-import datetime
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 from cameracontrolwidget_ui import Ui_CameraControlWidget
-from grasshopperdriver import GrasshopperDriver
+# from grasshopperdriver import GrasshopperDriver
+from grasshopperdriver_2 import GrasshopperDriver
 
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
-    # grasshopper_sn = '17491535'
-    grasshopper_sn = '18431942'  # Side Imaging
+    grasshopper_sn = '17491535'  # Spare Camera for testing
+    # grasshopper_sn = '18431942'  # Side Imaging
     frame_received_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
@@ -17,6 +17,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
 
         self.armed = False
         self.started = False
+        self.armed_serial_number = ''
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
 
         self.arm_pushButton.clicked.connect(self.toggle_arm)
@@ -25,19 +26,6 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.exposure_pushButton.clicked.connect(self.set_exposure)
 
         self.driver.frame_captured_signal.connect(self.frame_received_signal.emit)
-
-    # def receive_frame(self, frame):
-    #     # if self.driver.acquiring:
-    #         # if True:
-    #         #     curr_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    #         #     print(f'{curr_time} -- Frame Received')
-    #     self.frame_received_signal.emit(frame)
-    #
-    # def capture_on(self):
-    #     self.driver.frame_captured_signal.connect(self.receive_frame)
-    #
-    # def capture_off(self):
-    #     self.driver.frame_captured_signal.disconnect(self.receive_frame)
 
     def arm(self):
         serial_number = self.grasshopper_sn
@@ -49,6 +37,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.start_pushButton.setEnabled(True)
             self.set_exposure()
             self.armed = True
+            self.armed_serial_number = serial_number
         except Exception as e:
             print('Error while trying to ARM camera')
             print(e)
@@ -67,6 +56,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.arm_pushButton.setText('Arm Camera')
         self.start_pushButton.setEnabled(False)
         self.armed = False
+        self.armed_serial_number = ''
 
     def toggle_arm(self):
         if not self.armed:
@@ -93,6 +83,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.abort()
 
     def stop(self, aborting=False):
+        print('STOPPING')
         if not aborting:
             try:
                 self.driver.stop_acquisition()
