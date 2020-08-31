@@ -19,12 +19,16 @@ class FrameGrabber(QObject):
             time.sleep(1 / self.max_fps)  # Slow down frame rate to self.max_fps to give GUI time to update
 
 
-class CameraDriver(QObject):
+class JKamGenDriver(QObject):
+    """
+    Generic driver with functionality to interface with jkam UI. Has a number of narrow-scope camera control
+    methods which should be overridden in a custom driver for each type of camera to be implemented with jkam.
+    """
     frame_captured_signal = pyqtSignal(object)
     start_acquisition_signal = pyqtSignal()
 
     def __init__(self):
-        super(CameraDriver, self).__init__()
+        super(JKamGenDriver, self).__init__()
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()

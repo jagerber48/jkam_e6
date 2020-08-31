@@ -1,8 +1,13 @@
+from enum import Enum
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 from ui_components.cameracontrolwidget_ui import Ui_CameraControlWidget
-# from grasshopperdriver import GrasshopperDriver
 from grasshopperdriver import GrasshopperDriver
+
+
+class CamMode(Enum):
+    VIDEO = 0
+    ABSORPTION = 1
 
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
@@ -15,10 +20,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.setupUi(self)
         self.driver = GrasshopperDriver()
 
-        self.armed = False
-        self.started = False
-        self.armed_serial_number = ''
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
+        self.cam_mode = None
 
         self.arm_pushButton.clicked.connect(self.toggle_arm)
         self.start_pushButton.clicked.connect(self.toggle_start)
@@ -35,9 +38,11 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.arm_pushButton.setChecked(True)
             self.arm_pushButton.setText('Disarm Camera')
             self.start_pushButton.setEnabled(True)
+            self.exposure_pushButton.setEnabled(True)
             self.set_exposure()
-            self.armed = True
-            self.armed_serial_number = serial_number
+            self.video_radioButton.clicked.connect(self.set_mode)
+            self.absorption_radioButton.clicked.connect(self.set_mode)
+            self.set_mode()
         except Exception as e:
             print('Error while trying to ARM camera')
             print(e)
@@ -46,6 +51,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def disarm(self, aborting=False):
         if not aborting:
             try:
+                if self.driver.acquiring:
+                    self.stop()
                 self.driver.disarm_camera()
             except Exception as e:
                 print('Error while trying to DISARM camera')
@@ -55,28 +62,30 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.arm_pushButton.setChecked(False)
         self.arm_pushButton.setText('Arm Camera')
         self.start_pushButton.setEnabled(False)
-        self.armed = False
-        self.armed_serial_number = ''
+        self.exposure_pushButton.setEnabled(False)
+        self.video_radioButton.clicked.disconnect(self.set_mode)
+        self.absorption_radioButton.clicked.disconnect(self.set_mode)
 
     def toggle_arm(self):
-        if not self.armed:
+        if not self.driver.armed:
             self.arm()
         else:
-            if self.started:
-                self.stop()
             self.disarm()
+
+    def set_mode(self):
+        if self.video_radioButton.isChecked():
+            self.driver.trigger_off()
+            self.cam_mode = CamMode.VIDEO
+        elif self.absorption_radioButton.isChecked():
+            self.driver.trigger_on()
+            self.cam_mode = CamMode.ABSORPTION
 
     def start(self):
         try:
-            if self.video_radioButton.isChecked():
-                self.driver.trigger_off()
-            elif self.absorption_radioButton.isChecked():
-                self.driver.trigger_on()
             self.driver.start_acquisition()
             self.start_pushButton.setText('Stop Camera')
             self.video_radioButton.setEnabled(False)
             self.absorption_radioButton.setEnabled(False)
-            self.started = True
         except Exception as e:
             print('Error while trying to START video')
             print(e)
@@ -94,10 +103,9 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.start_pushButton.setText('Start Camera')
         self.video_radioButton.setEnabled(True)
         self.absorption_radioButton.setEnabled(True)
-        self.started = False
 
     def toggle_start(self):
-        if not self.started:
+        if not self.driver.acquiring:
             self.start()
         else:
             self.stop()

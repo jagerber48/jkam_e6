@@ -1,12 +1,9 @@
 import numpy as np
 import PySpin
-import genericcamdriver
+from jkamgendriver import JKamGenDriver
 
 
-class GrasshopperDriver(genericcamdriver.CameraDriver):
-    def __init__(self):
-        super(GrasshopperDriver, self).__init__()
-
+class GrasshopperDriver(JKamGenDriver):
     def _open_connection(self):
         self.system = PySpin.System.GetInstance()
 
