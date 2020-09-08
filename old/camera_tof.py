@@ -92,7 +92,7 @@ class CameraWindow(QtWidgets.QMainWindow):
 
     def init_figure(self):
         self.data = np.array([])
-        self.history_widget.setup_figure(self.im_tof)
+        self.history_widget.create_roi(self.im_tof)
 
     def toggle_camera(self):
         if self.camera_button.isChecked():

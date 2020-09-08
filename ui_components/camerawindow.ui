@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>704</width>
-    <height>726</height>
+    <width>747</width>
+    <height>492</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,14 +15,14 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
-     <widget class="IntegrateROI" name="history_widget" native="true"/>
-    </item>
-    <item row="1" column="1">
-     <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
-    </item>
-    <item row="0" column="0" colspan="2">
+    <item row="0" column="0" colspan="3">
      <widget class="QStackedWidget" name="view_stackedWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
       <property name="currentIndex">
        <number>1</number>
       </property>
@@ -42,6 +42,33 @@
       </widget>
      </widget>
     </item>
+    <item row="1" column="2">
+     <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
+    </item>
+    <item row="1" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="roi_analyzer_checkBox">
+        <property name="text">
+         <string>ROI Analyzer</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="1">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -49,7 +76,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>704</width>
+     <width>747</width>
      <height>26</height>
     </rect>
    </property>
@@ -57,12 +84,6 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>IntegrateROI</class>
-   <extends>QWidget</extends>
-   <header>AnalysisWidgets</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>AbsorptionViewWidget</class>
    <extends>QWidget</extends>

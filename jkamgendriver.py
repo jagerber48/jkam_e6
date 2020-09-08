@@ -5,7 +5,7 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal
 class FrameGrabber(QObject):
     captured = pyqtSignal(object)
 
-    def __init__(self, driver, max_fps=50):
+    def __init__(self, driver, max_fps=20):
         super(FrameGrabber, self).__init__()
         self.driver = driver
         self.max_fps = max_fps

@@ -14,18 +14,17 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_CameraWindow(object):
     def setupUi(self, CameraWindow):
         CameraWindow.setObjectName("CameraWindow")
-        CameraWindow.resize(704, 726)
+        CameraWindow.resize(747, 492)
         self.centralwidget = QtWidgets.QWidget(CameraWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName("gridLayout")
-        self.history_widget = IntegrateROI(self.centralwidget)
-        self.history_widget.setObjectName("history_widget")
-        self.gridLayout.addWidget(self.history_widget, 1, 0, 1, 1)
-        self.camera_control_widget = CameraControlWidget(self.centralwidget)
-        self.camera_control_widget.setObjectName("camera_control_widget")
-        self.gridLayout.addWidget(self.camera_control_widget, 1, 1, 1, 1)
         self.view_stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.view_stackedWidget.sizePolicy().hasHeightForWidth())
+        self.view_stackedWidget.setSizePolicy(sizePolicy)
         self.view_stackedWidget.setObjectName("view_stackedWidget")
         self.imageview_page = QtWidgets.QWidget()
         self.imageview_page.setObjectName("imageview_page")
@@ -43,10 +42,21 @@ class Ui_CameraWindow(object):
         self.absorption_view_widget.setObjectName("absorption_view_widget")
         self.gridLayout_3.addWidget(self.absorption_view_widget, 0, 0, 1, 1)
         self.view_stackedWidget.addWidget(self.absorption_view_page)
-        self.gridLayout.addWidget(self.view_stackedWidget, 0, 0, 1, 2)
+        self.gridLayout.addWidget(self.view_stackedWidget, 0, 0, 1, 3)
+        self.camera_control_widget = CameraControlWidget(self.centralwidget)
+        self.camera_control_widget.setObjectName("camera_control_widget")
+        self.gridLayout.addWidget(self.camera_control_widget, 1, 2, 1, 1)
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.roi_analyzer_checkBox = QtWidgets.QCheckBox(self.centralwidget)
+        self.roi_analyzer_checkBox.setObjectName("roi_analyzer_checkBox")
+        self.verticalLayout.addWidget(self.roi_analyzer_checkBox)
+        self.gridLayout.addLayout(self.verticalLayout, 1, 0, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout.addItem(spacerItem, 1, 1, 1, 1)
         CameraWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(CameraWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 704, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 747, 26))
         self.menubar.setObjectName("menubar")
         CameraWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(CameraWindow)
@@ -60,7 +70,7 @@ class Ui_CameraWindow(object):
     def retranslateUi(self, CameraWindow):
         _translate = QtCore.QCoreApplication.translate
         CameraWindow.setWindowTitle(_translate("CameraWindow", "jkam"))
-from AnalysisWidgets import IntegrateROI
+        self.roi_analyzer_checkBox.setText(_translate("CameraWindow", "ROI Analyzer"))
 from absorption_view_widget import AbsorptionViewWidget
 from cameracontrolwidget import CameraControlWidget
 from imagevieweditor import ImageViewEditor
