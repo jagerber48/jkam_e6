@@ -182,11 +182,6 @@ class PlotHistoryWidget(QtWidgets.QWidget, Ui_PlotHistoryWidget):
         self.history = np.zeros(self.num_history)
         self.history_min = self.history.min()
         self.history_max = self.history.max()
-        self.roi = None
-
-        self.analyzer = RoiIntegrationAnalyzer(self)
-        self.analyze_signal.connect(self.analyzer.analyze)
-        self.analyzer.analysis_complete_signal.connect(self.plot)
 
         self.history_PlotWidget.disableAutoRange()
         self.history_plot = self.history_PlotWidget.plot()
