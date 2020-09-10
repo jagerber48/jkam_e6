@@ -157,7 +157,7 @@ class IntegrateROI(QtWidgets.QWidget, Ui_PlotHistoryWidget):
         self.roi = None
 
         self.analyzer = IntegrationAnalyzer(self)
-        self.analyze_signal.connect(self.analyzer.analyze, )
+        self.analyze_signal.connect(self.analyzer.analyze)
         self.analyzer.analysis_complete_signal.connect(self.plot)
 
         # layout = QtWidgets.QVBoxLayout()
