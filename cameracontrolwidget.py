@@ -10,8 +10,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     settings such as camera state (arm/disarm, start/stop acquisition), trigger mode, and exposure time. It also
     receives and passes frames through the frame_received_signal signal.
     """
-    # grasshopper_sn = '17491535'  # Spare Camera for testing
-    grasshopper_sn = '18431942'  # Side Imaging
+    grasshopper_sn = '17491535'  # Spare Camera for testing
+    # grasshopper_sn = '18431942'  # Side Imaging
     frame_received_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
@@ -25,6 +25,12 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.start_pushButton.clicked.connect(self.toggle_start)
         self.exposure_lineEdit.editingFinished.connect(self.update_exposure)
         self.exposure_pushButton.clicked.connect(self.set_exposure)
+        self.continuous_radioButton.clicked.connect(self.toggle_trigger_mode)
+        self.triggered_radioButton.clicked.connect(self.toggle_trigger_mode)
+        self.software_trigger_pushButton.clicked.connect(self.driver.execute_software_trigger)
+        self.software_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
+        self.hardware_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
+
 
         self.driver.frame_captured_signal.connect(self.frame_received_signal.emit)
 
@@ -38,9 +44,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.start_pushButton.setEnabled(True)
             self.exposure_pushButton.setEnabled(True)
             self.set_exposure()
-            self.video_radioButton.clicked.connect(self.set_mode)
-            self.absorption_radioButton.clicked.connect(self.set_mode)
-            self.set_mode()
+            self.enable_trigger_controls()
+            self.toggle_trigger_mode()
         except Exception as e:
             print('Error while trying to ARM camera')
             print(e)
@@ -61,6 +66,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.arm_pushButton.setText('Arm Camera')
         self.start_pushButton.setEnabled(False)
         self.exposure_pushButton.setEnabled(False)
+        self.disable_trigger_controls()
 
     def toggle_arm(self):
         if not self.driver.armed:
@@ -68,19 +74,13 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         else:
             self.disarm()
 
-    def set_mode(self):
-        if self.driver.armed:
-            if self.video_radioButton.isChecked():
-                self.driver.trigger_off()
-            elif self.absorption_radioButton.isChecked():
-                self.driver.trigger_on()
-
     def start(self):
         try:
             self.driver.start_acquisition()
             self.start_pushButton.setText('Stop Camera')
-            self.video_radioButton.setEnabled(False)
-            self.absorption_radioButton.setEnabled(False)
+            self.disable_trigger_controls()
+            if self.software_trigger_radioButton.isChecked():
+                self.software_trigger_pushButton.setEnabled(True)
         except Exception as e:
             print('Error while trying to START video')
             print(e)
@@ -96,14 +96,43 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
                 print(e)
                 self.abort()
         self.start_pushButton.setText('Start Camera')
-        self.video_radioButton.setEnabled(True)
-        self.absorption_radioButton.setEnabled(True)
+        self.enable_trigger_controls()
+        self.software_trigger_pushButton.setEnabled(False)
 
     def toggle_start(self):
         if not self.driver.acquiring:
             self.start()
         else:
             self.stop()
+
+    def toggle_trigger_mode(self):
+        if self.continuous_radioButton.isChecked():
+            self.driver.trigger_off()
+            self.toggle_source_controls(False)
+        elif self.triggered_radioButton.isChecked():
+            self.driver.trigger_on()
+            self.toggle_source_controls(True)
+
+    def toggle_trigger_source(self):
+        if self.hardware_trigger_radioButton.isChecked():
+            self.driver.set_hardware_trigger()
+        elif self.software_trigger_radioButton.isChecked():
+            self.driver.set_software_trigger()
+
+    def enable_trigger_controls(self):
+        self.continuous_radioButton.setEnabled(True)
+        self.triggered_radioButton.setEnabled(True)
+        if self.triggered_radioButton.isChecked():
+            self.toggle_source_controls(True)
+
+    def disable_trigger_controls(self):
+        self.continuous_radioButton.setEnabled(False)
+        self.triggered_radioButton.setEnabled(False)
+        self.toggle_source_controls(False)
+
+    def toggle_source_controls(self, toggle_value):
+        self.software_trigger_radioButton.setEnabled(toggle_value)
+        self.hardware_trigger_radioButton.setEnabled(toggle_value)
 
     def update_exposure(self):
         exposure_input = self.exposure_lineEdit.text()

@@ -56,6 +56,22 @@ class GrasshopperDriver(JKamGenDriver):
         cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
 
     @staticmethod
+    def _set_hardware_trigger(cam):
+        cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
+        cam.TriggerSource.SetValue(PySpin.TriggerSource_Line0)
+        cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
+
+    @staticmethod
+    def _set_software_trigger(cam):
+        cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
+        cam.TriggerSource.SetValue(PySpin.TriggerSource_Software)
+        cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
+
+    @staticmethod
+    def _execute_software_trigger(cam):
+        cam.TriggerSoftware.Execute()
+
+    @staticmethod
     def _grab_frame(cam):
         try:
             image_result = cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)

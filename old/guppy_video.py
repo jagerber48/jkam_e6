@@ -106,7 +106,7 @@ class GuppyWindow(QMainWindow):
 
 	def initFigure(self):
 		self.data = np.array([])
-		self.history_widget.setup_figure(self.im_widget)
+		self.history_widget.create_roi(self.im_widget)
 
 	def setLevels(self):
 		self.levels = (self.data.min(), self.data.max())

@@ -109,7 +109,7 @@ class AndorWindow(QMainWindow):
 
 	def initFigure(self):
 		self.data = np.array([])      
-		self.history_widget.setup_figure(self.im_tof)
+		self.history_widget.create_roi(self.im_tof)
 
 	def toggleCamera(self):
 		if self.camera_button.isChecked():
