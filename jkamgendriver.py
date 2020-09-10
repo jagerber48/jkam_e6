@@ -99,11 +99,23 @@ class JKamGenDriver(QObject):
 
     def trigger_on(self):
         self._trigger_on(self.cam)
-        print('Hardware trigger enabled')
+        print('Trigger enabled')
 
     def trigger_off(self):
         self._trigger_off(self.cam)
-        print('Hardware trigger disabled')
+        print('Trigger disabled')
+
+    def set_software_trigger(self):
+        self._set_software_trigger(self.cam)
+        print('Software Trigger Enabled')
+
+    def set_hardware_trigger(self):
+        self._set_hardware_trigger(self.cam)
+        print('Hardware Trigger Enabled')
+
+    def execute_software_trigger(self):
+        self._execute_software_trigger(self.cam)
+        print('Software Trigger EXECUTED')
 
     def open_connection(self):
         self._open_connection()
@@ -194,6 +206,27 @@ class JKamGenDriver(QObject):
     def _trigger_off(cam):
         """
         disable hardware trigger
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _set_hardware_trigger(cam):
+        """
+        Configure camera to accept hardware trigger
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _set_software_trigger(cam):
+        """
+        Configure camera to accept software trigger
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _execute_software_trigger(cam):
+        """
+        Configure camera to accept software trigger
         """
         raise NotImplementedError
 

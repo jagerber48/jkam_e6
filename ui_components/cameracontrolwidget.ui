@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>CameraControlWidget</class>
  <widget class="QWidget" name="CameraControlWidget">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>231</width>
-    <height>180</height>
-   </rect>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="8" column="0" colspan="2">
     <widget class="QPushButton" name="exposure_pushButton">
@@ -25,6 +17,36 @@
     <widget class="QLabel" name="serial_label">
      <property name="text">
       <string>Serial Number: xxxxxxxx</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <widget class="QLabel" name="trigger_source_label">
+     <property name="text">
+      <string>Trigger Source:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0">
+    <widget class="QRadioButton" name="hardware_trigger_radioButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Hardware</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">trigger_buttonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="trigger_mode_label">
+     <property name="text">
+      <string>Trigger Mode</string>
      </property>
     </widget>
    </item>
@@ -58,16 +80,6 @@
      </item>
     </layout>
    </item>
-   <item row="10" column="0">
-    <widget class="QRadioButton" name="video_radioButton">
-     <property name="text">
-      <string>Video</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0" colspan="2">
     <widget class="QPushButton" name="start_pushButton">
      <property name="enabled">
@@ -78,6 +90,19 @@
      </property>
     </widget>
    </item>
+   <item row="14" column="1">
+    <widget class="QRadioButton" name="software_trigger_radioButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Software</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">trigger_buttonGroup</string>
+     </attribute>
+    </widget>
+   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QPushButton" name="arm_pushButton">
      <property name="text">
@@ -85,15 +110,51 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="1">
-    <widget class="QRadioButton" name="absorption_radioButton">
-     <property name="text">
-      <string>Absorption</string>
+   <item row="15" column="0" colspan="2">
+    <widget class="QPushButton" name="software_trigger_pushButton">
+     <property name="enabled">
+      <bool>false</bool>
      </property>
+     <property name="text">
+      <string>Software Trigger</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QRadioButton" name="triggered_radioButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Triggered</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">mode_buttonGroup</string>
+     </attribute>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="QRadioButton" name="continuous_radioButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Continuous</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">mode_buttonGroup</string>
+     </attribute>
     </widget>
    </item>
   </layout>
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="trigger_buttonGroup"/>
+  <buttongroup name="mode_buttonGroup"/>
+ </buttongroups>
 </ui>
