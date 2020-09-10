@@ -21,6 +21,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
         self.frame_received_signal = self.camera_control_widget.frame_received_signal
         self.frame_received_signal.connect(self.on_capture)
+        self.absorption_view_widget.analyis_complete_signal.connect(self.analyze)
 
         self.plothistoryanalyzer = PlotHistoryAnalyzer(RoiIntegrationAnalyzer(self.videovieweditor.imageview))
         self.roi_analyzer_checkBox.clicked.connect(self.toggle_analyzer_window)
@@ -59,10 +60,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         image_view = self.videovieweditor.imageview
         image_view.setImage(frame, autoRange=False,
                             autoLevels=False, autoHistogramRange=False)
-        self.plothistoryanalyzer.analysis_request_signal.emit()
+        self.analyze()
 
     def display_absorption_frame(self, frame):
         self.absorption_view_widget.process_frame(frame)
+
+    def analyze(self):
+        self.plothistoryanalyzer.analysis_request_signal.emit()
 
     def toggle_analyzer_window(self):
         if self.roi_analyzer_checkBox.isChecked():
