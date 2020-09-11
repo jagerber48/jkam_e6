@@ -14,6 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_PlotHistoryWidget(object):
     def setupUi(self, PlotHistoryWidget):
         PlotHistoryWidget.setObjectName("PlotHistoryWidget")
+        PlotHistoryWidget.resize(967, 353)
         self.gridLayout = QtWidgets.QGridLayout(PlotHistoryWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.set_max_pushButton = QtWidgets.QPushButton(PlotHistoryWidget)

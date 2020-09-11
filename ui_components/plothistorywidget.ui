@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>PlotHistoryWidget</class>
  <widget class="QWidget" name="PlotHistoryWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>967</width>
+    <height>353</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Plot History Window</string>
   </property>
