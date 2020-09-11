@@ -12,6 +12,9 @@ class ImagingMode(Enum):
 
 
 class JKamWindow(QMainWindow, Ui_CameraWindow):
+    # TODO: Documentation
+    # TODO: Background subtract button for RoiIntegrationAnalyzer
+    # TODO: Video/Absorption mode buttons
 
     def __init__(self):
         super(JKamWindow, self).__init__()

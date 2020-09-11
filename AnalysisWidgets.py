@@ -7,6 +7,7 @@ from ui_components.plothistorywidget_ui import Ui_PlotHistoryWidget
 
 
 class AbsorptionAnalyzer(QObject):
+    # TODO: Implement input parameters for conversion parameters
 
     RB_CROSS_SECTION = 2.907e-13  # Steck Rubidium 87 D Line Data
     RB_LINEWIDTH = 2 * np.pi * 6.07e6  # Steck Rubidium 87 D Line Data
