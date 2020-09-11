@@ -10,9 +10,12 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     settings such as camera state (arm/disarm, start/stop acquisition), trigger mode, and exposure time. It also
     receives and passes frames through the frame_received_signal signal.
     """
-    # grasshopper_sn = '17491535'  # Spare Camera for testing
-    grasshopper_sn = '18431942'  # Side Imaging
+    grasshopper_sn = '17491535'  # Spare Camera for testing
+    # grasshopper_sn = '18431942'  # Side Imaging
     frame_received_signal = pyqtSignal(object)
+    started_signal = pyqtSignal()
+    stopped_signal = pyqtSignal()
+    trigger_mode_toggled = pyqtSignal()
 
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
@@ -25,13 +28,11 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.start_pushButton.clicked.connect(self.toggle_start)
         self.exposure_lineEdit.editingFinished.connect(self.update_exposure)
         self.exposure_pushButton.clicked.connect(self.set_exposure)
-        self.continuous_radioButton.clicked.connect(self.toggle_trigger_mode)
         self.triggered_radioButton.clicked.connect(self.toggle_trigger_mode)
-        self.software_trigger_pushButton.clicked.connect(self.driver.execute_software_trigger)
+        self.continuous_radioButton.clicked.connect(self.toggle_trigger_mode)
         self.software_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
         self.hardware_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
-
-
+        self.software_trigger_pushButton.clicked.connect(self.driver.execute_software_trigger)
         self.driver.frame_captured_signal.connect(self.frame_received_signal.emit)
 
     def arm(self):
@@ -79,8 +80,9 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.driver.start_acquisition()
             self.start_pushButton.setText('Stop Camera')
             self.disable_trigger_controls()
-            if self.software_trigger_radioButton.isChecked():
+            if self.triggered_radioButton.isChecked() and self.software_trigger_radioButton.isChecked():
                 self.software_trigger_pushButton.setEnabled(True)
+            self.started_signal.emit()
         except Exception as e:
             print('Error while trying to START video')
             print(e)
@@ -98,6 +100,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.start_pushButton.setText('Start Camera')
         self.enable_trigger_controls()
         self.software_trigger_pushButton.setEnabled(False)
+        self.stopped_signal.emit()
 
     def toggle_start(self):
         if not self.driver.acquiring:
@@ -106,6 +109,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.stop()
 
     def toggle_trigger_mode(self):
+        self.trigger_mode_toggled.emit()
         if self.continuous_radioButton.isChecked():
             self.driver.trigger_off()
             self.toggle_source_controls(False)

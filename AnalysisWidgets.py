@@ -116,15 +116,15 @@ class RoiIntegrationAnalyzer(QObject):
         self.roi_sig = self.create_roi(pen='w')
         self.roi_bg = None
         self.bg_subtract = False
-
-        self.enable_bg_subtract()
         self.analyzing = False
 
     def set_imageview(self, imageview):
-        self.remove_roi()
-        self.imageview = imageview
-        self.roi_sig = self.create_roi()
-        self.enable_bg_subtract()
+        if imageview is not self.imageview:
+            self.remove_roi()
+            self.imageview = imageview
+            self.roi_sig = self.create_roi(pen='w')
+            if self.bg_subtract:
+                self.roi_bg = self.create_roi(pen='r')
 
     def create_roi(self, pen='w'):
         roi = pg.RectROI((200, 200), (200, 200), pen=pen)
@@ -139,7 +139,7 @@ class RoiIntegrationAnalyzer(QObject):
 
     def disable_bg_subtract(self):
         try:
-            del self.roi_bg
+            self.imageview.removeItem(self.roi_bg)
         except AttributeError:
             pass
         self.bg_subtract = False
@@ -173,7 +173,7 @@ class PlotHistoryAnalyzer(QObject):
     analysis_request_signal = pyqtSignal()
     analyze_signal = pyqtSignal()
 
-    def __init__(self, analyzer, label='counts', num_history=200):
+    def __init__(self, analyzer: RoiIntegrationAnalyzer, label='counts', num_history=200):
         super(PlotHistoryAnalyzer, self).__init__()
         self.analyzer = analyzer
         self.plothistorywidget = PlotHistoryWidget(label=label, num_history=num_history)
