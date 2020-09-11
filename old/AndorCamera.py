@@ -12,7 +12,7 @@ if platform.system() == "Windows":
     if platform.architecture()[0] == "32bit":
         library_path = "atmcd32d.dll"
         if not path.exists(library_path):
-            library_path = "C:\\Program Files (x86)\\Andor SOLIS\\atmcd32d.dll"
+            library_path = "C:\\Program Files\\Andor SDK3\\win32\\atmcd32d.dll"
         if not path.exists(library_path):
             library_path = "C:\\Program Files\\Andor iXon\\atmcd32d.dll"
         if not path.exists(library_path):

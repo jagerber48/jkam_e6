@@ -113,32 +113,58 @@ class RoiIntegrationAnalyzer(QObject):
         self.moveToThread(self.thread)
         self.thread.start()
         self.imageview = imageview
-        self.roi = None
-        self.create_roi()
+        self.roi_sig = self.create_roi(pen='w')
+        self.roi_bg = None
+        self.bg_subtract = False
+
+        self.enable_bg_subtract()
         self.analyzing = False
 
     def set_imageview(self, imageview):
         self.remove_roi()
         self.imageview = imageview
-        self.create_roi()
+        self.roi_sig = self.create_roi()
+        self.enable_bg_subtract()
 
-    def create_roi(self):
-        del self.roi
-        self.roi = pg.RectROI((200, 200), (200, 200), pen='w')
-        self.roi.addScaleHandle([1, 1], [0, 0])
-        self.roi.addScaleHandle([0, 0], [1, 1])
-        self.imageview.addItem(self.roi)
+    def create_roi(self, pen='w'):
+        roi = pg.RectROI((200, 200), (200, 200), pen=pen)
+        roi.addScaleHandle([1, 1], [0, 0])
+        roi.addScaleHandle([0, 0], [1, 1])
+        self.imageview.addItem(roi)
+        return roi
+
+    def enable_bg_subtract(self):
+        self.roi_bg = self.create_roi(pen='r')
+        self.bg_subtract = True
+
+    def disable_bg_subtract(self):
+        try:
+            del self.roi_bg
+        except AttributeError:
+            pass
+        self.bg_subtract = False
 
     def analyze(self):
         self.analyzing = True
-        roi_data = self.roi.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
-        roi_sum = np.nansum(roi_data)
-        self.analysis_complete_signal.emit(roi_sum)
+        roi_sig_data = self.roi_sig.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
+        roi_sig_sum = np.nansum(roi_sig_data)
+        pixel_num_sig = roi_sig_data.size
+        result = roi_sig_sum
+        if self.bg_subtract:
+            roi_bg_data = self.roi_bg.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
+            pixel_num_bg = roi_bg_data.size
+            roi_bg_mean = np.nansum(roi_bg_data) / pixel_num_bg
+            result = roi_sig_sum - roi_bg_mean * pixel_num_sig
+        self.analysis_complete_signal.emit(result)
         self.analyzing = False
 
     def remove_roi(self):
         try:
-            self.imageview.removeItem(self.roi)
+            self.imageview.removeItem(self.roi_sig)
+        except AttributeError:
+            pass
+        try:
+            self.imageview.removeItem(self.roi_bg)
         except AttributeError:
             pass
 
@@ -220,4 +246,4 @@ class PlotHistoryWidget(QtWidgets.QWidget, Ui_PlotHistoryWidget):
 
     def plot(self):
         self.history_plot.setData(self.history)
-        self.history_PlotWidget.setYRange(self.history_min, self.history_max)
+        # self.history_PlotWidget.setYRange(self.history_min, self.history_max)
