@@ -12,6 +12,8 @@ class ImagingMode(Enum):
 
 
 class JKamWindow(QMainWindow, Ui_CameraWindow):
+    # TODO: Documentation
+    # TODO: Handle closing of analysis window
 
     def __init__(self):
         super(JKamWindow, self).__init__()
@@ -27,9 +29,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.roi_analyzer_checkBox.clicked.connect(self.toggle_analyzer_window)
 
         self.imaging_mode = None
-        self.camera_control_widget.triggered_radioButton.clicked.connect(self.set_mode)
-        self.camera_control_widget.continuous_radioButton.clicked.connect(self.set_mode)
-        self.set_mode()
+        self.video_mode_radioButton.clicked.connect(self.set_imaging_mode)
+        self.absorption_mode_radioButton.clicked.connect(self.set_imaging_mode)
+        self.camera_control_widget.started_signal.connect(self.lock_imaging_mode)
+        self.camera_control_widget.stopped_signal.connect(self.unlock_imaging_mode)
+        self.camera_control_widget.trigger_mode_toggled.connect(self.trigger_mode_changed)
+        self.roi_bg_subtract_checkBox.toggled.connect(self.bg_subtract_toggled)
+        self.set_imaging_mode()
 
         self.absorption_frame_count = 0
         self.atom_frame = None
@@ -38,15 +44,39 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.optical_density_frame = None
         self.atom_number_frame = None
 
-    def set_mode(self):
-        if self.camera_control_widget.continuous_radioButton.isChecked():
+    def set_imaging_mode(self):
+        if self.video_mode_radioButton.isChecked():
             self.view_stackedWidget.setCurrentIndex(0)
             self.plothistoryanalyzer.analyzer.set_imageview(self.videovieweditor.imageview)
             self.imaging_mode = ImagingMode.VIDEO
-        elif self.camera_control_widget.triggered_radioButton.isChecked():
+        elif self.absorption_mode_radioButton.isChecked():
             self.view_stackedWidget.setCurrentIndex(1)
             self.plothistoryanalyzer.analyzer.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
             self.imaging_mode = ImagingMode.ABSORPTION
+
+    def lock_imaging_mode(self):
+        self.video_mode_radioButton.setEnabled(False)
+        self.absorption_mode_radioButton.setEnabled(False)
+
+    def unlock_imaging_mode(self):
+        self.video_mode_radioButton.setEnabled(True)
+        if not self.camera_control_widget.continuous_radioButton.isChecked():
+            self.absorption_mode_radioButton.setEnabled(True)
+
+    def trigger_mode_changed(self):
+        if self.camera_control_widget.continuous_radioButton.isChecked():
+            self.video_mode_radioButton.setChecked(True)
+            self.absorption_mode_radioButton.setChecked(False)
+            self.absorption_mode_radioButton.setEnabled(False)
+        elif self.camera_control_widget.triggered_radioButton.isChecked():
+            self.absorption_mode_radioButton.setEnabled(True)
+        self.set_imaging_mode()
+
+    def bg_subtract_toggled(self):
+        if self.roi_bg_subtract_checkBox.isChecked():
+            self.plothistoryanalyzer.analyzer.enable_bg_subtract()
+        if not self.roi_bg_subtract_checkBox.isChecked():
+            self.plothistoryanalyzer.analyzer.disable_bg_subtract()
 
     def on_capture(self, frame):
         self.frame_received_signal.disconnect(self.on_capture)

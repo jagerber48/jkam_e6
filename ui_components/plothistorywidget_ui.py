@@ -14,7 +14,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_PlotHistoryWidget(object):
     def setupUi(self, PlotHistoryWidget):
         PlotHistoryWidget.setObjectName("PlotHistoryWidget")
+<<<<<<< HEAD
         PlotHistoryWidget.resize(613, 267)
+=======
+        PlotHistoryWidget.resize(967, 353)
+>>>>>>> 990e6de6a27f46bb3c8e3d85273e966e10244693
         self.gridLayout = QtWidgets.QGridLayout(PlotHistoryWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.data_label = QtWidgets.QLabel(PlotHistoryWidget)
