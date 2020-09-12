@@ -11,6 +11,20 @@ class GrasshopperDriver(JKamGenDriver):
         self.cam_list.Clear()
         self.system.ReleaseInstance()
 
+    def _find_camera(self, serial_number):
+        print(f'Attempting to find camera device with serial number: {serial_number}')
+        cam_list = self._get_cam_list()
+        cam = None
+        for camera in cam_list:
+            cam_serial = self._get_cam_serial(camera)
+            print(f'Found device with serial number: {cam_serial}')
+            if cam_serial == serial_number:
+                cam = camera
+                print(f'SUCCESS set current camera with serial number: {serial_number}')
+        if cam is None:
+            print(f'FAILED to find camera with serial number: {serial_number}')
+        return cam
+
     def _get_cam_list(self):
         self.cam_list = self.system.GetCameras()
         return self.cam_list
@@ -20,8 +34,8 @@ class GrasshopperDriver(JKamGenDriver):
         cam_serial = cam.TLDevice.DeviceSerialNumber.GetValue()
         return cam_serial
 
-    @staticmethod
-    def _arm_camera(cam):
+    def _arm_camera(self, serial_number):
+        cam = self._find_camera(serial_number)
         cam.Init()
 
     @staticmethod

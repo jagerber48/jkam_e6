@@ -207,8 +207,8 @@ class PlotHistoryWidget(QtWidgets.QWidget, Ui_PlotHistoryWidget):
         self.label = label
         self.num_history = num_history
         self.history = np.zeros(self.num_history)
-        self.history_min = self.history.min()
-        self.history_max = self.history.max()
+        self.history_min = self.history.min(initial=None)
+        self.history_max = self.history.max(initial=None)
 
         self.history_PlotWidget.disableAutoRange()
         self.history_plot = self.history_PlotWidget.plot()
@@ -237,13 +237,15 @@ class PlotHistoryWidget(QtWidgets.QWidget, Ui_PlotHistoryWidget):
         self.plot()
 
     def set_min(self):
-        self.history_min = self.history.min()
+        self.history_min = self.history.min(initial=None)
         self.history_PlotWidget.setYRange(self.history_min, self.history_max)
 
     def set_max(self):
-        self.history_max = self.history.max()
+        self.history_max = self.history.max(initial=None)
         self.history_PlotWidget.setYRange(self.history_min, self.history_max)
 
     def plot(self):
+        if self.log_checkBox.isChecked():
+            self.history[self.history <= 0] = np.nan
         self.history_plot.setData(self.history)
         # self.history_PlotWidget.setYRange(self.history_min, self.history_max)
