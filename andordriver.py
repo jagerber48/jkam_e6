@@ -61,8 +61,8 @@ class AndorDriver(JKamGenDriver):
         frame = buf
         return frame
 
-    @staticmethod
-    def _load_default_settings(cam):
+    def _load_default_settings(self, cam):
+        self.system.set_enum_string(cam, "PixelEncoding", "Mono16")
         pass
         # cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
         # cam.UserSetLoad()
