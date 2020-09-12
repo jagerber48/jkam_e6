@@ -175,7 +175,7 @@ class ATCore(object):
         """)
 
         #self.lib = self.ffi.verify('#include "atcore.h"', include_dirs=["."], libraries=["atcore"])
-        self.lib = self.ffi.dlopen('andor_sdk//atcore')
+        self.lib = self.ffi.dlopen('andor_sdk//atcore.lib')
         self.handle_return(self.lib.AT_InitialiseLibrary())
 
     def __del__(self):
