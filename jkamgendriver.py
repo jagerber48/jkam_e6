@@ -37,7 +37,6 @@ class JKamGenDriver(QObject):
         self.start_acquisition_signal.connect(self.frame_grabber.grab_frames)
 
         self.open_connection()
-        self.cam_list = self._get_cam_list()
         self.cam = None
         self.serial_number = ''
         self.exposure_time = 0
@@ -46,25 +45,12 @@ class JKamGenDriver(QObject):
         self.armed = False
         self.acquiring = False
 
-    def find_camera(self, serial_number):
-        print(f'Attempting to find camera device with serial number: {serial_number}')
-        self.cam = None
-        for camera in self.cam_list:
-            cam_serial = self._get_cam_serial(camera)
-            print(f'Found device with serial number: {cam_serial}')
-            if cam_serial == serial_number:
-                self.cam = camera
-                self.serial_number = cam_serial
-                print(f'SUCCESS set current camera with serial number: {self.serial_number}')
-        if self.cam is None:
-            print(f'FAILED to find camera with serial number: {serial_number}')
-
     def arm_camera(self, serial_number):
         """
         Establish communication with camera and initialize for acquisition
         """
-        self.find_camera(serial_number)
-        self._arm_camera(self.cam)
+        # self.find_camera(serial_number)
+        self.cam = self._arm_camera(serial_number)
         self._load_default_settings(self.cam)
         self.armed = True
         print(f'ARMED Camera with serial number: {self.serial_number}')

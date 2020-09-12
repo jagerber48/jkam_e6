@@ -8,15 +8,14 @@ class GrasshopperDriver(JKamGenDriver):
         self.system = PySpin.System.GetInstance()
 
     def _close_connection(self):
-        self.cam_list.Clear()
         self.system.ReleaseInstance()
 
     def _find_camera(self, serial_number):
         print(f'Attempting to find camera device with serial number: {serial_number}')
-        cam_list = self._get_cam_list()
+        cam_list = self.system.GetCameras()
         cam = None
         for camera in cam_list:
-            cam_serial = self._get_cam_serial(camera)
+            cam_serial = camera.TLDevice.DeviceSerialNumber.GetValue()
             print(f'Found device with serial number: {cam_serial}')
             if cam_serial == serial_number:
                 cam = camera
@@ -25,18 +24,10 @@ class GrasshopperDriver(JKamGenDriver):
             print(f'FAILED to find camera with serial number: {serial_number}')
         return cam
 
-    def _get_cam_list(self):
-        self.cam_list = self.system.GetCameras()
-        return self.cam_list
-
-    @staticmethod
-    def _get_cam_serial(cam):
-        cam_serial = cam.TLDevice.DeviceSerialNumber.GetValue()
-        return cam_serial
-
     def _arm_camera(self, serial_number):
         cam = self._find_camera(serial_number)
         cam.Init()
+        return cam
 
     @staticmethod
     def _disarm_camera(cam):

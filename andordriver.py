@@ -1,40 +1,27 @@
 import numpy as np
-from .andordriver.atcore import ATCore
+from andordriver.atcore import ATCore
 from jkamgendriver import JKamGenDriver
 
 
-class AndorDriver(JKamGenDriver):
+class GrasshopperDriver(JKamGenDriver):
     def _open_connection(self):
         self.system = ATCore()
 
     def _close_connection(self):
-        self.cam_list.Clear()
-        self.system.ReleaseInstance()
+        self.system.close(self.cam)
 
-    def _get_cam_list(self):
-        self.cam_list = self.system.GetCameras()
-        return self.cam_list
-
-    @staticmethod
-    def _get_cam_serial(cam):
-        cam_serial = cam.TLDevice.DeviceSerialNumber.GetValue()
-        return cam_serial
-
-    @staticmethod
-    def _arm_camera(cam):
-        cam.Init()
+    def _arm_camera(self, serial_number):
+        return self.system.open(0)
 
     @staticmethod
     def _disarm_camera(cam):
-        cam.DeInit()
+        pass
 
-    @staticmethod
-    def _start_acquisition(cam):
-        cam.BeginAcquisition()
+    def _start_acquisition(self, cam):
+        self.system.command(cam, 'AcquisitionStart')
 
-    @staticmethod
-    def _stop_acquisition(cam):
-        cam.EndAcquisition()
+    def _stop_acquisition(self, cam):
+        self.system.command(cam, 'AcquisitionStop')
 
     @staticmethod
     def _set_exposure_time(cam, exposure_time):
