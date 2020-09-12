@@ -39,6 +39,7 @@ class AndorDriver(JKamGenDriver):
 
     def _trigger_off(self, cam):
         self.system.set_enum_string(cam, 'TriggerMode', 'Internal')
+        self.system.set_enum_string(cam, 'CycleMode', 'Continuous')
 
     def _set_hardware_trigger(self, cam):
         self._trigger_on(cam)
@@ -58,7 +59,7 @@ class AndorDriver(JKamGenDriver):
         formatted_img = np_d[0:self.config['aoiheight'], 0:self.config['aoiwidth']]
         frame = formatted_img
         self.system.queue_buffer(cam, self.buf.ctypes.data, self.imageSizeBytes)
-        self.system.queue_buffer(cam, self.buf2.ctypes.data, self.imageSizeBytes)
+        # self.system.queue_buffer(cam, self.buf2.ctypes.data, self.imageSizeBytes)
 
         return frame
 
