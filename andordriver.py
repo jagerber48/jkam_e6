@@ -57,17 +57,20 @@ class AndorDriver(JKamGenDriver):
         np_d = np_d.reshape(self.config['aoiheight'], round(np_d.size / self.config['aoiheight']))
         formatted_img = np_d[0:self.config['aoiheight'], 0:self.config['aoiwidth']]
         frame = formatted_img
+        self.system.queue_buffer(cam, self.buf.ctypes.data, self.imageSizeBytes)
+        self.system.queue_buffer(cam, self.buf2.ctypes.data, self.imageSizeBytes)
+
         return frame
 
     def _load_default_settings(self, cam):
         self.system.set_enum_string(cam, "PixelEncoding", "Mono16")
 
-        imageSizeBytes = self.system.get_int(cam, "ImageSizeBytes")
-        print("    Queuing Buffer (size", imageSizeBytes, ")")
-        self.buf = np.empty((imageSizeBytes,), dtype='B')
-        self.system.queue_buffer(cam, self.buf.ctypes.data, imageSizeBytes)
-        self.buf2 = np.empty((imageSizeBytes,), dtype='B')
-        self.system.queue_buffer(cam, self.buf2.ctypes.data, imageSizeBytes)
+        self.imageSizeBytes = self.system.get_int(cam, "ImageSizeBytes")
+        print("    Queuing Buffer (size", self.imageSizeBytes, ")")
+        self.buf = np.empty((self.imageSizeBytes,), dtype='B')
+        self.system.queue_buffer(cam, self.buf.ctypes.data, self.imageSizeBytes)
+        self.buf2 = np.empty((self.imageSizeBytes,), dtype='B')
+        self.system.queue_buffer(cam, self.buf2.ctypes.data, self.imageSizeBytes)
 
         self.config = {'aoiheight': self.system.get_int(cam, "AOIHeight"),
                        'aoiwidth': self.system.get_int(cam, "AOIWidth"),
