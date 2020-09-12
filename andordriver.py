@@ -35,7 +35,7 @@ class AndorDriver(JKamGenDriver):
         return exposure_time_result
 
     def _trigger_on(self, cam):
-        self.system.set_enum_string(cam, 'TriggerMode', 'ExternalStart')
+        self.system.set_enum_string(cam, 'TriggerMode', 'External Start')
 
     def _trigger_off(self, cam):
         self.system.set_enum_string(cam, 'TriggerMode', 'Internal')
@@ -56,7 +56,7 @@ class AndorDriver(JKamGenDriver):
         self.system.queue_buffer(cam, buf.ctypes.data, imageSizeBytes)
         buf2 = np.empty((imageSizeBytes,), dtype='B')
         self.system.queue_buffer(cam, buf2.ctypes.data, imageSizeBytes)
-        
+
         _, _ = self.system.wait_buffer(cam)
         frame = buf
         return frame
