@@ -1,4 +1,4 @@
-from andordriver.atcore import ATCore
+from andor_sdk.atcore import ATCore
 from jkamgendriver import JKamGenDriver
 
 

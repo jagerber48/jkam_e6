@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 from ui_components.cameracontrolwidget_ui import Ui_CameraControlWidget
 from grasshopperdriver import GrasshopperDriver
+from andordriver import AndorDriver
 
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
@@ -20,7 +21,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
         self.setupUi(self)
-        self.driver = GrasshopperDriver()
+        # self.driver = GrasshopperDriver()
+        self.driver = AndorDriver()
 
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
 
