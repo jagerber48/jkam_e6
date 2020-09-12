@@ -35,18 +35,17 @@ class AndorDriver(JKamGenDriver):
         return exposure_time_result
 
     def _trigger_on(self, cam):
-        self.system.set_enum_string(cam, 'TriggerMode', 'External Start')
         self.system.set_enum_string(cam, 'CycleMode', 'Fixed')
 
     def _trigger_off(self, cam):
-        self.system.set_enum_string(cam, 'TriggerMode', 'Internal')
+        self.system.set_enum_string(cam, 'TriggerMode', 'Software')
         self.system.set_enum_string(cam, 'CycleMode', 'Continuous')
 
     def _set_hardware_trigger(self, cam):
-        self._trigger_on(cam)
+        self.system.set_enum_string(cam, 'TriggerMode', 'External Start')
 
     def _set_software_trigger(self, cam):
-        self._trigger_off(cam)
+        self.system.set_enum_string(cam, 'TriggerMode', 'Software')
 
     def _execute_software_trigger(self, cam):
         self.system.command(cam, 'SoftwareTrigger')
