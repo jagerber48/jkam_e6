@@ -51,6 +51,8 @@ class AndorDriver(JKamGenDriver):
         self.system.command(cam, 'SoftwareTrigger')
 
     def _grab_frame(self, cam):
+        self.system.queue_buffer(cam, self.buf.ctypes.data, self.imageSizeBytes)
+        self._execute_software_trigger(cam)
         _, _ = self.system.wait_buffer(cam)
 
         np_arr = self.buf[0:self.config['aoiheight'] * self.config['aoistride']]
@@ -58,8 +60,6 @@ class AndorDriver(JKamGenDriver):
         np_d = np_d.reshape(self.config['aoiheight'], round(np_d.size / self.config['aoiheight']))
         formatted_img = np_d[0:self.config['aoiheight'], 0:self.config['aoiwidth']]
         frame = formatted_img
-        self.system.queue_buffer(cam, self.buf.ctypes.data, self.imageSizeBytes)
-        self._execute_software_trigger(cam)
 
         return frame
 
@@ -69,7 +69,7 @@ class AndorDriver(JKamGenDriver):
         self.imageSizeBytes = self.system.get_int(cam, "ImageSizeBytes")
         print("    Queuing Buffer (size", self.imageSizeBytes, ")")
         self.buf = np.empty((self.imageSizeBytes,), dtype='B')
-        self.system.queue_buffer(cam, self.buf.ctypes.data, self.imageSizeBytes)
+        # self.system.queue_buffer(cam, self.buf.ctypes.data, self.imageSizeBytes)
 
         self.config = {'aoiheight': self.system.get_int(cam, "AOIHeight"),
                        'aoiwidth': self.system.get_int(cam, "AOIWidth"),
