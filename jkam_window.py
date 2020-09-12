@@ -30,6 +30,11 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.frame_received_signal = self.camera_control_widget.frame_received_signal
         self.frame_received_signal.connect(self.on_capture)
 
+        self.plothistoryanalyzer = PlotHistoryAnalyzer(RoiIntegrationAnalyzer(self.videovieweditor.imageview))
+        self.roi_analyzer_checkBox.clicked.connect(self.toggle_analyzer_window)
+        self.roi_bg_subtract_checkBox.toggled.connect(self.bg_subtract_toggled)
+        self.absorption_view_widget.analyis_complete_signal.connect(self.analyze)
+
         self.imaging_mode = None
         self.video_mode_radioButton.clicked.connect(self.set_imaging_mode)
         self.absorption_mode_radioButton.clicked.connect(self.set_imaging_mode)
@@ -37,11 +42,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.camera_control_widget.stopped_signal.connect(self.unlock_imaging_mode)
         self.camera_control_widget.trigger_mode_toggled.connect(self.trigger_mode_changed)
         self.set_imaging_mode()
-
-        self.plothistoryanalyzer = PlotHistoryAnalyzer(RoiIntegrationAnalyzer(self.videovieweditor.imageview))
-        self.roi_analyzer_checkBox.clicked.connect(self.toggle_analyzer_window)
-        self.roi_bg_subtract_checkBox.toggled.connect(self.bg_subtract_toggled)
-        self.absorption_view_widget.analyis_complete_signal.connect(self.analyze)
 
     def bg_subtract_toggled(self):
         if self.roi_bg_subtract_checkBox.isChecked():
