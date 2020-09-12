@@ -50,19 +50,19 @@ class AndorDriver(JKamGenDriver):
         self.system.command(cam, 'SoftwareTrigger')
 
     def _grab_frame(self, cam):
-        imageSizeBytes = self.system.get_int(cam, "ImageSizeBytes")
-        print("    Queuing Buffer (size", imageSizeBytes, ")")
-        buf = np.empty((imageSizeBytes,), dtype='B')
-        self.system.queue_buffer(cam, buf.ctypes.data, imageSizeBytes)
-        buf2 = np.empty((imageSizeBytes,), dtype='B')
-        self.system.queue_buffer(cam, buf2.ctypes.data, imageSizeBytes)
-
         _, _ = self.system.wait_buffer(cam)
-        frame = buf
+        frame = self.buf
         return frame
 
     def _load_default_settings(self, cam):
         self.system.set_enum_string(cam, "PixelEncoding", "Mono16")
+
+        imageSizeBytes = self.system.get_int(cam, "ImageSizeBytes")
+        print("    Queuing Buffer (size", imageSizeBytes, ")")
+        self.buf = np.empty((imageSizeBytes,), dtype='B')
+        self.system.queue_buffer(cam, self.buf.ctypes.data, imageSizeBytes)
+        self.buf2 = np.empty((imageSizeBytes,), dtype='B')
+        self.system.queue_buffer(cam, self.buf2.ctypes.data, imageSizeBytes)
         pass
         # cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
         # cam.UserSetLoad()
