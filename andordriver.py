@@ -51,7 +51,12 @@ class AndorDriver(JKamGenDriver):
 
     def _grab_frame(self, cam):
         _, _ = self.system.wait_buffer(cam)
-        frame = self.buf
+
+        np_arr = self.buf[0:self.config['aoiheight'] * self.config['aoistride']]
+        np_d = np_arr.view(dtype='H')
+        np_d = np_d.reshape(self.config['aoiheight'], round(np_d.size / self.config['aoiheight']))
+        formatted_img = np_d[0:self.config['aoiheight'], 0:self.config['aoiwidth']]
+        frame = formatted_img
         return frame
 
     def _load_default_settings(self, cam):
@@ -63,6 +68,11 @@ class AndorDriver(JKamGenDriver):
         self.system.queue_buffer(cam, self.buf.ctypes.data, imageSizeBytes)
         self.buf2 = np.empty((imageSizeBytes,), dtype='B')
         self.system.queue_buffer(cam, self.buf2.ctypes.data, imageSizeBytes)
+
+        self.config = {'aoiheight': self.system.get_int(cam, "AOIHeight"),
+                       'aoiwidth': self.system.get_int(cam, "AOIWidth"),
+                       'aoistride': self.system.get_int(cam, "AOIStride"),
+                       'pixelencoding': self.system.get_enum_string(cam, "PixelEncoding")}
         pass
         # cam.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
         # cam.UserSetLoad()
