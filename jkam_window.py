@@ -16,6 +16,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     # TODO: Handle closing of analysis window
     # TODO: Saving and storing of cameras and settings
     # TODO: Gaussian Fit Analysis
+    # TODO: Implement Fluorescence Imaging
     """
     GUI to control cameras especially for use in ultracold atomic imaging applications. Software control of
     different types of commercial imaging sensors. Provides functionality for video capture as well as multi-image
