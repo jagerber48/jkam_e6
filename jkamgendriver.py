@@ -133,19 +133,6 @@ class JKamGenDriver(QObject):
         """
         raise NotImplementedError
 
-    def _get_cam_list(self):
-        """
-        Return list of of accessible cameras
-        """
-        raise NotImplementedError
-
-    @staticmethod
-    def _get_cam_serial(cam):
-        """
-        Return serial number of cam as a string
-        """
-        raise NotImplementedError
-
     @staticmethod
     def _arm_camera(cam):
         """
