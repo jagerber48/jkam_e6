@@ -58,7 +58,6 @@ class AndorDriver(JKamGenDriver):
         np_d = np_d.reshape(self.config['aoiheight'], round(np_d.size / self.config['aoiheight']))
         formatted_img = np_d[0:self.config['aoiheight'], 0:self.config['aoiwidth']]
         frame = formatted_img
-        self.system.flush(cam)
         self.system.queue_buffer(cam, self.buf.ctypes.data, self.imageSizeBytes)
         self._execute_software_trigger(cam)
 
