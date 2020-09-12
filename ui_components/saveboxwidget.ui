@@ -51,7 +51,7 @@
        </widget>
       </item>
       <item row="4" column="0" colspan="2">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="file_path_label">
         <property name="font">
          <font>
           <pointsize>8</pointsize>
@@ -63,9 +63,9 @@
        </widget>
       </item>
       <item row="3" column="0" colspan="2">
-       <widget class="QLabel" name="file_path_label">
+       <widget class="QLabel" name="file_path_text_label">
         <property name="text">
-         <string>Filename for next save: </string>
+         <string>File path for next save: </string>
         </property>
        </widget>
       </item>
@@ -87,7 +87,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Y:\\e6-expdata\\data\\2020\\09\\11\\data</string>
+           <string>Y:\e6-expdata\data\2020\09\11\data</string>
           </property>
          </widget>
         </item>
@@ -167,9 +167,6 @@
           </property>
           <property name="maximum">
            <number>100000</number>
-          </property>
-          <property name="singleStep">
-           <number>0</number>
           </property>
           <property name="value">
            <number>1</number>
