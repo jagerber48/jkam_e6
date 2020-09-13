@@ -187,9 +187,11 @@ class PlotHistoryAnalyzer(QObject):
 
     def enable(self):
         self.analysis_request_signal.connect(self.analyze)
+        print('enabled')
 
     def disable(self):
         self.analysis_request_signal.disconnect(self.analyze)
+        print('disabled')
 
     def clear(self):
         self.analyzer.remove_roi()
@@ -200,6 +202,8 @@ class PlotHistoryWidget(QtWidgets.QWidget, Ui_PlotHistoryWidget):
     Rolling History Widget. pyqtgraph with the main functionality of providing a rolling history of data which has
     been loaded in through the "append_data" method.
     """
+    window_close_signal = pyqtSignal()
+
     def __init__(self, label='counts', num_history=200):
         super(PlotHistoryWidget, self).__init__()
         self.setupUi(self)
@@ -247,3 +251,7 @@ class PlotHistoryWidget(QtWidgets.QWidget, Ui_PlotHistoryWidget):
     def plot(self):
         self.history_plot.setData(self.history)
         # self.history_PlotWidget.setYRange(self.history_min, self.history_max)
+
+    def closeEvent(self, event):
+        self.window_close_signal.emit()
+        return super().closeEvent(event)

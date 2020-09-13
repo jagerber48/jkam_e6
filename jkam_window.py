@@ -14,7 +14,6 @@ class ImagingMode(Enum):
 
 class JKamWindow(QMainWindow, Ui_CameraWindow):
     # TODO: Documentation
-    # TODO: Handle closing of analysis window
     # TODO: Saving and storing of cameras and settings
     # TODO: Gaussian Fit Analysis
     # TODO: Implement Fluorescence Imaging
@@ -36,6 +35,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.roi_analyzer_checkBox.clicked.connect(self.toggle_analyzer_window)
         self.roi_bg_subtract_checkBox.toggled.connect(self.bg_subtract_toggled)
         self.absorption_view_widget.analyis_complete_signal.connect(self.on_all_frames_received)
+        self.plothistoryanalyzer.plothistorywidget.window_close_signal.connect(self.analyzer_window_closed)
 
         self.imaging_mode = None
         self.video_mode_radioButton.clicked.connect(self.set_imaging_mode)
@@ -46,7 +46,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.set_imaging_mode()
 
         self.savebox_widget.save_single_pushButton.clicked.connect(self.save_video_mode)
-
         self.video_frame = None
         self.autosave_ok = False
 
@@ -85,16 +84,16 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
                 dark_frame = self.absorption_view_widget.dark_frame
                 self.savebox_widget.save(atom_frame, bright_frame, dark_frame)
 
-    # def analyze(self):
-    #     self.plothistoryanalyzer.analysis_request_signal.emit()
-
     def toggle_analyzer_window(self):
         if self.roi_analyzer_checkBox.isChecked():
             self.plothistoryanalyzer.plothistorywidget.show()
             self.plothistoryanalyzer.enable()
         else:
             self.plothistoryanalyzer.plothistorywidget.close()
-            self.plothistoryanalyzer.disable()
+
+    def analyzer_window_closed(self):
+        self.roi_analyzer_checkBox.setChecked(False)
+        self.plothistoryanalyzer.disable()
 
     def set_imaging_mode(self):
         if self.video_mode_radioButton.isChecked():
