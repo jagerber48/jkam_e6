@@ -112,7 +112,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.set_imaging_mode()
 
     def save_video_mode(self):
-        self.savebox_widget.save_h5_single(self.video_data)
+        self.savebox_widget.save(self.video_data)
 
     def closeEvent(self, event):
         self.camera_control_widget.close()

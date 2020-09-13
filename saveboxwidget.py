@@ -3,7 +3,7 @@ from pathlib import Path
 from enum import Enum
 import h5py
 
-from PyQt5.QtWidgets import QWidget, QFileDialog
+from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSignal
 
 from ui_components.saveboxwidget_ui import Ui_SaveBoxWidget
@@ -16,6 +16,8 @@ class Mode(Enum):
 
 
 class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
+    # TODO: Implement 'running' mode
+    # TODO: Implement absorption/fluorescence saving mode
     save_request_signal = pyqtSignal()
     default_root = Path.cwd()
     # default_root = Path('Y:/', 'expdata-e6', 'data', '2020', '09', '12', 'data')
@@ -106,20 +108,31 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         self.file_number_spinBox.setEnabled(toggle_value)
 
     def save(self, *args):
-        self.get_savepath()
+        if self.file_path.exists():
+            msg = "The target file already exists, overwrite?"
+            reply = QMessageBox.question(self, 'Overwrite confirmation',
+                                         msg, QMessageBox.Yes, QMessageBox.No)
+            if reply == QMessageBox.No:
+                print('Save operation aborted')
+                # self.scan_button.setChecked(False)
+                return
+        if not self.data_path.exists():
+            self.data_path.mkdir(parents=True)
         if self.mode == Mode.SINGLE:
             self.save_h5_single(*args)
 
     def save_h5_single(self, frame, timestamp=None):
-        if not self.save_path.exists():
-            self.save_path.mkdir(parents=True)
-        with h5py.File(self.file_name, 'w') as hf:
+        with h5py.File(str(self.file_path), 'w') as hf:
             hf.create_dataset("frame", data=frame.astype('uint16'))
             if timestamp is not None:
                 hf.attrs['timestamp'] = timestamp.isoformat()
 
 
 def get_abbreviated_path_string(path, max_len=50):
+    """
+    Abbreviates string representation of a path object by removing top directory ancestors until the
+    string representation is less than max_len. Returns the string representation
+    """
     parts = path.parts
     path_string = ''
     path_abbreviated = False
