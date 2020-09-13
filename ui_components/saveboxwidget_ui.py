@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_SaveBoxWidget(object):
     def setupUi(self, SaveBoxWidget):
         SaveBoxWidget.setObjectName("SaveBoxWidget")
-        SaveBoxWidget.resize(346, 402)
+        SaveBoxWidget.resize(339, 395)
         self.gridLayout = QtWidgets.QGridLayout(SaveBoxWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.frame = QtWidgets.QFrame(SaveBoxWidget)
@@ -36,6 +36,7 @@ class Ui_SaveBoxWidget(object):
         self.file_prefix_lineEdit.setObjectName("file_prefix_lineEdit")
         self.gridLayout_2.addWidget(self.file_prefix_lineEdit, 3, 1, 1, 2)
         self.run_pushButton = QtWidgets.QPushButton(self.frame)
+        self.run_pushButton.setCheckable(True)
         self.run_pushButton.setObjectName("run_pushButton")
         self.gridLayout_2.addWidget(self.run_pushButton, 18, 0, 1, 3)
         self.file_number_label = QtWidgets.QLabel(self.frame)
@@ -93,11 +94,7 @@ class Ui_SaveBoxWidget(object):
         self.data_dir_label.setFont(font)
         self.data_dir_label.setObjectName("data_dir_label")
         self.gridLayout_2.addWidget(self.data_dir_label, 2, 0, 1, 3)
-        self.gridLayout.addWidget(self.frame, 0, 0, 3, 5)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout.addItem(spacerItem, 0, 5, 3, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout.addItem(spacerItem1, 3, 0, 1, 5)
+        self.gridLayout.addWidget(self.frame, 0, 0, 2, 2)
 
         self.retranslateUi(SaveBoxWidget)
         self.tabWidget.setCurrentIndex(0)

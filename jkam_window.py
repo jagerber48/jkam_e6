@@ -9,6 +9,7 @@ from AnalysisWidgets import PlotHistoryAnalyzer, RoiIntegrationAnalyzer
 class ImagingMode(Enum):
     VIDEO = 0
     ABSORPTION = 1
+    FLUORESCENCE = 2
 
 
 class JKamWindow(QMainWindow, Ui_CameraWindow):
@@ -34,7 +35,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.plothistoryanalyzer = PlotHistoryAnalyzer(RoiIntegrationAnalyzer(self.videovieweditor.imageview))
         self.roi_analyzer_checkBox.clicked.connect(self.toggle_analyzer_window)
         self.roi_bg_subtract_checkBox.toggled.connect(self.bg_subtract_toggled)
-        self.absorption_view_widget.analyis_complete_signal.connect(self.analyze)
+        self.absorption_view_widget.analyis_complete_signal.connect(self.on_all_frames_received)
 
         self.imaging_mode = None
         self.video_mode_radioButton.clicked.connect(self.set_imaging_mode)
@@ -46,7 +47,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
         self.savebox_widget.save_single_pushButton.clicked.connect(self.save_video_mode)
 
-        self.video_data = None
+        self.video_frame = None
+        self.autosave_ok = False
 
     def bg_subtract_toggled(self):
         if self.roi_bg_subtract_checkBox.isChecked():
@@ -63,17 +65,28 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.frame_received_signal.connect(self.on_capture)
 
     def display_video_frame(self, frame):
-        self.video_data = frame
+        self.video_frame = frame
         image_view = self.videovieweditor.imageview
-        image_view.setImage(frame, autoRange=False,
+        image_view.setImage(self.video_frame, autoRange=False,
                             autoLevels=False, autoHistogramRange=False)
-        self.analyze()
+        self.on_all_frames_received()
 
     def display_absorption_frame(self, frame):
         self.absorption_view_widget.process_frame(frame)
 
-    def analyze(self):
+    def on_all_frames_received(self):
         self.plothistoryanalyzer.analysis_request_signal.emit()
+        if self.verify_autosave():
+            if self.imaging_mode == ImagingMode.VIDEO:
+                self.savebox_widget.save(self.video_frame)
+            if self.imaging_mode == ImagingMode.ABSORPTION:
+                atom_frame = self.absorption_view_widget.atom_frame
+                bright_frame = self.absorption_view_widget.bright_frame
+                dark_frame = self.absorption_view_widget.dark_frame
+                self.savebox_widget.save(atom_frame, bright_frame, dark_frame)
+
+    # def analyze(self):
+    #     self.plothistoryanalyzer.analysis_request_signal.emit()
 
     def toggle_analyzer_window(self):
         if self.roi_analyzer_checkBox.isChecked():
@@ -88,10 +101,12 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.view_stackedWidget.setCurrentIndex(0)
             self.plothistoryanalyzer.analyzer.set_imageview(self.videovieweditor.imageview)
             self.imaging_mode = ImagingMode.VIDEO
+            self.savebox_widget.mode = self.savebox_widget.ModeType.SINGLE
         elif self.absorption_mode_radioButton.isChecked():
             self.view_stackedWidget.setCurrentIndex(1)
             self.plothistoryanalyzer.analyzer.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
             self.imaging_mode = ImagingMode.ABSORPTION
+            self.savebox_widget.mode = self.savebox_widget.ModeType.ABSORPTION
 
     def lock_imaging_mode(self):
         self.video_mode_radioButton.setEnabled(False)
@@ -112,7 +127,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.set_imaging_mode()
 
     def save_video_mode(self):
-        self.savebox_widget.save(self.video_data)
+        self.savebox_widget.save(self.video_frame)
+
+    def verify_autosave(self):
+        if not self.camera_control_widget.continuous_radioButton.isChecked() and self.savebox_widget.autosaving:
+            return True
+        else:
+            return False
 
     def closeEvent(self, event):
         self.camera_control_widget.close()
