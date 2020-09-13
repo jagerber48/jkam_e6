@@ -44,6 +44,10 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.camera_control_widget.trigger_mode_toggled.connect(self.trigger_mode_changed)
         self.set_imaging_mode()
 
+        self.savebox_widget.save_single_pushButton.clicked.connect(self.save_video_mode)
+
+        self.video_data = None
+
     def bg_subtract_toggled(self):
         if self.roi_bg_subtract_checkBox.isChecked():
             self.plothistoryanalyzer.analyzer.enable_bg_subtract()
@@ -59,6 +63,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.frame_received_signal.connect(self.on_capture)
 
     def display_video_frame(self, frame):
+        self.video_data = frame
         image_view = self.videovieweditor.imageview
         image_view.setImage(frame, autoRange=False,
                             autoLevels=False, autoHistogramRange=False)
@@ -105,6 +110,9 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         elif self.camera_control_widget.triggered_radioButton.isChecked():
             self.absorption_mode_radioButton.setEnabled(True)
         self.set_imaging_mode()
+
+    def save_video_mode(self):
+        self.savebox_widget.save_h5_single(self.video_data)
 
     def closeEvent(self, event):
         self.camera_control_widget.close()

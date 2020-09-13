@@ -21,8 +21,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
         self.setupUi(self)
-        # self.driver = GrasshopperDriver()
-        self.driver = AndorDriver()
+        self.driver = GrasshopperDriver()
+        # self.driver = AndorDriver()
 
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
 
