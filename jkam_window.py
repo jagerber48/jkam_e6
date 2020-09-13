@@ -1,5 +1,21 @@
+"""
+JKam package provides a GUI interface to control  camera sensors especially for use in ultracold atomic imaging
+applications. Software control of various types of sensors is supported through the JKamGenDriver class which acts
+as an interface between the JKam package and a sensor specific driver.
+Functionality includes video acquisition and softwar and setting up software and hardware triggering as well as
+sensor exposure adjustments. There is also support for absorption imaging which includes the capture of three
+frames and subsequent image processing.
+Image can be saved and autosaved upon acquisition and processing.
+Some basic image processing functionality is implemented such as region of area integration with background subtraction.
+There are plans to implement a Gaussian fit analyzer.
+
+Original program by Jonathan Kohler.
+Updated by Justin Gerber (2020) - gerberja@berkeley.edu
+"""
+
 from enum import Enum
 import sys
+import ctypes
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtGui import QIcon
 from ui_components.camerawindow_ui import Ui_CameraWindow
@@ -18,10 +34,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     # TODO: Gaussian Fit Analysis
     # TODO: Implement Fluorescence Imaging
     """
-    GUI to control cameras especially for use in ultracold atomic imaging applications. Software control of
-    different types of commercial imaging sensors. Provides functionality for video capture as well as multi-image
-    capture and processing. Also includes rudimentary image analysis tools such as region of interest integration
-    and (future) gaussian fits.
+    Camera GUI. Includes visualization of image captures, camera controls and trigger configuration,
+    UI for saving and autosaving of imaging and some simple image analysis UI.
     """
 
     def __init__(self):
@@ -45,7 +59,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.camera_control_widget.trigger_mode_toggled.connect(self.trigger_mode_changed)
         self.set_imaging_mode()
 
-        self.savebox_widget.save_single_pushButton.clicked.connect(self.save_video_mode)
+        self.savebox_widget.save_single_pushButton.clicked.connect(self.save_frames)
         self.video_frame = None
         self.autosave_ok = False
 
@@ -76,13 +90,16 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     def on_all_frames_received(self):
         self.plothistoryanalyzer.analysis_request_signal.emit()
         if self.verify_autosave():
-            if self.imaging_mode == ImagingMode.VIDEO:
-                self.savebox_widget.save(self.video_frame)
-            if self.imaging_mode == ImagingMode.ABSORPTION:
-                atom_frame = self.absorption_view_widget.atom_frame
-                bright_frame = self.absorption_view_widget.bright_frame
-                dark_frame = self.absorption_view_widget.dark_frame
-                self.savebox_widget.save(atom_frame, bright_frame, dark_frame)
+            self.save_frames()
+
+    def save_frames(self):
+        if self.imaging_mode == ImagingMode.VIDEO:
+            self.savebox_widget.save(self.video_frame)
+        if self.imaging_mode == ImagingMode.ABSORPTION:
+            atom_frame = self.absorption_view_widget.atom_frame
+            bright_frame = self.absorption_view_widget.bright_frame
+            dark_frame = self.absorption_view_widget.dark_frame
+            self.savebox_widget.save(atom_frame, bright_frame, dark_frame)
 
     def toggle_analyzer_window(self):
         if self.roi_analyzer_checkBox.isChecked():
@@ -125,9 +142,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.absorption_mode_radioButton.setEnabled(True)
         self.set_imaging_mode()
 
-    def save_video_mode(self):
-        self.savebox_widget.save(self.video_frame)
-
     def verify_autosave(self):
         if not self.camera_control_widget.continuous_radioButton.isChecked() and self.savebox_widget.autosaving:
             return True
@@ -139,10 +153,14 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         sys.exit()
 
 
-# Start Qt event loop unless running in interactive mode.
 def main():
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon('favicon.ico'))
+
+    # Code to setup windows icon for jkam
+    app.setWindowIcon(QIcon('favicon.png'))
+    myappid = u'jkam_app'  # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
     ex = JKamWindow()
     ex.show()
     app.exec_()
