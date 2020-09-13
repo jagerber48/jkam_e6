@@ -121,12 +121,44 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         if self.mode == Mode.SINGLE:
             self.save_h5_single(*args)
 
-    def save_h5_single(self, frame, timestamp=None):
+    def save_single_shot(self, *args):
+        if self.file_path.exists():
+            msg = "The target file already exists, overwrite?"
+            reply = QMessageBox.question(self, 'Overwrite confirmation',
+                                         msg, QMessageBox.Yes, QMessageBox.No)
+            if reply == QMessageBox.No:
+                print('Save operation aborted')
+                # self.scan_button.setChecked(False)
+                return
+        if not self.data_path.exists():
+            self.data_path.mkdir(parents=True)
+        if self.mode == Mode.SINGLE:
+            self.save_h5_single_frame(*args)
+        if self.mode == Mode.ABSORPTION:
+            self.save_h5_absorption_frames(*args)
+        if self.mode == Mode.FLUORESCENCE:
+            self.save_h5_fluorescence_frames(*args)
+
+    def save_h5_single_frame(self, frame, timestamp=None):
         with h5py.File(str(self.file_path), 'w') as hf:
             hf.create_dataset("frame", data=frame.astype('uint16'))
             if timestamp is not None:
                 hf.attrs['timestamp'] = timestamp.isoformat()
 
+    def save_h5_absorption_frames(self, atom_frame, bright_frame, dark_frame, timestamp=None):
+        with h5py.File(str(self.file_path), 'w') as hf:
+            hf.create_dataset("atom_frame", data=atom_frame.astype('uint16'))
+            hf.create_dataset("bright_frame", data=bright_frame.astype('uint16'))
+            hf.create_dataset("dark_frame", data=dark_frame.astype('uint16'))
+            if timestamp is not None:
+                hf.attrs['timestamp'] = timestamp.isoformat()
+
+    def save_h5_fluorescence_frames(self, atom_frame, reference_frame, timestamp=None):
+        with h5py.File(str(self.file_path), 'w') as hf:
+            hf.create_dataset("atom_frame", data=atom_frame.astype('uint16'))
+            hf.create_dataset("reference_frame", data=reference_frame.astype('uint16'))
+            if timestamp is not None:
+                hf.attrs['timestamp'] = timestamp.isoformat()
 
 def get_abbreviated_path_string(path, max_len=50):
     """
