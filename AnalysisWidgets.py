@@ -109,29 +109,38 @@ class RoiIntegrationAnalyzer(QObject):
     # TODO: Get the logic right, it's super messed up right now. Functionality is spread between 3 classes,
     # TODO: This one, the plothistoryanalyzer class and jkam_window. Needs to be condensed a lot.
     analysis_complete_signal = pyqtSignal(float)
+    analyze_signal = pyqtSignal()
 
     def __init__(self):
         super(RoiIntegrationAnalyzer, self).__init__()
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()
+        self.analyze_signal.connect(self.analyze)
 
-    def analyze(self, roi_sig, imageview, roi_bg=None, bg_subtract=False):
-        self.thread.quit()
-        roi_sig_data = roi_sig.getArrayRegion(imageview.image, imageview.getImageItem())
+        self.imageview = None
+        self.roi_sig = None
+        self.roi_bg = None
+        self.analyzing = False
+
+    def analyze(self):
+        self.analyzing = True
+        roi_sig_data = self.roi_sig.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
         roi_sig_sum = np.nansum(roi_sig_data)
         pixel_num_sig = roi_sig_data.size
         result = roi_sig_sum
-        if roi_bg is not None and bg_subtract:
-            roi_bg_data = roi_bg.getArrayRegion(imageview.image, imageview.getImageItem())
+        if self.roi_bg is not None and self.bg_subtract:
+            roi_bg_data = self.roi_bg.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
             pixel_num_bg = roi_bg_data.size
             roi_bg_mean = np.nansum(roi_bg_data) / pixel_num_bg
             result = roi_sig_sum - roi_bg_mean * pixel_num_sig
         self.analysis_complete_signal.emit(result)
-        self.thread.start()
+        self.analyzing = False
 
 
 class RoiAnalyzer(QWidget, Ui_RoiAnalyzer):
+    analyze_signal = pyqtSignal()
+
     def __init__(self, imageview, label='counts', num_history=200):
         super(RoiAnalyzer, self).__init__(imageview)
         self.setupUi(self)
@@ -140,20 +149,27 @@ class RoiAnalyzer(QWidget, Ui_RoiAnalyzer):
         self.plothistorywindow.window_close_signal.connect(self.window_closed)
         self.analyzer.analysis_complete_signal.connect(self.plothistorywindow.append_data)
 
+        self.analyze_signal.connect(self.analyze)
+
         self.enable_checkBox.clicked.connect(self.toggle_enable)
         self.bg_subtract_checkBox.clicked.connect(self.toggle_bg_subtract)
 
         self.imageview = None
+        self.analyzer.imageview = self.imageview
+
         self.enabled = False
         self.bg_subtract = False
-        self.roi_sig = None
-        self.roi_bg = None
+
+    def analyze(self):
+        if self.enabled and not self.analyzer.analyzing:
+            self.analyzer.analyze_signal.emit()
 
     def enable(self):
         self.enabled = True
-        self.roi_sig = self.create_roi(pen='w')
+        self.analyzer.enabled = True
+        self.analyzer.roi_sig = self.create_roi(pen='w')
         if self.bg_subtract:
-            self.roi_bg = self.create_roi(pen='r')
+            self.analyzer.roi_bg = self.create_roi(pen='r')
 
     def disable(self):
         self.enabled = False
@@ -162,39 +178,41 @@ class RoiAnalyzer(QWidget, Ui_RoiAnalyzer):
 
     def enable_bg_subtract(self):
         self.bg_subtract = True
+        self.analyzer.bg_subtract = self.bg_subtract
         if self.enabled:
-            self.roi_bg = self.create_roi(pen='r')
+            self.analyzer.roi_bg = self.create_roi(pen='r')
 
     def disable_bg_subtract(self):
         self.bg_subtract = False
-        if self.roi_bg is not None:
+        self.analyzer.bg_subtract = False
+        if self.analyzer.roi_bg is not None:
             self.remove_bg_roi()
 
     def remove_sig_roi(self):
         try:
-            self.imageview.removeItem(self.roi_sig)
-            self.roi_sig = None
+            self.analyzer.imageview.removeItem(self.analyzer.roi_sig)
+            self.analyzer.roi_sig = None
         except AttributeError:
             pass
 
     def remove_bg_roi(self):
         try:
-            self.imageview.removeItem(self.roi_bg)
-            self.roi_bg = None
+            self.analyzer.imageview.removeItem(self.analyzer.roi_bg)
+            self.analyzer.roi_bg = None
         except AttributeError:
             pass
 
     def set_imageview(self, imageview):
         if imageview is not self.imageview:
-            self.toggle_enable()
-            self.imageview = imageview
+            self.disable()
+            self.analyzer.imageview = imageview
             self.toggle_enable()
 
     def create_roi(self, pen='w'):
         roi = pg.RectROI((200, 200), (200, 200), pen=pen)
         roi.addScaleHandle([1, 1], [0, 0])
         roi.addScaleHandle([0, 0], [1, 1])
-        self.imageview.addItem(roi)
+        self.analyzer.imageview.addItem(roi)
         return roi
 
     def toggle_enable(self):

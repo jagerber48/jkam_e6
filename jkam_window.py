@@ -36,9 +36,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     Camera GUI. Includes visualization of image captures, camera controls and trigger configuration,
     UI for saving and autosaving of imaging and some simple image analysis UI.
     """
-    roi_analyze_signal = pyqtSignal()
-    roi_analyzer_enable_signal = pyqtSignal(bool)
-    roi_analyzer_bg_enable_signal = pyqtSignal(bool)
+    analyze_signal = pyqtSignal()
     all_frames_received_signal = pyqtSignal()
 
     def __init__(self):
@@ -55,7 +53,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         # self.roi_bg_subtract_checkBox.clicked.connect(self.toggle_roi_analyzer_bg_subtract)
         # self.roi_analyzer_bg_enable_signal.connect(self.roihistoryanalyzer.toggle_bg_subtract)
         # self.roihistoryanalyzer.window_close_signal.connect(self.analyzer_window_closed)
-        # self.absorption_view_widget.analyis_complete_signal.connect(self.on_all_frames_received)
+        self.absorption_view_widget.analyis_complete_signal.connect(self.on_all_frames_received)
+        self.analyze_signal.connect(self.roi_analyzer_widget.analyze_signal.emit)
 
         self.imaging_mode = None
         self.video_mode_radioButton.clicked.connect(self.set_imaging_mode)
@@ -88,8 +87,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.absorption_view_widget.process_frame(frame)
 
     def on_all_frames_received(self):
-        self.roi_analyze_signal.emit()
-        # self.roihistoryanalyzer.analysis_request_signal.emit()
+        self.analyze_signal.emit()
         if self.verify_autosave():
             self.save_frames()
 
