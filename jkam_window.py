@@ -49,7 +49,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.roi_analyzer_checkBox.clicked.connect(self.toggle_analyzer_window)
         self.roi_bg_subtract_checkBox.toggled.connect(self.bg_subtract_toggled)
         self.absorption_view_widget.analyis_complete_signal.connect(self.on_all_frames_received)
-        self.plothistoryanalyzer.plothistorywidget.window_close_signal.connect(self.analyzer_window_closed)
+        self.plothistoryanalyzer.plothistorywindow.window_close_signal.connect(self.analyzer_window_closed)
 
         self.imaging_mode = None
         self.video_mode_radioButton.clicked.connect(self.set_imaging_mode)
@@ -103,10 +103,10 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def toggle_analyzer_window(self):
         if self.roi_analyzer_checkBox.isChecked():
-            self.plothistoryanalyzer.plothistorywidget.show()
+            self.plothistoryanalyzer.plothistorywindow.show()
             self.plothistoryanalyzer.enable()
         else:
-            self.plothistoryanalyzer.plothistorywidget.close()
+            self.plothistoryanalyzer.plothistorywindow.close()
 
     def analyzer_window_closed(self):
         self.roi_analyzer_checkBox.setChecked(False)
