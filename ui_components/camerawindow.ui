@@ -134,26 +134,8 @@
          <enum>QFrame::Sunken</enum>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="roi_analyzer_checkBox">
-           <property name="text">
-            <string>Enable</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="roi_bg_subtract_checkBox">
-           <property name="text">
-            <string>Background Subtract</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="roi_label">
-           <property name="text">
-            <string>ROI Analyzer</string>
-           </property>
-          </widget>
+         <item row="0" column="1">
+          <widget class="RoiAnalyzer" name="roi_analyzer_widget" native="true"/>
          </item>
         </layout>
        </widget>
@@ -181,7 +163,7 @@
      <x>0</x>
      <y>0</y>
      <width>805</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -210,6 +192,12 @@
    <class>SaveBoxWidget</class>
    <extends>QWidget</extends>
    <header>saveboxwidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RoiAnalyzer</class>
+   <extends>QWidget</extends>
+   <header>AnalysisWidgets</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

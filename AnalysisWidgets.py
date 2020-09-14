@@ -1,8 +1,10 @@
 import numpy as np
 from scipy.constants import hbar
 from PyQt5.QtCore import QThread, QObject, pyqtSignal
+from PyQt5.QtWidgets import QWidget
 import pyqtgraph as pg
 from plothistorywindow import PlotHistoryWindow
+from ui_components.roianalyzer_ui import Ui_RoiAnalyzer
 
 
 class AbsorptionAnalyzer(QObject):
@@ -106,18 +108,46 @@ class AbsorptionAnalyzer(QObject):
 class RoiIntegrationAnalyzer(QObject):
     # TODO: Get the logic right, it's super messed up right now. Functionality is spread between 3 classes,
     # TODO: This one, the plothistoryanalyzer class and jkam_window. Needs to be condensed a lot.
-    analysis_complete_signal = pyqtSignal(object)
+    analysis_complete_signal = pyqtSignal(float)
 
-    def __init__(self, imageview: AbsorptionAnalyzer):
+    def __init__(self):
         super(RoiIntegrationAnalyzer, self).__init__()
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()
-        self.imageview = imageview
-        self.roi_sig = None
-        self.roi_bg = None
+
+    def analyze(self, roi_sig, imageview, roi_bg=None, bg_subtract=False):
+        self.thread.quit()
+        roi_sig_data = roi_sig.getArrayRegion(imageview.image, imageview.getImageItem())
+        roi_sig_sum = np.nansum(roi_sig_data)
+        pixel_num_sig = roi_sig_data.size
+        result = roi_sig_sum
+        if roi_bg is not None and bg_subtract:
+            roi_bg_data = roi_bg.getArrayRegion(imageview.image, imageview.getImageItem())
+            pixel_num_bg = roi_bg_data.size
+            roi_bg_mean = np.nansum(roi_bg_data) / pixel_num_bg
+            result = roi_sig_sum - roi_bg_mean * pixel_num_sig
+        self.analysis_complete_signal.emit(result)
+        self.thread.start()
+
+
+class RoiAnalyzer(QWidget, Ui_RoiAnalyzer):
+    def __init__(self, imageview, label='counts', num_history=200):
+        super(RoiAnalyzer, self).__init__(imageview)
+        self.setupUi(self)
+        self.analyzer = RoiIntegrationAnalyzer()
+        self.plothistorywindow = PlotHistoryWindow(label=label, num_history=num_history)
+        self.plothistorywindow.window_close_signal.connect(self.window_closed)
+        self.analyzer.analysis_complete_signal.connect(self.plothistorywindow.append_data)
+
+        self.enable_checkBox.clicked.connect(self.toggle_enable)
+        self.bg_subtract_checkBox.clicked.connect(self.toggle_bg_subtract)
+
+        self.imageview = None
         self.enabled = False
         self.bg_subtract = False
+        self.roi_sig = None
+        self.roi_bg = None
 
     def enable(self):
         self.enabled = True
@@ -156,9 +186,9 @@ class RoiIntegrationAnalyzer(QObject):
 
     def set_imageview(self, imageview):
         if imageview is not self.imageview:
-            self.toggle_enable(False)
+            self.toggle_enable()
             self.imageview = imageview
-            self.toggle_enable(True)
+            self.toggle_enable()
 
     def create_roi(self, pen='w'):
         roi = pg.RectROI((200, 200), (200, 200), pen=pen)
@@ -167,45 +197,20 @@ class RoiIntegrationAnalyzer(QObject):
         self.imageview.addItem(roi)
         return roi
 
-    def analyze(self):
-        if self.enabled:
-            self.thread.quit()
-            roi_sig_data = self.roi_sig.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
-            roi_sig_sum = np.nansum(roi_sig_data)
-            pixel_num_sig = roi_sig_data.size
-            result = roi_sig_sum
-            if self.bg_subtract:
-                roi_bg_data = self.roi_bg.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
-                pixel_num_bg = roi_bg_data.size
-                roi_bg_mean = np.nansum(roi_bg_data) / pixel_num_bg
-                result = roi_sig_sum - roi_bg_mean * pixel_num_sig
-            self.analysis_complete_signal.emit(result)
-            self.thread.start()
-
-
-class RoiHistoryAnalyzer(RoiIntegrationAnalyzer):
-    window_close_signal = pyqtSignal()
-
-    def __init__(self, imageview, label='counts', num_history=200):
-        super(RoiHistoryAnalyzer, self).__init__(imageview)
-        self.plothistorywindow = PlotHistoryWindow(label=label, num_history=num_history)
-        self.plothistorywindow.window_close_signal.connect(self.window_closed)
-        self.analyzer.analysis_complete_signal.connect(self.plothistorywindow.append_data)
-
-    def toggle_enable(self, toggle_value):
-        if toggle_value is True:
+    def toggle_enable(self):
+        if self.enable_checkBox.isChecked():
             self.plothistorywindow.show()
             self.enable()
-        elif toggle_value is False:
+        elif not self.enable_checkBox.isChecked():
             self.plothistorywindow.close()
             self.disable()
 
-    def toggle_bg_subtract(self, toggle_value):
-        if toggle_value is True:
+    def toggle_bg_subtract(self):
+        if self.bg_subtract_checkBox.isChecked():
             self.enable_bg_subtract()
-        elif toggle_value is False:
+        elif not self.bg_subtract_checkBox.isChecked():
             self.disable_bg_subtract()
 
     def window_closed(self):
-        super().disable()
-        self.window_close_signal.emit()
+        self.disable()
+        self.enable_checkBox.setChecked(False)

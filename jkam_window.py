@@ -20,7 +20,6 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtGui import QIcon
 from ui_components.camerawindow_ui import Ui_CameraWindow
-from AnalysisWidgets import RoiHistoryAnalyzer, RoiIntegrationAnalyzer
 
 
 class ImagingMode(Enum):
@@ -38,6 +37,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     UI for saving and autosaving of imaging and some simple image analysis UI.
     """
     roi_analyze_signal = pyqtSignal()
+    roi_analyzer_enable_signal = pyqtSignal(bool)
+    roi_analyzer_bg_enable_signal = pyqtSignal(bool)
     all_frames_received_signal = pyqtSignal()
 
     def __init__(self):
@@ -47,11 +48,14 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.frame_received_signal = self.camera_control_widget.frame_received_signal
         self.frame_received_signal.connect(self.on_capture)
 
-        self.roihistoryanalyzer = RoiHistoryAnalyzer(RoiIntegrationAnalyzer(self.videovieweditor.imageview))
-        self.roi_analyzer_checkBox.clicked.connect(self.toggle_roi_enable)
-        self.roi_bg_subtract_checkBox.toggled.connect(self.toggle_roi_bg_subtract)
-        self.absorption_view_widget.analyis_complete_signal.connect(self.on_all_frames_received)
-        self.roihistoryanalyzer.plothistorywindow.window_close_signal.connect(self.analyzer_window_closed)
+        # self.roihistoryanalyzer = self.
+        # self.roi_analyze_signal.connect(self.roihistoryanalyzer.analyze)
+        # self.roi_analyzer_checkBox.clicked.connect(self.toggle_roi_analyzer_enable)
+        # self.roi_analyzer_enable_signal.connect(self.roihistoryanalyzer.toggle_enable)
+        # self.roi_bg_subtract_checkBox.clicked.connect(self.toggle_roi_analyzer_bg_subtract)
+        # self.roi_analyzer_bg_enable_signal.connect(self.roihistoryanalyzer.toggle_bg_subtract)
+        # self.roihistoryanalyzer.window_close_signal.connect(self.analyzer_window_closed)
+        # self.absorption_view_widget.analyis_complete_signal.connect(self.on_all_frames_received)
 
         self.imaging_mode = None
         self.video_mode_radioButton.clicked.connect(self.set_imaging_mode)
@@ -84,7 +88,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.absorption_view_widget.process_frame(frame)
 
     def on_all_frames_received(self):
-        self.roihistoryanalyzer.analysis_request_signal.emit()
+        self.roi_analyze_signal.emit()
+        # self.roihistoryanalyzer.analysis_request_signal.emit()
         if self.verify_autosave():
             self.save_frames()
 
@@ -97,32 +102,24 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             dark_frame = self.absorption_view_widget.dark_frame
             self.savebox_widget.save(atom_frame, bright_frame, dark_frame)
 
-    def toggle_roi_enable(self):
-        if self.roi_analyzer_checkBox.isChecked():
-            self.roihistoryanalyzer.plothistorywindow.show()
-            self.roihistoryanalyzer.enable()
-        else:
-            self.roihistoryanalyzer.plothistorywindow.close()
+    def toggle_roi_analyzer_enable(self):
+        self.roi_analyzer_enable_signal.emit(self.roi_analyzer_checkBox.isChecked())
 
-    def toggle_roi_bg_subtract(self):
-        if self.roi_bg_subtract_checkBox.isChecked():
-            self.roihistoryanalyzer.analyzer.enable_bg_subtract()
-        if not self.roi_bg_subtract_checkBox.isChecked():
-            self.roihistoryanalyzer.analyzer.disable_bg_subtract()
+    def toggle_roi_analyzer_bg_subtract(self):
+        self.roi_analyzer_bg_enable_signal.emit(self.roi_bg_subtract_checkBox.isChecked())
 
     def analyzer_window_closed(self):
         self.roi_analyzer_checkBox.setChecked(False)
-        self.roihistoryanalyzer.disable()
 
     def set_imaging_mode(self):
         if self.video_mode_radioButton.isChecked():
             self.view_stackedWidget.setCurrentIndex(0)
-            self.roihistoryanalyzer.analyzer.set_imageview(self.videovieweditor.imageview)
+            self.roi_analyzer_widget.set_imageview(self.videovieweditor.imageview)
             self.imaging_mode = ImagingMode.VIDEO
             self.savebox_widget.mode = self.savebox_widget.ModeType.SINGLE
         elif self.absorption_mode_radioButton.isChecked():
             self.view_stackedWidget.setCurrentIndex(1)
-            self.roihistoryanalyzer.analyzer.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
+            self.roi_analyzer_widget.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
             self.imaging_mode = ImagingMode.ABSORPTION
             self.savebox_widget.mode = self.savebox_widget.ModeType.ABSORPTION
 
