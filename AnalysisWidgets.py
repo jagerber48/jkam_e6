@@ -107,8 +107,6 @@ class RoiIntegrationAnalyzer(QObject):
     # TODO: Get the logic right, it's super messed up right now. Functionality is spread between 3 classes,
     # TODO: This one, the plothistoryanalyzer class and jkam_window. Needs to be condensed a lot.
     analysis_complete_signal = pyqtSignal(object)
-    toggle_enable_signal = pyqtSignal(bool)
-    toggle_bg_subtract_signal = pyqtSignal(bool)
 
     def __init__(self, imageview: AbsorptionAnalyzer):
         super(RoiIntegrationAnalyzer, self).__init__()
@@ -118,39 +116,24 @@ class RoiIntegrationAnalyzer(QObject):
         self.imageview = imageview
         self.roi_sig = None
         self.roi_bg = None
-        self.bg_subtract = False
-        self.analyzing = False
         self.enabled = False
-        self.toggle_enable_signal.connect(self.toggle_enable)
-        self.toggle_bg_subtract_signal.connect(self.toggle_bg_subtract)
-
-    def toggle_enable(self, toggle_value):
-        if toggle_value is True:
-            self.enable()
-        elif toggle_value is False:
-            self.disable()
-
-    def toggle_bg_subtract(self, toggle_value):
-        if toggle_value is True:
-            self.enable_bg_subtract()
-        elif toggle_value is False:
-            self.disable_bg_subtract()
+        self.bg_subtract = False
 
     def enable(self):
-        self.roi_sig = self.create_roi(pen='w')
         self.enabled = True
+        self.roi_sig = self.create_roi(pen='w')
         if self.bg_subtract:
-            self.enable_bg_subtract()
-
-    def enable_bg_subtract(self):
-        self.bg_subtract = True
-        if self.enabled:
             self.roi_bg = self.create_roi(pen='r')
 
     def disable(self):
         self.enabled = False
         self.remove_sig_roi()
         self.remove_bg_roi()
+
+    def enable_bg_subtract(self):
+        self.bg_subtract = True
+        if self.enabled:
+            self.roi_bg = self.create_roi(pen='r')
 
     def disable_bg_subtract(self):
         self.bg_subtract = False
@@ -173,9 +156,9 @@ class RoiIntegrationAnalyzer(QObject):
 
     def set_imageview(self, imageview):
         if imageview is not self.imageview:
-            self.disable()
+            self.toggle_enable(False)
             self.imageview = imageview
-            self.enable()
+            self.toggle_enable(True)
 
     def create_roi(self, pen='w'):
         roi = pg.RectROI((200, 200), (200, 200), pen=pen)
@@ -186,7 +169,7 @@ class RoiIntegrationAnalyzer(QObject):
 
     def analyze(self):
         if self.enabled:
-            self.analyzing = True
+            self.thread.quit()
             roi_sig_data = self.roi_sig.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
             roi_sig_sum = np.nansum(roi_sig_data)
             pixel_num_sig = roi_sig_data.size
@@ -197,41 +180,32 @@ class RoiIntegrationAnalyzer(QObject):
                 roi_bg_mean = np.nansum(roi_bg_data) / pixel_num_bg
                 result = roi_sig_sum - roi_bg_mean * pixel_num_sig
             self.analysis_complete_signal.emit(result)
-            self.analyzing = False
-
-    def remove_roi(self):
-        try:
-            self.imageview.removeItem(self.roi_sig)
-        except AttributeError:
-            pass
-        try:
-            self.imageview.removeItem(self.roi_bg)
-        except AttributeError:
-            pass
+            self.thread.start()
 
 
-class PlotHistoryAnalyzer(QObject):
-    analysis_request_signal = pyqtSignal()
-    analyze_signal = pyqtSignal()
+class RoiHistoryAnalyzer(RoiIntegrationAnalyzer):
+    window_close_signal = pyqtSignal()
 
-    def __init__(self, analyzer: RoiIntegrationAnalyzer, label='counts', num_history=200):
-        super(PlotHistoryAnalyzer, self).__init__()
-        self.analyzer = analyzer
+    def __init__(self, imageview, label='counts', num_history=200):
+        super(RoiHistoryAnalyzer, self).__init__(imageview)
         self.plothistorywindow = PlotHistoryWindow(label=label, num_history=num_history)
+        self.plothistorywindow.window_close_signal.connect(self.window_closed)
         self.analyzer.analysis_complete_signal.connect(self.plothistorywindow.append_data)
-        self.analyze_signal.connect(self.analyzer.analyze)
-        self.analyzing = False
 
-    def analyze(self):
-        if not self.analyzer.analyzing:
-            self.analyze_signal.emit()
+    def toggle_enable(self, toggle_value):
+        if toggle_value is True:
+            self.plothistorywindow.show()
+            self.enable()
+        elif toggle_value is False:
+            self.plothistorywindow.close()
+            self.disable()
 
-    def enable(self):
-        print('enabling')
-        self.analysis_request_signal.connect(self.analyze)
-        self.analyzer.enable()
+    def toggle_bg_subtract(self, toggle_value):
+        if toggle_value is True:
+            self.enable_bg_subtract()
+        elif toggle_value is False:
+            self.disable_bg_subtract()
 
-    def disable(self):
-        print('disabling')
-        self.analysis_request_signal.disconnect(self.analyze)
-        self.analyzer.disable()
+    def window_closed(self):
+        super().disable()
+        self.window_close_signal.emit()
