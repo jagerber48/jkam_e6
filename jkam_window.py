@@ -63,12 +63,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.video_frame = None
         self.autosave_ok = False
 
-    def bg_subtract_toggled(self):
-        if self.roi_bg_subtract_checkBox.isChecked():
-            self.plothistoryanalyzer.analyzer.enable_bg_subtract()
-        if not self.roi_bg_subtract_checkBox.isChecked():
-            self.plothistoryanalyzer.analyzer.disable_bg_subtract()
-
     def on_capture(self, frame):
         self.frame_received_signal.disconnect(self.on_capture)
         if self.imaging_mode == ImagingMode.VIDEO:
@@ -107,6 +101,12 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.plothistoryanalyzer.enable()
         else:
             self.plothistoryanalyzer.plothistorywindow.close()
+
+    def bg_subtract_toggled(self):
+        if self.roi_bg_subtract_checkBox.isChecked():
+            self.plothistoryanalyzer.analyzer.enable_bg_subtract()
+        if not self.roi_bg_subtract_checkBox.isChecked():
+            self.plothistoryanalyzer.analyzer.disable_bg_subtract()
 
     def analyzer_window_closed(self):
         self.roi_analyzer_checkBox.setChecked(False)

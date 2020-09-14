@@ -11,7 +11,7 @@ import pyqtgraph as pg
 
 from old.grasshopperdriver_3 import GrasshopperDriver
 from AnalysisWidgets import AbsorptionROI
-from ScanWidget import ScanWidget
+from old.ScanWidget import ScanWidget
 
 from colormaps import false2_cmap
 

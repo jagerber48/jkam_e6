@@ -13,9 +13,9 @@ QtCore.Signal = QtCore.pyqtSignal
 import numpy as np
 import pyqtgraph as pg
 
-from AndorDriver import AndorObject, AndorConfig, Status
+from AndorDriver import AndorObject, Status
 from AnalysisWidgets import AbsorptionROI
-from ScanWidget import ScanWidget
+from old.ScanWidget import ScanWidget
 
 # from colormaps import cmap
 

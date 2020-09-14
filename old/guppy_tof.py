@@ -1,6 +1,5 @@
 import sys
-from shutil import copyfile
-from os import makedirs, path
+from os import path
 import datetime
 
 import numpy as np
@@ -23,7 +22,7 @@ except:
 
 from GuppyDriver import GuppyObject
 from AnalysisWidgets import AbsorptionROI
-from ScanWidget import ScanWidget
+from old.ScanWidget import ScanWidget
 
 from colormaps import cmap
 
