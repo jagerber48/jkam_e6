@@ -1,7 +1,6 @@
 from ui_components.fluorescence_view_widget_ui import Ui_FluorescenceViewWidget
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
-import pyqtgraph as pg
 from AnalysisWidgets import AbsorptionAnalyzer
 
 
@@ -19,12 +18,6 @@ class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
 
         for editor in self.editor_list:
             image_view = editor.imageview
-            image_view.ui.roiBtn.hide()
-            image_view.ui.menuBtn.hide()
-            vLine = pg.InfiniteLine(angle=90, movable=True)
-            hLine = pg.InfiniteLine(angle=0, movable=True)
-            image_view.addItem(vLine, ignoreBounds=True)
-            image_view.addItem(hLine, ignoreBounds=True)
             image_view.getView().setXLink(self.N_view_editor.imageview.getView())
             image_view.getView().setYLink(self.N_view_editor.imageview.getView())
 

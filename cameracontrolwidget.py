@@ -91,7 +91,6 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.abort()
 
     def stop(self, aborting=False):
-        print('STOPPING')
         if not aborting:
             try:
                 self.driver.stop_acquisition()

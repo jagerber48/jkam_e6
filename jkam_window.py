@@ -27,11 +27,13 @@ class ImagingMode(Enum):
     ABSORPTION = 1
     FLUORESCENCE = 2
 
+
 class JKamWindow(QMainWindow, Ui_CameraWindow):
     # TODO: Documentation
     # TODO: Saving and storing of cameras and settings
     # TODO: Gaussian Fit Analysis
-    # TODO: More
+    # TODO: More default settings to load in Andordriver
+    # TODO: ROI imaging/saving to save on data storage?
     """
     Camera GUI. Includes visualization of image captures, camera controls and trigger configuration,
     UI for saving and autosaving of imaging and some simple image analysis UI.
