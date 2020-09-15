@@ -6,7 +6,6 @@ if sys.version < '3':
 else:
     def u(x):
         return x
-import os
 
 class ATCoreException(Exception): pass
 
@@ -176,7 +175,6 @@ class ATCore(object):
         """)
 
         #self.lib = self.ffi.verify('#include "atcore.h"', include_dirs=["."], libraries=["atcore"])
-        os.environ['PATH'] = os.path.dirname(__file__) + ';' + os.environ['PATH']
         self.lib = self.ffi.dlopen('atcore')
         self.handle_return(self.lib.AT_InitialiseLibrary())
 

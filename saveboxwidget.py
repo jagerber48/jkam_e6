@@ -69,7 +69,10 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         self.daily_data_path = Path(year, month, day, 'data')
 
     def set_run_path(self):
-        self.run_path = Path(self.run_name_lineEdit.text())
+        if self.run_path != Path(self.run_name_lineEdit.text()):
+            self.run_path = Path(self.run_name_lineEdit.text())
+            self.file_number_spinBox.setValue(1)
+            self.file_number = self.file_number_spinBox.value()
 
     def build_data_path(self):
         self.set_daily_data_path()
@@ -134,6 +137,8 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
     def save(self, *args):
         # Only verify file path existence for single shot saves. For autosaving the path is verified when the
         # run is started.
+        self.build_data_path()
+        self.build_file_name()
         if not self.autosaving:
             if self.file_path.exists():
                 msg = "The target file already exists, overwrite?"
