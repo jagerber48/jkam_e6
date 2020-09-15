@@ -1,4 +1,4 @@
-from atcore import ATCore, ATCoreException
+from atcore import ATCore
 import numpy as np
 # import pyfits
 

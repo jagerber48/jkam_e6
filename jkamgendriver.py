@@ -44,6 +44,7 @@ class JKamGenDriver(QObject):
         self.connected = False
         self.armed = False
         self.acquiring = False
+        self._trigger_enabled = False
 
     def arm_camera(self, serial_number):
         """
@@ -72,8 +73,8 @@ class JKamGenDriver(QObject):
         print(f'STARTED camera acquisition with serial number: {self.serial_number}')
 
     def stop_acquisition(self):
-        self._stop_acquisition(self.cam)
         self.acquiring = False
+        self._stop_acquisition(self.cam)
         print(f'STOPPED camera acquisition with serial number: {self.serial_number}')
 
     def set_exposure_time(self, exposure_time):
@@ -85,10 +86,12 @@ class JKamGenDriver(QObject):
 
     def trigger_on(self):
         self._trigger_on(self.cam)
+        self._trigger_enabled = True
         print('Trigger enabled')
 
     def trigger_off(self):
         self._trigger_off(self.cam)
+        self._trigger_enabled = False
         print('Trigger disabled')
 
     def set_software_trigger(self):

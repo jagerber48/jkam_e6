@@ -1,5 +1,5 @@
 import numpy as np
-from andor_sdk.atcore import ATCore
+from atcore import ATCore, ATCoreException
 from jkamgendriver import JKamGenDriver
 
 
@@ -8,41 +8,46 @@ class AndorDriver(JKamGenDriver):
         self.system = ATCore()
 
     def _close_connection(self):
-        self.system.close(self.cam)
+        pass
 
     def _arm_camera(self, serial_number):
         return self.system.open(0)
 
-    @staticmethod
-    def _disarm_camera(cam):
-        pass
+    def _disarm_camera(self, cam):
+        self.system.flush(cam)
+        self.system.close(cam)
 
     def _start_acquisition(self, cam):
+        print('flushing')
+        self.system.flush(cam)
+        print('flushed')
         self.system.command(cam, 'AcquisitionStart')
+        print('started')
 
     def _stop_acquisition(self, cam):
+        print('stopping')
         self.system.command(cam, 'AcquisitionStop')
+        print('stopped')
 
     def _set_exposure_time(self, cam, exposure_time):
         """
-        exposure time input in ms. Andor SDK3 uses exposure time in s
+        exposure time input in ms. Andor SDK3 sets exposure time in s and gets it in us.
         Return actual exposure time in ms
         """
         converted_exposure_time = exposure_time * 1e-3
         self.system.set_float(cam, 'ExposureTime', converted_exposure_time)
         self.system.get_float(cam, 'ExposureTime')
-        exposure_time_result = self.system.get_float(cam, 'ExposureTime') * 1e-3
+        exposure_time_result = self.system.get_float(cam, 'ExposureTime') * 1e3
         return exposure_time_result
 
     def _trigger_on(self, cam):
-        self.system.set_enum_string(cam, 'CycleMode', 'Fixed')
+        pass
 
     def _trigger_off(self, cam):
         self.system.set_enum_string(cam, 'TriggerMode', 'Software')
-        self.system.set_enum_string(cam, 'CycleMode', 'Continuous')
 
     def _set_hardware_trigger(self, cam):
-        self.system.set_enum_string(cam, 'TriggerMode', 'External Start')
+        self.system.set_enum_string(cam, 'TriggerMode', 'External')
 
     def _set_software_trigger(self, cam):
         self.system.set_enum_string(cam, 'TriggerMode', 'Software')
@@ -52,19 +57,23 @@ class AndorDriver(JKamGenDriver):
 
     def _grab_frame(self, cam):
         self.system.queue_buffer(cam, self.buf.ctypes.data, self.imageSizeBytes)
-        self._execute_software_trigger(cam)
-        _, _ = self.system.wait_buffer(cam)
-
+        if not self._trigger_enabled:
+            self._execute_software_trigger(cam)
+            print('triggered')
+        try:
+            _, _ = self.system.wait_buffer(cam, timeout=ATCore.AT_INFINITE)
+        except ATCoreException:
+            print('ATCoreException')
         np_arr = self.buf[0:self.config['aoiheight'] * self.config['aoistride']]
         np_d = np_arr.view(dtype='H')
         np_d = np_d.reshape(self.config['aoiheight'], round(np_d.size / self.config['aoiheight']))
-        formatted_img = np_d[0:self.config['aoiheight'], 0:self.config['aoiwidth']]
-        frame = formatted_img
-
+        # formatted_img = np_d  # [0:self.config['aoiheight'], 0:self.config['aoiwidth']]
+        frame = np_d
         return frame
 
     def _load_default_settings(self, cam):
-        self.system.set_enum_string(cam, "PixelEncoding", "Mono16")
+        self.system.set_enum_string(cam, "SimplePreAmpGainControl", "12-bit (low noise)")
+        self.system.set_enum_string(cam, 'CycleMode', 'Continuous')
 
         self.imageSizeBytes = self.system.get_int(cam, "ImageSizeBytes")
         print("    Queuing Buffer (size", self.imageSizeBytes, ")")

@@ -7,8 +7,8 @@ from ui_components.saveboxwidget_ui import Ui_SaveBoxWidget
 
 
 class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
-    default_root = Path.cwd()
-    # default_root = Path('Y:/', 'expdata-e6', 'data', '2020', '09', '12', 'data')
+    # default_root = Path.cwd()
+    default_root = Path('Y:/', 'expdata-e6', 'data')
     default_camera_name = 'jkam_imaging'
 
     class ModeType(Enum):

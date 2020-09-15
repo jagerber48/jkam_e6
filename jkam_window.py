@@ -53,7 +53,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         # self.roi_bg_subtract_checkBox.clicked.connect(self.toggle_roi_analyzer_bg_subtract)
         # self.roi_analyzer_bg_enable_signal.connect(self.roihistoryanalyzer.toggle_bg_subtract)
         # self.roihistoryanalyzer.window_close_signal.connect(self.analyzer_window_closed)
-        self.absorption_view_widget.analyis_complete_signal.connect(self.on_all_frames_received)
+        self.absorption_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
         self.analyze_signal.connect(self.roi_analyzer_widget.analyze_signal.emit)
 
         self.imaging_mode = None
