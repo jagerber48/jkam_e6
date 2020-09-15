@@ -28,6 +28,7 @@ class AndorDriver(JKamGenDriver):
         print('stopping')
         self.system.command(cam, 'AcquisitionStop')
         print('stopped')
+        self.system.flush(cam)
 
     def _set_exposure_time(self, cam, exposure_time):
         """
@@ -41,7 +42,7 @@ class AndorDriver(JKamGenDriver):
         return exposure_time_result
 
     def _trigger_on(self, cam):
-        pass
+        self.system.set_enum_string(cam, 'TriggerMode', 'Software')
 
     def _trigger_off(self, cam):
         self.system.set_enum_string(cam, 'TriggerMode', 'Software')
@@ -64,11 +65,12 @@ class AndorDriver(JKamGenDriver):
             _, _ = self.system.wait_buffer(cam, timeout=ATCore.AT_INFINITE)
         except ATCoreException:
             print('ATCoreException')
+            return
         np_arr = self.buf[0:self.config['aoiheight'] * self.config['aoistride']]
         np_d = np_arr.view(dtype='H')
         np_d = np_d.reshape(self.config['aoiheight'], round(np_d.size / self.config['aoiheight']))
-        # formatted_img = np_d  # [0:self.config['aoiheight'], 0:self.config['aoiwidth']]
-        frame = np_d
+        formatted_img = np_d[0:self.config['aoiheight'], 0:self.config['aoiwidth']]
+        frame = np.copy(formatted_img.astype(int))
         return frame
 
     def _load_default_settings(self, cam):

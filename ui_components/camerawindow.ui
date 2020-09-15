@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="2">
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="savebox_verticalLayout">
       <item>
        <widget class="SaveBoxWidget" name="savebox_widget" native="true"/>
       </item>
@@ -60,11 +60,17 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="fluorescence_view_page"/>
+      <widget class="QWidget" name="fluorescence_view_page">
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="FluorescenceViewWidget" name="fluorescence_view_widget" native="true"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
     <item row="1" column="0">
-     <layout class="QGridLayout" name="gridLayout_7">
+     <layout class="QGridLayout" name="mode_analysis_gridLayout">
       <item row="0" column="0" colspan="2">
        <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
       </item>
@@ -108,7 +114,7 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QRadioButton" name="radioButton">
+          <widget class="QRadioButton" name="fluorescence_mode_radioButton">
            <property name="text">
             <string>Fluorescence</string>
            </property>
@@ -209,6 +215,12 @@
    <class>RoiAnalyzer</class>
    <extends>QWidget</extends>
    <header>AnalysisWidgets</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FluorescenceViewWidget</class>
+   <extends>QWidget</extends>
+   <header>fluorescence_view_widget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

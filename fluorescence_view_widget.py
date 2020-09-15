@@ -1,4 +1,4 @@
-from ui_components.fluorescence_view_widget_ui import  Ui_FluorescenceViewWidget
+from ui_components.fluorescence_view_widget_ui import Ui_FluorescenceViewWidget
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 import pyqtgraph as pg
@@ -40,17 +40,17 @@ class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
         if self.frame_count == 1:
             self.atom_frame = frame
             image_view = self.atom_view_editor.imageview
-            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+            image_view.setImage(self.atom_frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
         elif self.frame_count == 2:
             self.ref_frame = frame
             image_view = self.reference_view_editor.imageview
-            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+            image_view.setImage(self.ref_frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
 
             # self.diff_frame, self.number_frame = self.analyzer.absorption_od_and_number(self.atom_frame,
             #                                                                             self.ref_frame,
             #                                                                             self.dark_frame)
 
-            self.diff_frame = self. atom_frame - self.ref_frame
+            self.diff_frame = self.atom_frame - self.ref_frame
             self.number_frame = 1 * self.diff_frame
 
             image_view = self.diff_view_editor.imageview
@@ -61,7 +61,7 @@ class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
             image_view.setImage(self.number_frame, autoRange=False, autoLevels=False,
                                 autoHistogramRange=False)
             self.frame_count = 0
-            self.analyis_complete_signal.emit()
+            self.analysis_complete_signal.emit()
         else:
             print('ERROR: too many frames')
             self.atom_frame = None

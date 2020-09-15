@@ -31,7 +31,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     # TODO: Documentation
     # TODO: Saving and storing of cameras and settings
     # TODO: Gaussian Fit Analysis
-    # TODO: Implement Fluorescence Imaging
+    # TODO: More
     """
     Camera GUI. Includes visualization of image captures, camera controls and trigger configuration,
     UI for saving and autosaving of imaging and some simple image analysis UI.
@@ -54,11 +54,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         # self.roi_analyzer_bg_enable_signal.connect(self.roihistoryanalyzer.toggle_bg_subtract)
         # self.roihistoryanalyzer.window_close_signal.connect(self.analyzer_window_closed)
         self.absorption_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
+        self.fluorescence_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
         self.analyze_signal.connect(self.roi_analyzer_widget.analyze_signal.emit)
 
         self.imaging_mode = None
         self.video_mode_radioButton.clicked.connect(self.set_imaging_mode)
         self.absorption_mode_radioButton.clicked.connect(self.set_imaging_mode)
+        self.fluorescence_mode_radioButton.clicked.connect(self.set_imaging_mode)
         self.camera_control_widget.started_signal.connect(self.lock_imaging_mode)
         self.camera_control_widget.stopped_signal.connect(self.unlock_imaging_mode)
         self.camera_control_widget.trigger_mode_toggled.connect(self.trigger_mode_changed)
@@ -66,7 +68,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
         self.savebox_widget.save_single_pushButton.clicked.connect(self.save_frames)
         self.video_frame = None
-        self.autosave_ok = False
 
     def on_capture(self, frame):
         self.frame_received_signal.disconnect(self.on_capture)
@@ -74,6 +75,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.display_video_frame(frame)
         elif self.imaging_mode == ImagingMode.ABSORPTION:
             self.display_absorption_frame(frame)
+        elif self.imaging_mode == ImagingMode.FLUORESCENCE:
+            self.display_fluorescence_frame(frame)
         self.frame_received_signal.connect(self.on_capture)
 
     def display_video_frame(self, frame):
@@ -85,6 +88,9 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def display_absorption_frame(self, frame):
         self.absorption_view_widget.process_frame(frame)
+
+    def display_fluorescence_frame(self, frame):
+        self.fluorescence_view_widget.process_frame(frame)
 
     def on_all_frames_received(self):
         self.analyze_signal.emit()
@@ -99,6 +105,10 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             bright_frame = self.absorption_view_widget.bright_frame
             dark_frame = self.absorption_view_widget.dark_frame
             self.savebox_widget.save(atom_frame, bright_frame, dark_frame)
+        if self.imaging_mode == ImagingMode.FLUORESCENCE:
+            atom_frame = self.fluorescence_view_widget.atom_frame
+            ref_frame = self.fluorescence_view_widget.ref_frame
+            self.savebox_widget.save(atom_frame, ref_frame)
 
     def toggle_roi_analyzer_enable(self):
         self.roi_analyzer_enable_signal.emit(self.roi_analyzer_checkBox.isChecked())
@@ -120,23 +130,31 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.roi_analyzer_widget.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
             self.imaging_mode = ImagingMode.ABSORPTION
             self.savebox_widget.mode = self.savebox_widget.ModeType.ABSORPTION
+        elif self.fluorescence_mode_radioButton.isChecked():
+            self.view_stackedWidget.setCurrentIndex(2)
+            self.roi_analyzer_widget.set_imageview(self.fluorescence_view_widget.N_view_editor.imageview)
+            self.imaging_mode = ImagingMode.FLUORESCENCE
+            self.savebox_widget.mode = self.savebox_widget.ModeType.FLUORESCENCE
 
     def lock_imaging_mode(self):
         self.video_mode_radioButton.setEnabled(False)
         self.absorption_mode_radioButton.setEnabled(False)
+        self.fluorescence_mode_radioButton.setEnabled(False)
 
     def unlock_imaging_mode(self):
         self.video_mode_radioButton.setEnabled(True)
         if not self.camera_control_widget.continuous_radioButton.isChecked():
             self.absorption_mode_radioButton.setEnabled(True)
+            self.fluorescence_mode_radioButton.setEnabled(True)
 
     def trigger_mode_changed(self):
         if self.camera_control_widget.continuous_radioButton.isChecked():
             self.video_mode_radioButton.setChecked(True)
-            self.absorption_mode_radioButton.setChecked(False)
             self.absorption_mode_radioButton.setEnabled(False)
+            self.fluorescence_mode_radioButton.setEnabled(False)
         elif self.camera_control_widget.triggered_radioButton.isChecked():
             self.absorption_mode_radioButton.setEnabled(True)
+            self.fluorescence_mode_radioButton.setEnabled(True)
         self.set_imaging_mode()
 
     def verify_autosave(self):
