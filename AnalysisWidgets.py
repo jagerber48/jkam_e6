@@ -1,9 +1,10 @@
 import numpy as np
 from scipy.constants import hbar
-from PyQt5 import QtWidgets
 from PyQt5.QtCore import QThread, QObject, pyqtSignal
+from PyQt5.QtWidgets import QWidget
 import pyqtgraph as pg
-from ui_components.plothistorywidget_ui import Ui_PlotHistoryWidget
+from plothistorywindow import PlotHistoryWindow
+from ui_components.roianalyzer_ui import Ui_RoiAnalyzer
 
 
 class AbsorptionAnalyzer(QObject):
@@ -105,44 +106,22 @@ class AbsorptionAnalyzer(QObject):
 
 
 class RoiIntegrationAnalyzer(QObject):
-    analysis_complete_signal = pyqtSignal(object)
+    # TODO: Get the logic right, it's super messed up right now. Functionality is spread between 3 classes,
+    # TODO: This one, the plothistoryanalyzer class and jkam_window. Needs to be condensed a lot.
+    analysis_complete_signal = pyqtSignal(float)
+    analyze_signal = pyqtSignal()
 
-    def __init__(self, imageview: AbsorptionAnalyzer):
+    def __init__(self):
         super(RoiIntegrationAnalyzer, self).__init__()
         self.thread = QThread()
         self.moveToThread(self.thread)
         self.thread.start()
-        self.imageview = imageview
-        self.roi_sig = self.create_roi(pen='w')
+        self.analyze_signal.connect(self.analyze)
+
+        self.imageview = None
+        self.roi_sig = None
         self.roi_bg = None
-        self.bg_subtract = False
         self.analyzing = False
-
-    def set_imageview(self, imageview):
-        if imageview is not self.imageview:
-            self.remove_roi()
-            self.imageview = imageview
-            self.roi_sig = self.create_roi(pen='w')
-            if self.bg_subtract:
-                self.roi_bg = self.create_roi(pen='r')
-
-    def create_roi(self, pen='w'):
-        roi = pg.RectROI((200, 200), (200, 200), pen=pen)
-        roi.addScaleHandle([1, 1], [0, 0])
-        roi.addScaleHandle([0, 0], [1, 1])
-        self.imageview.addItem(roi)
-        return roi
-
-    def enable_bg_subtract(self):
-        self.roi_bg = self.create_roi(pen='r')
-        self.bg_subtract = True
-
-    def disable_bg_subtract(self):
-        try:
-            self.imageview.removeItem(self.roi_bg)
-        except AttributeError:
-            pass
-        self.bg_subtract = False
 
     def analyze(self):
         self.analyzing = True
@@ -150,7 +129,7 @@ class RoiIntegrationAnalyzer(QObject):
         roi_sig_sum = np.nansum(roi_sig_data)
         pixel_num_sig = roi_sig_data.size
         result = roi_sig_sum
-        if self.bg_subtract:
+        if self.roi_bg is not None and self.bg_subtract:
             roi_bg_data = self.roi_bg.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
             pixel_num_bg = roi_bg_data.size
             roi_bg_mean = np.nansum(roi_bg_data) / pixel_num_bg
@@ -158,92 +137,98 @@ class RoiIntegrationAnalyzer(QObject):
         self.analysis_complete_signal.emit(result)
         self.analyzing = False
 
-    def remove_roi(self):
-        try:
-            self.imageview.removeItem(self.roi_sig)
-        except AttributeError:
-            pass
-        try:
-            self.imageview.removeItem(self.roi_bg)
-        except AttributeError:
-            pass
 
-
-class PlotHistoryAnalyzer(QObject):
-    analysis_request_signal = pyqtSignal()
+class RoiAnalyzer(QWidget, Ui_RoiAnalyzer):
     analyze_signal = pyqtSignal()
 
-    def __init__(self, analyzer: RoiIntegrationAnalyzer, label='counts', num_history=200):
-        super(PlotHistoryAnalyzer, self).__init__()
-        self.analyzer = analyzer
-        self.plothistorywidget = PlotHistoryWidget(label=label, num_history=num_history)
-        self.analyzer.analysis_complete_signal.connect(self.plothistorywidget.append_data)
-        self.analyze_signal.connect(self.analyzer.analyze)
-        self.analyzing = False
+    def __init__(self, imageview, label='counts', num_history=200):
+        super(RoiAnalyzer, self).__init__(imageview)
+        self.setupUi(self)
+        self.analyzer = RoiIntegrationAnalyzer()
+        self.plothistorywindow = PlotHistoryWindow(label=label, num_history=num_history)
+        self.plothistorywindow.window_close_signal.connect(self.window_closed)
+        self.analyzer.analysis_complete_signal.connect(self.plothistorywindow.append_data)
+
+        self.analyze_signal.connect(self.analyze)
+
+        self.enable_checkBox.clicked.connect(self.toggle_enable)
+        self.bg_subtract_checkBox.clicked.connect(self.toggle_bg_subtract)
+
+        self.imageview = None
+        self.analyzer.imageview = self.imageview
+
+        self.enabled = False
+        self.bg_subtract = False
 
     def analyze(self):
-        if not self.analyzer.analyzing:
-            self.analyze_signal.emit()
+        if self.enabled and not self.analyzer.analyzing:
+            self.analyzer.analyze_signal.emit()
 
     def enable(self):
-        self.analysis_request_signal.connect(self.analyze)
+        self.enabled = True
+        self.analyzer.enabled = True
+        self.analyzer.roi_sig = self.create_roi(pen='w')
+        if self.bg_subtract:
+            self.analyzer.roi_bg = self.create_roi(pen='r')
 
     def disable(self):
-        self.analysis_request_signal.disconnect(self.analyze)
+        self.enabled = False
+        self.remove_sig_roi()
+        self.remove_bg_roi()
 
-    def clear(self):
-        self.analyzer.remove_roi()
+    def enable_bg_subtract(self):
+        self.bg_subtract = True
+        self.analyzer.bg_subtract = self.bg_subtract
+        if self.enabled:
+            self.analyzer.roi_bg = self.create_roi(pen='r')
 
+    def disable_bg_subtract(self):
+        self.bg_subtract = False
+        self.analyzer.bg_subtract = False
+        if self.analyzer.roi_bg is not None:
+            self.remove_bg_roi()
 
-class PlotHistoryWidget(QtWidgets.QWidget, Ui_PlotHistoryWidget):
-    """
-    Rolling History Widget. pyqtgraph with the main functionality of providing a rolling history of data which has
-    been loaded in through the "append_data" method.
-    """
-    def __init__(self, label='counts', num_history=200):
-        super(PlotHistoryWidget, self).__init__()
-        self.setupUi(self)
+    def remove_sig_roi(self):
+        try:
+            self.analyzer.imageview.removeItem(self.analyzer.roi_sig)
+            self.analyzer.roi_sig = None
+        except AttributeError:
+            pass
 
-        self.label = label
-        self.num_history = num_history
-        self.history = np.zeros(self.num_history)
-        self.history_min = self.history.min()
-        self.history_max = self.history.max()
+    def remove_bg_roi(self):
+        try:
+            self.analyzer.imageview.removeItem(self.analyzer.roi_bg)
+            self.analyzer.roi_bg = None
+        except AttributeError:
+            pass
 
-        self.history_PlotWidget.disableAutoRange()
-        self.history_plot = self.history_PlotWidget.plot()
-        self.history_plot.setPen(width=2)
-        self.history_PlotWidget.setXRange(0, self.num_history)
+    def set_imageview(self, imageview):
+        if imageview is not self.imageview:
+            self.disable()
+            self.analyzer.imageview = imageview
+            self.toggle_enable()
 
-        plot_item = self.history_PlotWidget.getPlotItem()
-        plot_item.showGrid(x=True, y=True)
-        plot_item.getAxis('bottom').setGrid(255)
-        plot_item.getAxis('left').setGrid(255)
-        plot_item.setLabel('bottom', text='Frame')
-        plot_item.setLabel('left', text=self.label)
+    def create_roi(self, pen='w'):
+        roi = pg.RectROI((200, 200), (200, 200), pen=pen)
+        roi.addScaleHandle([1, 1], [0, 0])
+        roi.addScaleHandle([0, 0], [1, 1])
+        self.analyzer.imageview.addItem(roi)
+        return roi
 
-        self.set_min_pushButton.clicked.connect(self.set_min)
-        self.clear_pushButton.clicked.connect(self.clear_history)
-        self.set_max_pushButton.clicked.connect(self.set_max)
+    def toggle_enable(self):
+        if self.enable_checkBox.isChecked():
+            self.plothistorywindow.show()
+            self.enable()
+        elif not self.enable_checkBox.isChecked():
+            self.plothistorywindow.close()
+            self.disable()
 
-    def append_data(self, data):
-        self.history = np.roll(self.history, -1)
-        self.history[-1] = data
-        self.plot()
-        self.data_label.setText(f'{data:.3e}')
+    def toggle_bg_subtract(self):
+        if self.bg_subtract_checkBox.isChecked():
+            self.enable_bg_subtract()
+        elif not self.bg_subtract_checkBox.isChecked():
+            self.disable_bg_subtract()
 
-    def clear_history(self):
-        self.history[:] = 0
-        self.plot()
-
-    def set_min(self):
-        self.history_min = self.history.min()
-        self.history_PlotWidget.setYRange(self.history_min, self.history_max)
-
-    def set_max(self):
-        self.history_max = self.history.max()
-        self.history_PlotWidget.setYRange(self.history_min, self.history_max)
-
-    def plot(self):
-        self.history_plot.setData(self.history)
-        # self.history_PlotWidget.setYRange(self.history_min, self.history_max)
+    def window_closed(self):
+        self.disable()
+        self.enable_checkBox.setChecked(False)

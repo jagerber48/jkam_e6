@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1033</width>
-    <height>509</height>
+    <width>805</width>
+    <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,27 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" rowspan="3" colspan="4">
+    <item row="1" column="2">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="SaveBoxWidget" name="savebox_widget" native="true"/>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="0" colspan="3">
      <widget class="QStackedWidget" name="view_stackedWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -24,7 +44,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="imageview_page">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -42,85 +62,87 @@
       </widget>
      </widget>
     </item>
-    <item row="3" column="3">
-     <widget class="QFrame" name="roi_analyzer_frame">
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_4">
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="roi_analyzer_checkBox">
-         <property name="text">
-          <string>Enable</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="roi_label">
-         <property name="text">
-          <string>ROI Analyzer</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="roi_bg_subtract_checkBox">
-         <property name="text">
-          <string>Background Subtract</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+    <item row="1" column="0">
+     <layout class="QGridLayout" name="gridLayout_7">
+      <item row="0" column="0" colspan="2">
+       <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QFrame" name="image_capture_mode_frame">
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="0">
+          <widget class="QLabel" name="image_capture_mode_label">
+           <property name="text">
+            <string>Image Capture Mode</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QRadioButton" name="absorption_mode_radioButton">
+           <property name="text">
+            <string>Absorption</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">image_capture_buttonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QRadioButton" name="video_mode_radioButton">
+           <property name="text">
+            <string>Video</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">image_capture_buttonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="1">
+       <widget class="QFrame" name="roi_analyzer_frame">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Sunken</enum>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="1">
+          <widget class="RoiAnalyzer" name="roi_analyzer_widget" native="true"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </item>
-    <item row="3" column="2">
-     <widget class="QFrame" name="image_capture_mode_frame">
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_5">
-       <item row="2" column="0">
-        <widget class="QRadioButton" name="video_mode_radioButton">
-         <property name="text">
-          <string>Video</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">image_capture_buttonGroup</string>
-         </attribute>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="image_capture_mode_label">
-         <property name="text">
-          <string>Image Capture Mode</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QRadioButton" name="absorption_mode_radioButton">
-         <property name="text">
-          <string>Absorption</string>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">image_capture_buttonGroup</string>
-         </attribute>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="3" column="1" rowspan="2">
+    <item row="1" column="1">
      <spacer name="horizontalSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -133,35 +155,6 @@
       </property>
      </spacer>
     </item>
-    <item row="3" column="0" rowspan="2">
-     <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
-    </item>
-    <item row="4" column="2">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="4" column="3">
-     <spacer name="verticalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -169,8 +162,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1033</width>
-     <height>26</height>
+     <width>805</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -193,6 +186,18 @@
    <class>CameraControlWidget</class>
    <extends>QWidget</extends>
    <header>cameracontrolwidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SaveBoxWidget</class>
+   <extends>QWidget</extends>
+   <header>saveboxwidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RoiAnalyzer</class>
+   <extends>QWidget</extends>
+   <header>AnalysisWidgets</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
