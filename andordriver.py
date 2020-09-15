@@ -1,5 +1,5 @@
 import numpy as np
-from atcore import ATCore, ATCoreException
+from andor_sdk.atcore import ATCore, ATCoreException
 from jkamgendriver import JKamGenDriver
 
 
