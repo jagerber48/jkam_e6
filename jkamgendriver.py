@@ -3,8 +3,6 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
 
 class FrameGrabber(QThread):
-    captured = pyqtSignal(object)
-
     def __init__(self, driver, max_fps=20):
         super(FrameGrabber, self).__init__()
         self.driver = driver
@@ -17,17 +15,16 @@ class FrameGrabber(QThread):
 
 
 class JKamGenDriver(QObject):
+    # TODO: More documentation so it is clear how to write more custom camera drivers
     """
     Generic driver with functionality to interface with jkam UI. Has a number of narrow-scope camera control
     methods which should be overridden in a custom driver for each type of camera to be implemented with jkam.
     """
     frame_captured_signal = pyqtSignal(object)
-    start_acquisition_signal = pyqtSignal()
 
     def __init__(self):
         super(JKamGenDriver, self).__init__()
         self.frame_grabber = FrameGrabber(self)
-        self.start_acquisition_signal.connect(self.frame_grabber.start)
 
         self.open_connection()
         self.cam = None
@@ -62,11 +59,12 @@ class JKamGenDriver(QObject):
     def start_acquisition(self):
         self._start_acquisition(self.cam)
         self.acquiring = True
-        self.start_acquisition_signal.emit()
+        self.frame_grabber.start()
         print(f'STARTED camera acquisition with serial number: {self.serial_number}')
 
     def stop_acquisition(self):
         self.acquiring = False
+        self.frame_grabber.quit()
         self._stop_acquisition(self.cam)
         print(f'STOPPED camera acquisition with serial number: {self.serial_number}')
 

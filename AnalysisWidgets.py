@@ -106,8 +106,6 @@ class AbsorptionAnalyzer(QObject):
 
 
 class RoiIntegrationAnalyzer(QThread):
-    # TODO: Get the logic right, it's super messed up right now. Functionality is spread between 3 classes,
-    # TODO: This one, the plothistoryanalyzer class and jkam_window. Needs to be condensed a lot.
     analysis_complete_signal = pyqtSignal(float)
 
     def __init__(self):

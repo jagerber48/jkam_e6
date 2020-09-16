@@ -6,6 +6,8 @@ from andordriver import AndorDriver
 
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
+    # TODO: Calls to JKamGenDriver could be done through signals so that JKamGenDriver could operate in its own thread
+    # TODO: Functionality to choose between different serial numbers and drivers
     """
     This widget essentially serves as a ui for a jkamgendriver. It handles receiving user inputs to change camera
     settings such as camera state (arm/disarm, start/stop acquisition), trigger mode, and exposure time. It also

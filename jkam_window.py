@@ -105,15 +105,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             ref_frame = self.fluorescence_view_widget.ref_frame
             self.savebox_widget.save(atom_frame, ref_frame)
 
-    def toggle_roi_analyzer_enable(self):
-        self.roi_analyzer_enable_signal.emit(self.roi_analyzer_checkBox.isChecked())
-
-    def toggle_roi_analyzer_bg_subtract(self):
-        self.roi_analyzer_bg_enable_signal.emit(self.roi_bg_subtract_checkBox.isChecked())
-
-    def analyzer_window_closed(self):
-        self.roi_analyzer_checkBox.setChecked(False)
-
     def set_imaging_mode(self):
         if self.video_mode_radioButton.isChecked():
             self.view_stackedWidget.setCurrentIndex(0)
