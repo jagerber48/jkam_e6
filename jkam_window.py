@@ -52,7 +52,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
         self.absorption_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
         self.fluorescence_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
-        self.analyze_signal.connect(self.roi_analyzer_widget.analyze_signal.emit)
+        self.analyze_signal.connect(self.roi_analyzer_widget.analyze)
 
         self.imaging_mode = None
         self.image_capture_buttonGroup.buttonClicked.connect(self.set_imaging_mode)

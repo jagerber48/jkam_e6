@@ -105,26 +105,19 @@ class AbsorptionAnalyzer(QObject):
         return column_number
 
 
-class RoiIntegrationAnalyzer(QObject):
+class RoiIntegrationAnalyzer(QThread):
     # TODO: Get the logic right, it's super messed up right now. Functionality is spread between 3 classes,
     # TODO: This one, the plothistoryanalyzer class and jkam_window. Needs to be condensed a lot.
     analysis_complete_signal = pyqtSignal(float)
-    analyze_signal = pyqtSignal()
 
     def __init__(self):
         super(RoiIntegrationAnalyzer, self).__init__()
-        self.thread = QThread()
-        self.moveToThread(self.thread)
-        self.thread.start()
-        self.analyze_signal.connect(self.analyze)
-
         self.imageview = None
         self.roi_sig = None
         self.roi_bg = None
-        self.analyzing = False
+        self.bg_subtract = False
 
-    def analyze(self):
-        self.analyzing = True
+    def run(self):
         roi_sig_data = self.roi_sig.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
         roi_sig_sum = np.nansum(roi_sig_data)
         pixel_num_sig = roi_sig_data.size
@@ -135,7 +128,6 @@ class RoiIntegrationAnalyzer(QObject):
             roi_bg_mean = np.nansum(roi_bg_data) / pixel_num_bg
             result = roi_sig_sum - roi_bg_mean * pixel_num_sig
         self.analysis_complete_signal.emit(result)
-        self.analyzing = False
 
 
 class RoiAnalyzer(QWidget, Ui_RoiAnalyzer):
@@ -148,9 +140,7 @@ class RoiAnalyzer(QWidget, Ui_RoiAnalyzer):
         self.plothistorywindow = PlotHistoryWindow(label=label, num_history=num_history)
         self.plothistorywindow.window_close_signal.connect(self.window_closed)
         self.analyzer.analysis_complete_signal.connect(self.plothistorywindow.append_data)
-
-        self.analyze_signal.connect(self.analyze)
-
+        self.analyze_signal.connect(self.analyzer.run)
         self.enable_checkBox.clicked.connect(self.toggle_enable)
         self.bg_subtract_checkBox.clicked.connect(self.toggle_bg_subtract)
 
@@ -161,12 +151,11 @@ class RoiAnalyzer(QWidget, Ui_RoiAnalyzer):
         self.bg_subtract = False
 
     def analyze(self):
-        if self.enabled and not self.analyzer.analyzing:
-            self.analyzer.analyze_signal.emit()
+        if self.enabled:
+            self.analyzer.start()
 
     def enable(self):
         self.enabled = True
-        self.analyzer.enabled = True
         self.analyzer.roi_sig = self.create_roi(pen='w')
         if self.bg_subtract:
             self.analyzer.roi_bg = self.create_roi(pen='r')

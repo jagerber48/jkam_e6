@@ -11,8 +11,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     settings such as camera state (arm/disarm, start/stop acquisition), trigger mode, and exposure time. It also
     receives and passes frames through the frame_received_signal signal.
     """
-    # grasshopper_sn = '17491535'  # Spare Camera for testing
-    grasshopper_sn = '18431942'  # Side Imaging
+    grasshopper_sn = '17491535'  # Spare Camera for testing
+    # grasshopper_sn = '18431942'  # Side Imaging
     frame_received_signal = pyqtSignal(object)
     started_signal = pyqtSignal()
     stopped_signal = pyqtSignal()
@@ -21,8 +21,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
         self.setupUi(self)
-        # self.driver = GrasshopperDriver()
-        self.driver = AndorDriver()
+        self.driver = GrasshopperDriver()
+        # self.driver = AndorDriver()
 
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
 
