@@ -50,21 +50,12 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.frame_received_signal = self.camera_control_widget.frame_received_signal
         self.frame_received_signal.connect(self.on_capture)
 
-        # self.roihistoryanalyzer = self.
-        # self.roi_analyze_signal.connect(self.roihistoryanalyzer.analyze)
-        # self.roi_analyzer_checkBox.clicked.connect(self.toggle_roi_analyzer_enable)
-        # self.roi_analyzer_enable_signal.connect(self.roihistoryanalyzer.toggle_enable)
-        # self.roi_bg_subtract_checkBox.clicked.connect(self.toggle_roi_analyzer_bg_subtract)
-        # self.roi_analyzer_bg_enable_signal.connect(self.roihistoryanalyzer.toggle_bg_subtract)
-        # self.roihistoryanalyzer.window_close_signal.connect(self.analyzer_window_closed)
         self.absorption_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
         self.fluorescence_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
         self.analyze_signal.connect(self.roi_analyzer_widget.analyze_signal.emit)
 
         self.imaging_mode = None
-        self.video_mode_radioButton.clicked.connect(self.set_imaging_mode)
-        self.absorption_mode_radioButton.clicked.connect(self.set_imaging_mode)
-        self.fluorescence_mode_radioButton.clicked.connect(self.set_imaging_mode)
+        self.image_capture_buttonGroup.buttonClicked.connect(self.set_imaging_mode)
         self.camera_control_widget.started_signal.connect(self.lock_imaging_mode)
         self.camera_control_widget.stopped_signal.connect(self.unlock_imaging_mode)
         self.camera_control_widget.trigger_mode_toggled.connect(self.trigger_mode_changed)
