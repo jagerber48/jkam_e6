@@ -117,6 +117,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         elif self.triggered_radioButton.isChecked():
             self.driver.trigger_on()
             self.toggle_source_controls(True)
+            self.toggle_trigger_source()
 
     def toggle_trigger_source(self):
         if self.hardware_trigger_radioButton.isChecked():
