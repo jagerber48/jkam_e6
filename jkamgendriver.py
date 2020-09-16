@@ -2,18 +2,15 @@ import time
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
 
-class FrameGrabber(QObject):
+class FrameGrabber(QThread):
     captured = pyqtSignal(object)
 
     def __init__(self, driver, max_fps=20):
         super(FrameGrabber, self).__init__()
         self.driver = driver
         self.max_fps = max_fps
-        self.thread = QThread()
-        self.moveToThread(self.thread)
-        self.thread.start()
 
-    def grab_frames(self):
+    def run(self):
         while self.driver.acquiring:
             self.driver.grab_frame()
             time.sleep(1 / self.max_fps)  # Slow down frame rate to self.max_fps to give GUI time to update
@@ -29,12 +26,8 @@ class JKamGenDriver(QObject):
 
     def __init__(self):
         super(JKamGenDriver, self).__init__()
-        self.thread = QThread()
-        self.moveToThread(self.thread)
-        self.thread.start()
-
         self.frame_grabber = FrameGrabber(self)
-        self.start_acquisition_signal.connect(self.frame_grabber.grab_frames)
+        self.start_acquisition_signal.connect(self.frame_grabber.start)
 
         self.open_connection()
         self.cam = None
