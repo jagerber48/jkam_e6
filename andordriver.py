@@ -13,8 +13,16 @@ class AndorDriver(JKamGenDriver):
     def _close_connection(self):
         pass
 
+    def _get_serial_number(self, cam):
+        return self.system.get_string(cam, 'SerialNumber')
+
     def _arm_camera(self, serial_number):
-        return self.system.open(0)
+        cam = self.system.open(0)
+        if self._get_serial_number(cam) == serial_number:
+            return cam
+        else:
+            print(f'Andor camera with serial number: {serial_number} not found!')
+            return None
 
     def _disarm_camera(self, cam):
         self.system.flush(cam)
@@ -35,7 +43,6 @@ class AndorDriver(JKamGenDriver):
         """
         converted_exposure_time = exposure_time * 1e-3
         self.system.set_float(cam, 'ExposureTime', converted_exposure_time)
-        self.system.get_float(cam, 'ExposureTime')
         exposure_time_result = self.system.get_float(cam, 'ExposureTime') * 1e3
         return exposure_time_result
 
