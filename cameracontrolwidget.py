@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 from ui_components.cameracontrolwidget_ui import Ui_CameraControlWidget
+import camerasettings
+import importlib
 from grasshopperdriver import GrasshopperDriver
 from andordriver import AndorDriver
 
@@ -23,8 +25,10 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
         self.setupUi(self)
-        self.driver = GrasshopperDriver()
+        # self.driver = GrasshopperDriver()
         # self.driver = AndorDriver()
+        self.driver = None
+        self.armed = False
 
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
 
@@ -36,16 +40,49 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.continuous_radioButton.clicked.connect(self.toggle_trigger_mode)
         self.software_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
         self.hardware_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
-        self.software_trigger_pushButton.clicked.connect(self.driver.execute_software_trigger)
-        self.driver.frame_captured_signal.connect(self.frame_received_signal.emit)
+        # self.software_trigger_pushButton.clicked.connect(self.driver.execute_software_trigger)
+        # self.driver.frame_captured_signal.connect(self.frame_received_signal.emit)
+
+        self.imaging_systems = dict()
+        self.populate_imaging_systems()
+
+    def populate_imaging_systems(self):
+        for system in camerasettings.imaging_system_list:
+            self.camera_comboBox.addItem(system.name)
+            self.imaging_systems[system.name] = system
+
+    def load_driver(self):
+        if self.camera_comboBox.currentIndex() != 0:
+            imaging_system_name = self.camera_comboBox.currentText()
+            imaging_system = self.imaging_systems[imaging_system_name]
+            self.serial_number = imaging_system.camera_serial_number
+            self.driver = imaging_system.camera_type.driver
+            try:
+                self.software_trigger_pushButton.disconnect()
+            except TypeError:
+                pass
+            try:
+                self.driver.frame_captured_signal.disconnect()
+            except TypeError:
+                pass
+            self.software_trigger_pushButton.clicked.connect(self.driver.execute_software_trigger)
+            self.driver.frame_captured_signal.connect(self.frame_received_signal.emit)
+        elif self.camera_comboBox.currentIndex() == 0:
+            print('Please select imaging system!')
+            self.driver = None
+            self.serial_number =''
 
     def arm(self):
-        serial_number = self.grasshopper_sn
+        self.load_driver()
+        # serial_number = self.grasshopper_sn
         try:
-            self.driver.arm_camera(serial_number)
-            self.serial_label.setText(f'Serial Number: {serial_number}')
             self.arm_pushButton.setChecked(True)
+            self.arm_pushButton.setText('Arming Camera')
+            self.driver.arm_camera(self.serial_number)
+            self.armed = True
+            self.serial_label.setText(f'Serial Number: {self.serial_number}')
             self.arm_pushButton.setText('Disarm Camera')
+            self.camera_comboBox.setEnabled(False)
             self.start_pushButton.setEnabled(True)
             self.exposure_pushButton.setEnabled(True)
             self.set_exposure()
@@ -62,6 +99,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
                 if self.driver.acquiring:
                     self.stop()
                 self.driver.disarm_camera()
+                self.armed = False
+                self.camera_comboBox.setEnabled(True)
             except Exception as e:
                 print('Error while trying to DISARM camera')
                 print(e)
@@ -74,7 +113,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.disable_trigger_controls()
 
     def toggle_arm(self):
-        if not self.driver.armed:
+        if not self.armed:
             self.arm()
         else:
             self.disarm()
