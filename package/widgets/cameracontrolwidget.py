@@ -16,6 +16,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     grasshopper_sn = '17491535'  # Spare Camera for testing
     # grasshopper_sn = '18431942'  # Side Imaging
     frame_received_signal = pyqtSignal(object)
+    armed_signal = pyqtSignal()
+    disarmed_signal = pyqtSignal()
     started_signal = pyqtSignal()
     stopped_signal = pyqtSignal()
     trigger_mode_toggled = pyqtSignal()
@@ -85,6 +87,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.set_exposure()
             self.enable_trigger_controls()
             self.toggle_trigger_mode()
+            self.armed_signal.emit()
         except Exception as e:
             print('Error while trying to ARM camera')
             print(e)
@@ -98,6 +101,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
                 self.driver.disarm_camera()
                 self.armed = False
                 self.camera_comboBox.setEnabled(True)
+                self.disarm_signal.emit()
             except Exception as e:
                 print('Error while trying to DISARM camera')
                 print(e)

@@ -57,6 +57,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.image_capture_buttonGroup.buttonClicked.connect(self.set_imaging_mode)
         self.camera_control_widget.started_signal.connect(self.lock_imaging_mode)
         self.camera_control_widget.stopped_signal.connect(self.unlock_imaging_mode)
+        self.camera_control_widget.armed_signal.connect(self.armed)
+        self.camera_control_widget.disarmed_signal.connect(self.disarmed)
         self.camera_control_widget.trigger_mode_toggled.connect(self.trigger_mode_changed)
         self.set_imaging_mode()
 
@@ -114,8 +116,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         elif self.absorption_mode_radioButton.isChecked():
             self.view_stackedWidget.setCurrentIndex(1)
             self.roi_analyzer_widget.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
-            self.absorption_view_widget.load_analyzer(atom=RbAtom(),
-                                                      imaging_system=self.camera_control_widget.imaging_system)
             self.imaging_mode = ImagingMode.ABSORPTION
             self.savebox_widget.mode = self.savebox_widget.ModeType.ABSORPTION
         elif self.fluorescence_mode_radioButton.isChecked():
@@ -144,6 +144,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.absorption_mode_radioButton.setEnabled(True)
             self.fluorescence_mode_radioButton.setEnabled(True)
         self.set_imaging_mode()
+
+    def armed(self):
+        imaging_system = self.camera_control_widget.imaging_system
+        self.absorption_view_widget.load_analyzer(atom=RbAtom, imaging_system=imaging_system)
+
+    def disarmed(self):
+        self.absorption_view_widget.unload_analyzer()
 
     def verify_autosave(self):
         if not self.camera_control_widget.continuous_radioButton.isChecked() and self.savebox_widget.autosaving:

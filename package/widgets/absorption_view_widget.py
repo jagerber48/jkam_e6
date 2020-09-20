@@ -75,7 +75,7 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
     def load_analyzer(self, *, atom, imaging_system):
         self.analyzer = AbsorptionAnalyzer(atom=atom, imaging_system=imaging_system)
         self.parameters_window = AbsorptionParametersWidget(atom=atom, imaging_system=imaging_system)
-        self.imaging_parameters_pushButton.connect(self.parameters_window.show)
+        self.imaging_parameters_pushButton.clicked.connect(self.parameters_window.show)
 
         self.analyzer_loaded = True
 
@@ -87,6 +87,7 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
 class AbsorptionParametersWidget(QWidget, Ui_AbsorptionParametersWidget):
     def __init__(self, parent=None, *, atom, imaging_system, detuning=0, pulse_time=100e-6):
         super(AbsorptionParametersWidget, self).__init__(parent=parent)
+        self.setupUi(self)
         self.atom = atom
         self.imaging_system = imaging_system
         self.detuning = detuning

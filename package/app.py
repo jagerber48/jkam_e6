@@ -9,7 +9,7 @@ def run():
     app = QApplication(sys.argv)
 
     # Code to setup windows icon for jkam
-    app.setWindowIcon(QIcon('favicon.png'))
+    app.setWindowIcon(QIcon('package/imagedata/favicon.ico'))
     myappid = u'jkam_app'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
