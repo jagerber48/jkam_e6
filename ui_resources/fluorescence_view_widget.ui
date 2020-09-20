@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FluorescenceViewWidget</class>
+ <widget class="QWidget" name="FluorescenceViewWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>609</width>
+    <height>471</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="N_tab">
+      <attribute name="title">
+       <string>Atom Number</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="ImageViewEditor" name="N_view_editor" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="diff_tab">
+      <attribute name="title">
+       <string>Difference Counts</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="ImageViewEditor" name="diff_view_editor" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="atom_tab">
+      <attribute name="title">
+       <string>With Atoms Image</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <widget class="ImageViewEditor" name="atom_view_editor" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="reference_tab">
+      <attribute name="title">
+       <string>Reference Image</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="0" column="0">
+        <widget class="ImageViewEditor" name="reference_view_editor" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ImageViewEditor</class>
+   <extends>QWidget</extends>
+   <header>package.widgets.imagevieweditor</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
