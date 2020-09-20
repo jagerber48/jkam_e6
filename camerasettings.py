@@ -22,7 +22,8 @@ class AndorCamera:
     adu_conversion_12_high_well = 1 / 7.5  # 12-bit (high well capacity) mode
     adu_conversion_12_low_noise = 1 / 0.28  # 12-bit (low noise) mode
     adu_conversion_16 = 1 / 0.45  # 16-bit (low noise and high well capacity)
-    adu_conversion = 1 / adu_conversion_12_low_noise  # Number of digital counts per electron
+    adu_conversion = adu_conversion_12_low_noise  # Number of digital counts per electron
+
     bit_conversion = 2**0  # No truncation or padding
     total_gain = bit_conversion * adu_conversion * quantum_efficiency  # Number of recoreded digital counts per photon
 
@@ -52,7 +53,7 @@ class HighNASystem:
     name = 'High NA Imaging'
     camera_serial_number = 'VSC-12091'
     camera_type = AndorCamera()
-    magnification = 50  # Not Applicable
+    magnification = 50
 
 
 class RbProperties:
@@ -63,5 +64,3 @@ class RbProperties:
 
 
 imaging_system_list = [SideImagingSystem(), MOTImagingSystem(), HighNASystem(), SpareGrasshopper()]
-
-    # grasshopper_sn = '17491535'  # Spare Camera for testing

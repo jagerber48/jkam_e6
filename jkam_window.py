@@ -33,8 +33,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     # TODO: Saving and storing of cameras and settings
     # TODO: Gaussian Fit Analysis
     # TODO: More default settings to load in Andordriver
-    # TODO: Cleanup Andor arming (use proper serial number for example)
-    # TODO: Get Andor triggering working when app is loaded.
     # TODO: ROI imaging/saving to save on data storage?
     """
     Camera GUI. Includes visualization of image captures, camera controls and trigger configuration,
