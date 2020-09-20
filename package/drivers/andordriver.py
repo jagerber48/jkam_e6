@@ -1,6 +1,6 @@
 import numpy as np
 import os
-from andor_sdk.atcore import ATCore, ATCoreException
+from package.drivers.andor_sdk.atcore import ATCore, ATCoreException
 from package.drivers.jkamgendriver import JKamGenDriver
 
 os.environ['PATH'] = os.path.dirname(__file__) + os.sep + 'andor_sdk' + ';' + os.environ['PATH']
