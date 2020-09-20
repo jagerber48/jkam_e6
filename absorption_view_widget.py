@@ -22,7 +22,8 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
             image_view.getView().setXLink(self.N_view_editor.imageview.getView())
             image_view.getView().setYLink(self.N_view_editor.imageview.getView())
 
-        self.analyzer = AbsorptionAnalyzer()
+        self.analyzer = None
+        self.analyzer_loaded = False
         self.frame_count = 0
         self.atom_frame = None
         self.bright_frame = None
@@ -66,3 +67,11 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
             self.od_frame = None
             self.number_frame = None
             self.frame_count = 0
+
+    def load_analyzer(self, *, atom, imaging_system):
+        self.analyzer = AbsorptionAnalyzer(atom=atom, imaging_system=imaging_system)
+        self.analyzer_loaded = True
+
+    def unload_analyzer(self):
+        del self.analyzer
+        self.analyzer = None

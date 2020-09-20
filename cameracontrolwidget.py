@@ -39,11 +39,10 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.continuous_radioButton.clicked.connect(self.toggle_trigger_mode)
         self.software_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
         self.hardware_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
-        # self.software_trigger_pushButton.clicked.connect(self.driver.execute_software_trigger)
-        # self.driver.frame_captured_signal.connect(self.frame_received_signal.emit)
 
         self.imaging_systems = dict()
         self.populate_imaging_systems()
+        self.imaging_system = None
 
     def populate_imaging_systems(self):
         for system in camerasettings.imaging_system_list:
@@ -53,9 +52,9 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def load_driver(self):
         if self.camera_comboBox.currentIndex() != 0:
             imaging_system_name = self.camera_comboBox.currentText()
-            imaging_system = self.imaging_systems[imaging_system_name]
-            self.serial_number = imaging_system.camera_serial_number
-            self.driver = imaging_system.camera_type.driver
+            self.imaging_system = self.imaging_systems[imaging_system_name]
+            self.serial_number = self.imaging_system.camera_serial_number
+            self.driver = self.imaging_system.camera_type.driver
             try:
                 self.software_trigger_pushButton.disconnect()
             except TypeError:

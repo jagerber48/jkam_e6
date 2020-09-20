@@ -56,11 +56,11 @@ class HighNASystem:
     magnification = 50
 
 
-class RbProperties:
-    cross_section = 2.907e-13  # Steck Rubidium 87 D Line Data
-    linewidth = 2 * np.pi * 6.07e6  # Steck Rubidium 87 D Line Data
-    saturation_intensity = 1.67 * 1e4 / 1e3  # Steck Rubidium 87 D Line Data, convert mW/cm^2 to W/m^2
-    d2_transition_freq = 2 * np.pi * 384.230e12
+class RbAtom:
+    cross_section = 2.907e-13  # m^2 - Steck Rubidium 87 D Line Data
+    linewidth = 2 * np.pi * 6.07e6  # Hz -  Steck Rubidium 87 D Line Data
+    saturation_intensity = 1.67 * 1e4 / 1e3  # W/m^2 - Steck Rubidium 87 D Line Data, convert mW/cm^2 to W/m^2
+    transition_freq = 2 * np.pi * 384.230e12  # Hz - D2 Transition
 
 
 imaging_system_list = [SideImagingSystem(), MOTImagingSystem(), HighNASystem(), SpareGrasshopper()]

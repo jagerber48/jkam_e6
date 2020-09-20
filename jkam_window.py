@@ -20,6 +20,7 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtGui import QIcon
 from ui_components.camerawindow_ui import Ui_CameraWindow
+from camerasettings import RbAtom
 
 
 class ImagingMode(Enum):
@@ -112,6 +113,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         elif self.absorption_mode_radioButton.isChecked():
             self.view_stackedWidget.setCurrentIndex(1)
             self.roi_analyzer_widget.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
+            self.absorption_view_widget.load_analyzer(atom=RbAtom(),
+                                                      imaging_system=self.camera_control_widget.imaging_system)
             self.imaging_mode = ImagingMode.ABSORPTION
             self.savebox_widget.mode = self.savebox_widget.ModeType.ABSORPTION
         elif self.fluorescence_mode_radioButton.isChecked():
