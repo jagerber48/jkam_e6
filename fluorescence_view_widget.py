@@ -21,7 +21,7 @@ class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
             image_view.getView().setXLink(self.N_view_editor.imageview.getView())
             image_view.getView().setYLink(self.N_view_editor.imageview.getView())
 
-        self.analyzer = AbsorptionAnalyzer()
+        self.analyzer = None
         self.frame_count = 0
         self.atom_frame = None
         self.ref_frame = None

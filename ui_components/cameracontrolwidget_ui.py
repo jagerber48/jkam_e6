@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_CameraControlWidget(object):
     def setupUi(self, CameraControlWidget):
         CameraControlWidget.setObjectName("CameraControlWidget")
-        CameraControlWidget.resize(507, 240)
+        CameraControlWidget.resize(492, 240)
         self.gridLayout = QtWidgets.QGridLayout(CameraControlWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.frame = QtWidgets.QFrame(CameraControlWidget)
@@ -99,7 +99,7 @@ class Ui_CameraControlWidget(object):
 
     def retranslateUi(self, CameraControlWidget):
         _translate = QtCore.QCoreApplication.translate
-        self.camera_comboBox.setItemText(0, _translate("CameraControlWidget", "Select Camera..."))
+        self.camera_comboBox.setItemText(0, _translate("CameraControlWidget", "Select Imaging System..."))
         self.serial_label.setText(_translate("CameraControlWidget", "Serial Number: xxxxxxxx"))
         self.arm_pushButton.setText(_translate("CameraControlWidget", "Arm Camera"))
         self.start_pushButton.setText(_translate("CameraControlWidget", "Start Camera"))

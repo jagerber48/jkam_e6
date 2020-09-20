@@ -62,7 +62,7 @@ class AbsorptionAnalyzer(QObject):
 
     def atom_count_analysis_below_sat(self, optical_density,
                                       detuning=0):
-        detuning_factor = 1 + (2 * detuning / self.gamma) ** 2
+        detuning_factor = 1 + (2 * detuning / self.linewidth) ** 2
         column_density_below_sat = (detuning_factor / self.cross_section) * optical_density
         column_area = self.pixel_area / self.magnification  # size of a pixel in object plane
         column_number = column_area * column_density_below_sat
@@ -76,9 +76,9 @@ class AbsorptionAnalyzer(QObject):
 
         # convert detected photons to detected intensity
         atom_intensity_det = (atom_photons_det *
-                              (hbar * self.imaging_frequency) / (self.pixel_area * image_pulse_time))
+                              (hbar * self.transition_frequency) / (self.pixel_area * image_pulse_time))
         bright_intensity_det = (bright_photons_det *
-                                (hbar * self.imaging_frequency) / (self.pixel_area * image_pulse_time))
+                                (hbar * self.transition_frequency) / (self.pixel_area * image_pulse_time))
 
         # convert detected intensity to intensity before and after atoms
         intensity_out = atom_intensity_det / efficiency_path / self.magnification

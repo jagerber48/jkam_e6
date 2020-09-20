@@ -6,3 +6,4 @@ python -m PyQt5.uic.pyuic -x imageview_editor.ui -o imageview_editor_ui.py
 python -m PyQt5.uic.pyuic -x plothistorywindow.ui -o plothistorywindow_ui.py
 python -m PyQt5.uic.pyuic -x roianalyzer.ui -o roianalyzer_ui.py
 python -m PyQt5.uic.pyuic -x saveboxwidget.ui -o saveboxwidget_ui.py
+python -m PyQt5.uic.pyuic -x absorption_parameters_widget.ui -o absorption_parameters_widget_ui.py
