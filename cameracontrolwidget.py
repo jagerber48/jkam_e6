@@ -1,10 +1,8 @@
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import pyqtSignal
 from ui_components.cameracontrolwidget_ui import Ui_CameraControlWidget
 import camerasettings
-import importlib
-from grasshopperdriver import GrasshopperDriver
-from andordriver import AndorDriver
+import time
 
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
@@ -28,6 +26,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         # self.driver = GrasshopperDriver()
         # self.driver = AndorDriver()
         self.driver = None
+        self.serial_number = ''
         self.armed = False
 
         self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
@@ -70,14 +69,13 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         elif self.camera_comboBox.currentIndex() == 0:
             print('Please select imaging system!')
             self.driver = None
-            self.serial_number =''
+            self.serial_number = ''
 
     def arm(self):
-        self.load_driver()
-        # serial_number = self.grasshopper_sn
         try:
-            self.arm_pushButton.setChecked(True)
-            self.arm_pushButton.setText('Arming Camera')
+            self.arm_pushButton.setText('Arming')
+            QApplication.processEvents()
+            self.load_driver()
             self.driver.arm_camera(self.serial_number)
             self.armed = True
             self.serial_label.setText(f'Serial Number: {self.serial_number}')
@@ -197,4 +195,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.disarm(aborting=True)
 
     def close(self):
-        self.driver.close_connection()
+        try:
+            self.driver.close_connection()
+        except AttributeError:
+            pass
