@@ -1,7 +1,28 @@
+from enum import Enum
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import pyqtSignal
 from package.ui.cameracontrolwidget_ui import Ui_CameraControlWidget
 from package.data import camerasettings
+
+
+class TriggerMode(Enum):
+    TRIGGERED = 0
+    CONTINUOUS = 1
+
+
+class DriverMode(Enum):
+    UNLOADED = 0
+    LOADED = 1
+
+
+class ArmMode(Enum):
+    DISARMED = 0
+    ARMED = 1
+
+
+class AcquireMode(Enum):
+    STOPPED = 0
+    STARTED = 1
 
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
@@ -16,13 +37,11 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     disarmed_signal = pyqtSignal()
     started_signal = pyqtSignal()
     stopped_signal = pyqtSignal()
-    trigger_mode_toggled_signal = pyqtSignal()
+    trigger_mode_toggled_signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
         self.setupUi(self)
-        # self.driver = GrasshopperDriver()
-        # self.driver = AndorDriver()
         self.driver = None
         self.serial_number = ''
         self.armed = False
@@ -33,10 +52,11 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.start_pushButton.clicked.connect(self.toggle_start)
         self.exposure_lineEdit.editingFinished.connect(self.update_exposure)
         self.exposure_pushButton.clicked.connect(self.set_exposure)
-        self.triggered_radioButton.clicked.connect(self.toggle_trigger_mode)
-        self.continuous_radioButton.clicked.connect(self.toggle_trigger_mode)
-        self.software_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
-        self.hardware_trigger_radioButton.clicked.connect(self.toggle_trigger_source)
+
+        self.trigger_mode = TriggerMode.CONTINUOUS
+        self.mode_buttonGroup.buttonClicked.connect(self.set_trigger_state)
+        self.trigger_buttonGroup.buttonClicked.connect(self.set_trigger_state)
+        self.acquire_mode = AcquireMode.STOPPED
 
         self.imaging_systems = dict()
         self.populate_imaging_systems()
@@ -119,7 +139,9 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         try:
             self.driver.start_acquisition()
             self.start_pushButton.setText('Stop Camera')
-            self.disable_trigger_controls()
+            self.acquire_mode = AcquireMode.STARTED
+            self.set_trigger_state()
+            # self.disable_trigger_controls()
             if self.triggered_radioButton.isChecked() and self.software_trigger_radioButton.isChecked():
                 self.software_trigger_pushButton.setEnabled(True)
             self.started_signal.emit()
@@ -137,7 +159,9 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
                 print(e)
                 self.abort()
         self.start_pushButton.setText('Start Camera')
-        self.enable_trigger_controls()
+        self.acquire_mode = AcquireMode.STOPPED
+        self.set_trigger_state()
+        # self.enable_trigger_controls()
         self.software_trigger_pushButton.setEnabled(False)
         self.stopped_signal.emit()
 
@@ -147,15 +171,53 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         else:
             self.stop()
 
+    def set_trigger_state(self):
+        if self.acquire_mode is AcquireMode.STOPPED:
+            self.continuous_radioButton.setEnabled(True)
+            self.triggered_radioButton.setEnabled(True)
+            if self.continuous_radioButton.isChecked():
+                self.driver.trigger_off()
+                self.trigger_mode = TriggerMode.CONTINUOUS
+                self.software_trigger_radioButton.setEnabled(False)
+                self.hardware_trigger_radioButton.setEnabled(False)
+            elif self.triggered_radioButton.isChecked():
+                self.driver.trigger_on()
+                self.trigger_mode = TriggerMode.TRIGGERED
+                self.software_trigger_radioButton.setEnabled(True)
+                self.hardware_trigger_radioButton.setEnabled(True)
+                if self.hardware_trigger_radioButton.isChecked():
+                    self.driver.set_hardware_trigger()
+                elif self.software_trigger_radioButton.isChecked():
+                    self.driver.set_software_trigger()
+            self.trigger_mode_toggled_signal.emit(self.trigger_mode)
+        elif self.acquire_mode is AcquireMode.STARTED:
+            self.continuous_radioButton.setEnabled(False)
+            self.triggered_radioButton.setEnabled(False)
+            self.software_trigger_radioButton.setEnabled(False)
+            self.hardware_trigger_radioButton.setEnabled(False)
+
+
     def toggle_trigger_mode(self):
-        self.trigger_mode_toggled_signal.emit()
         if self.continuous_radioButton.isChecked():
             self.driver.trigger_off()
-            self.toggle_source_controls(False)
+            self.trigger_mode = TriggerMode.CONTINUOUS
+            self.software_trigger_radioButton.setEnabled(False)
+            self.hardware_trigger_radioButton.setEnabled(False)
         elif self.triggered_radioButton.isChecked():
             self.driver.trigger_on()
-            self.toggle_source_controls(True)
+            self.trigger_mode = TriggerMode.TRIGGERED
+            self.software_trigger_radioButton.setEnabled(True)
+            self.hardware_trigger_radioButton.setEnabled(True)
             self.toggle_trigger_source()
+        self.trigger_mode_toggled_signal.emit(self.trigger_mode)
+
+    def check_trigger_mode(self):
+        if self.trigger_mode is TriggerMode.CONTINUOUS:
+            self.software_trigger_radioButton.setEnabled(False)
+            self.hardware_trigger_radioButton.setEnabled(False)
+        elif self.trigger_mode is TriggerMode.TRIGGERED:
+            self.software_trigger_radioButton.setEnabled(True)
+            self.hardware_trigger_radioButton.setEnabled(True)
 
     def toggle_trigger_source(self):
         if self.hardware_trigger_radioButton.isChecked():
@@ -166,17 +228,12 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def enable_trigger_controls(self):
         self.continuous_radioButton.setEnabled(True)
         self.triggered_radioButton.setEnabled(True)
-        if self.triggered_radioButton.isChecked():
-            self.toggle_source_controls(True)
+        self.check_trigger_mode()
 
     def disable_trigger_controls(self):
         self.continuous_radioButton.setEnabled(False)
         self.triggered_radioButton.setEnabled(False)
-        self.toggle_source_controls(False)
-
-    def toggle_source_controls(self, toggle_value):
-        self.software_trigger_radioButton.setEnabled(toggle_value)
-        self.hardware_trigger_radioButton.setEnabled(toggle_value)
+        self.check_trigger_mode()
 
     def update_exposure(self):
         exposure_input = self.exposure_lineEdit.text()

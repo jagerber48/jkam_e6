@@ -12,8 +12,6 @@ There are plans to implement a Gaussian fit analyzer.
 Original program by Jonathan Kohler.
 Updated by Justin Gerber (2020) - gerberja@berkeley.edu
 """
-
-from enum import Enum
 import sys
 import ctypes
 from PyQt5.QtCore import pyqtSignal
@@ -21,12 +19,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtGui import QIcon
 from package.ui.camerawindow_ui import Ui_CameraWindow
 from package.data.camerasettings import RbAtom
-
-
-class ImagingMode(Enum):
-    VIDEO = 0
-    ABSORPTION = 1
-    FLUORESCENCE = 2
+from package.widgets.imagecapturemodewidget import ImagingMode
 
 
 class JKamWindow(QMainWindow, Ui_CameraWindow):
@@ -54,13 +47,15 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.analyze_signal.connect(self.roi_analyzer_widget.analyze)
 
         self.imaging_mode = None
-        # self.image_capture_buttonGroup.buttonClicked.connect(self.set_imaging_mode)
-        self.camera_control_widget.started_signal.connect(self.lock_imaging_mode)
-        self.camera_control_widget.stopped_signal.connect(self.unlock_imaging_mode)
+        self.imagecapturemodewidget.state_set_signal.connect(self.set_imaging_mode)
+        self.camera_control_widget.started_signal.connect(self.imagecapturemodewidget.lock)
+        self.camera_control_widget.stopped_signal.connect(self.imagecapturemodewidget.unlock)
+        self.camera_control_widget.trigger_mode_toggled_signal.connect(self.imagecapturemodewidget.set_trigger_mode)
+        self.imagecapturemodewidget.set_imaging_mode()
+
         self.camera_control_widget.armed_signal.connect(self.armed)
         self.camera_control_widget.disarmed_signal.connect(self.disarmed)
-        self.camera_control_widget.trigger_mode_toggled_signal.connect(self.trigger_mode_changed)
-        # self.set_imaging_mode()
+        # self.camera_control_widget.trigger_mode_toggled_signal.connect(self.trigger_mode_changed)
 
         self.savebox_widget.save_single_pushButton.clicked.connect(self.save_frames)
         self.video_frame = None
@@ -68,11 +63,11 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def on_capture(self, frame):
         self.frame_received_signal.disconnect(self.on_capture)
-        if self.imaging_mode == ImagingMode.VIDEO:
+        if self.imaging_mode is ImagingMode.VIDEO:
             self.display_video_frame(frame)
-        elif self.imaging_mode == ImagingMode.ABSORPTION:
+        elif self.imaging_mode is ImagingMode.ABSORPTION:
             self.display_absorption_frame(frame)
-        elif self.imaging_mode == ImagingMode.FLUORESCENCE:
+        elif self.imaging_mode is ImagingMode.FLUORESCENCE:
             self.display_fluorescence_frame(frame)
         self.frame_received_signal.connect(self.on_capture)
 
@@ -95,55 +90,32 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.save_frames()
 
     def save_frames(self):
-        if self.imaging_mode == ImagingMode.VIDEO:
+        if self.imaging_mode is ImagingMode.VIDEO:
             self.savebox_widget.save(self.video_frame)
-        if self.imaging_mode == ImagingMode.ABSORPTION:
+        if self.imaging_mode is ImagingMode.ABSORPTION:
             atom_frame = self.absorption_view_widget.atom_frame
             bright_frame = self.absorption_view_widget.bright_frame
             dark_frame = self.absorption_view_widget.dark_frame
             self.savebox_widget.save(atom_frame, bright_frame, dark_frame)
-        if self.imaging_mode == ImagingMode.FLUORESCENCE:
+        if self.imaging_mode is ImagingMode.FLUORESCENCE:
             atom_frame = self.fluorescence_view_widget.atom_frame
             ref_frame = self.fluorescence_view_widget.ref_frame
             self.savebox_widget.save(atom_frame, ref_frame)
 
-    def set_imaging_mode(self):
-        if self.video_mode_radioButton.isChecked():
+    def set_imaging_mode(self, imaging_mode):
+        self.imaging_mode = imaging_mode
+        if self.imaging_mode is ImagingMode.VIDEO:
             self.view_stackedWidget.setCurrentIndex(0)
             self.roi_analyzer_widget.set_imageview(self.videovieweditor.imageview)
-            self.imaging_mode = ImagingMode.VIDEO
             self.savebox_widget.mode = self.savebox_widget.ModeType.SINGLE
-        elif self.absorption_mode_radioButton.isChecked():
+        elif self.imaging_mode is ImagingMode.ABSORPTION:
             self.view_stackedWidget.setCurrentIndex(1)
             self.roi_analyzer_widget.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
-            self.imaging_mode = ImagingMode.ABSORPTION
             self.savebox_widget.mode = self.savebox_widget.ModeType.ABSORPTION
-        elif self.fluorescence_mode_radioButton.isChecked():
+        elif self.imaging_mode is ImagingMode.FLUORESCENCE:
             self.view_stackedWidget.setCurrentIndex(2)
             self.roi_analyzer_widget.set_imageview(self.fluorescence_view_widget.N_view_editor.imageview)
-            self.imaging_mode = ImagingMode.FLUORESCENCE
             self.savebox_widget.mode = self.savebox_widget.ModeType.FLUORESCENCE
-
-    def lock_imaging_mode(self):
-        self.video_mode_radioButton.setEnabled(False)
-        self.absorption_mode_radioButton.setEnabled(False)
-        self.fluorescence_mode_radioButton.setEnabled(False)
-
-    def unlock_imaging_mode(self):
-        self.video_mode_radioButton.setEnabled(True)
-        if not self.camera_control_widget.continuous_radioButton.isChecked():
-            self.absorption_mode_radioButton.setEnabled(True)
-            self.fluorescence_mode_radioButton.setEnabled(True)
-
-    def trigger_mode_changed(self):
-        if self.camera_control_widget.continuous_radioButton.isChecked():
-            self.video_mode_radioButton.setChecked(True)
-            self.absorption_mode_radioButton.setEnabled(False)
-            self.fluorescence_mode_radioButton.setEnabled(False)
-        elif self.camera_control_widget.triggered_radioButton.isChecked():
-            self.absorption_mode_radioButton.setEnabled(True)
-            self.fluorescence_mode_radioButton.setEnabled(True)
-        self.set_imaging_mode()
 
     def armed(self):
         imaging_system = self.camera_control_widget.imaging_system
