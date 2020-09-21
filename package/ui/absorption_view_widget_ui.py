@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_AbsorptionViewWidget(object):
     def setupUi(self, AbsorptionViewWidget):
         AbsorptionViewWidget.setObjectName("AbsorptionViewWidget")
-        AbsorptionViewWidget.resize(707, 493)
+        AbsorptionViewWidget.resize(675, 493)
         self.gridLayout = QtWidgets.QGridLayout(AbsorptionViewWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.tabWidget = QtWidgets.QTabWidget(AbsorptionViewWidget)
@@ -48,6 +48,7 @@ class Ui_AbsorptionViewWidget(object):
         self.detuning_lineEdit.setObjectName("detuning_lineEdit")
         self.horizontalLayout.addWidget(self.detuning_lineEdit)
         self.imaging_parameters_pushButton = QtWidgets.QPushButton(self.N_tab)
+        self.imaging_parameters_pushButton.setCheckable(True)
         self.imaging_parameters_pushButton.setObjectName("imaging_parameters_pushButton")
         self.horizontalLayout.addWidget(self.imaging_parameters_pushButton)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)

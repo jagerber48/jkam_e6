@@ -25,7 +25,6 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
             image_view.getView().setXLink(self.N_view_editor.imageview.getView())
             image_view.getView().setYLink(self.N_view_editor.imageview.getView())
 
-
         self.analyzer = None
         self.analyzer_loaded = False
         self.frame_count = 0
@@ -72,19 +71,37 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
             self.number_frame = None
             self.frame_count = 0
 
+    def show_parameters(self):
+        self.parameters_window.show()
+        self.imaging_parameters_pushButton.setChecked(True)
+
+    def close_parameters(self):
+        self.parameters_window.hide()
+        self.imaging_parameters_pushButton.setChecked(False)
+
+    def toggle_show_parameters(self):
+        if self.parameters_window.isHidden():
+            self.show_parameters()
+        elif not self.parameters_window.isHidden():
+            self.close_parameters()
+
     def load_analyzer(self, *, atom, imaging_system):
         self.analyzer = AbsorptionAnalyzer(atom=atom, imaging_system=imaging_system)
         self.parameters_window = AbsorptionParametersWidget(atom=atom, imaging_system=imaging_system)
-        self.imaging_parameters_pushButton.clicked.connect(self.parameters_window.show)
-
+        self.imaging_parameters_pushButton.clicked.connect(self.toggle_show_parameters)
+        self.parameters_window.window_close_signal.connect(self.close_parameters)
         self.analyzer_loaded = True
 
     def unload_analyzer(self):
+        self.imaging_parameters_pushButton.clicked.disconnect()
+        self.close_parameters()
         del self.analyzer
         self.analyzer = None
 
 
 class AbsorptionParametersWidget(QWidget, Ui_AbsorptionParametersWidget):
+    window_close_signal = pyqtSignal()
+
     def __init__(self, parent=None, *, atom, imaging_system, detuning=0, pulse_time=100e-6):
         super(AbsorptionParametersWidget, self).__init__(parent=parent)
         self.setupUi(self)
@@ -92,12 +109,14 @@ class AbsorptionParametersWidget(QWidget, Ui_AbsorptionParametersWidget):
         self.imaging_system = imaging_system
         self.detuning = detuning
         self.pulse_time = pulse_time
+        self.close_pushButton.clicked.connect(self.close)
 
     def set_atom_text(self):
-        self.frequency_value_label.setText(f'{self.transition_frequency*1e-12:.1f} THz')
-        self.cross_section_value_label.setText(f'{self.cross_section*1e4:.1f} cm<sup>2</sup>')
+        transition_frequency_text_value = self.transition_frequency * 1e-12 / (2 * np.pi)
+        self.frequency_value_label.setText(f'{transition_frequency_text_value:.1f} THz')
+        self.cross_section_value_label.setText(f'{self.cross_section*1e4:.1e} cm<sup>2</sup>')
         self.isat_value_label.setText(f'{self.saturation_intensity*1e3/1e4:.1f} mW/cm<sup>2</sup>')
-        self.linewidth_value_label.setText(f'{self.linewidth*1e-6:.1f} MHz')
+        self.linewidth_value_label.setText(f'{self.linewidth * 1e-6 / (2 * np.pi):.1f} MHz')
 
     def set_imaging_sytem_text(self):
         pixel_size = np.sqrt(self.pixel_area) * 1e6  # micron
@@ -146,3 +165,7 @@ class AbsorptionParametersWidget(QWidget, Ui_AbsorptionParametersWidget):
     def pulse_time(self, value):
         self._pulse_time = value
         self.pulse_value_label.setText(f'{self._pulse_time*1e6} us')
+
+    def closeEvent(self, event):
+        self.window_close_signal.emit()
+        return super().closeEvent(event)

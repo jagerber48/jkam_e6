@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>707</width>
+    <width>675</width>
     <height>493</height>
    </rect>
   </property>
@@ -73,7 +73,10 @@
          <item>
           <widget class="QPushButton" name="imaging_parameters_pushButton">
            <property name="text">
-            <string>See Imaging Parameters</string>
+            <string>Imaging Parameters</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

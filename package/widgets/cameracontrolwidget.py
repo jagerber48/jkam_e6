@@ -101,7 +101,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
                 self.driver.disarm_camera()
                 self.armed = False
                 self.camera_comboBox.setEnabled(True)
-                self.disarm_signal.emit()
+                self.disarmed_signal.emit()
             except Exception as e:
                 print('Error while trying to DISARM camera')
                 print(e)
