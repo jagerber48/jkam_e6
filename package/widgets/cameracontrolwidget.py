@@ -16,7 +16,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     disarmed_signal = pyqtSignal()
     started_signal = pyqtSignal()
     stopped_signal = pyqtSignal()
-    trigger_mode_toggled = pyqtSignal()
+    trigger_mode_toggled_signal = pyqtSignal()
 
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
@@ -148,7 +148,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.stop()
 
     def toggle_trigger_mode(self):
-        self.trigger_mode_toggled.emit()
+        self.trigger_mode_toggled_signal.emit()
         if self.continuous_radioButton.isChecked():
             self.driver.trigger_off()
             self.toggle_source_controls(False)

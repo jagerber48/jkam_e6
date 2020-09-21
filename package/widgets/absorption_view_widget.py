@@ -34,6 +34,8 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
         self.od_frame = None
         self.number_frame = None
 
+        self.imaging_parameters_pushButton.setCheckable(False)
+
     def process_frame(self, frame):
         self.frame_count += 1
         if self.frame_count == 1:
@@ -90,11 +92,13 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
         self.parameters_window = AbsorptionParametersWidget(atom=atom, imaging_system=imaging_system)
         self.imaging_parameters_pushButton.clicked.connect(self.toggle_show_parameters)
         self.parameters_window.window_close_signal.connect(self.close_parameters)
+        self.imaging_parameters_pushButton.setCheckable(True)
         self.analyzer_loaded = True
 
     def unload_analyzer(self):
         self.imaging_parameters_pushButton.clicked.disconnect()
         self.close_parameters()
+        self.imaging_parameters_pushButton.setCheckable(False)
         del self.analyzer
         self.analyzer = None
 

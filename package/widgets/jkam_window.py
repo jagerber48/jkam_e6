@@ -59,7 +59,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.camera_control_widget.stopped_signal.connect(self.unlock_imaging_mode)
         self.camera_control_widget.armed_signal.connect(self.armed)
         self.camera_control_widget.disarmed_signal.connect(self.disarmed)
-        self.camera_control_widget.trigger_mode_toggled.connect(self.trigger_mode_changed)
+        self.camera_control_widget.trigger_mode_toggled_signal.connect(self.trigger_mode_changed)
         self.set_imaging_mode()
 
         self.savebox_widget.save_single_pushButton.clicked.connect(self.save_frames)
