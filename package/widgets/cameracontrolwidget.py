@@ -48,21 +48,18 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.trigger_source = TriggerSource.HARDWARE
         self.acquire_mode = AcquireMode.STOPPED
 
-        self.driver = None
-        self.serial_number = ''
-
-        self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
-
         self.arm_pushButton.clicked.connect(self.toggle_arm)
         self.start_pushButton.clicked.connect(self.toggle_start)
+
+        self.capture_mode_buttonGroup.buttonClicked.connect(self.set_trigger_state)
+        self.trigger_source_buttonGroup.buttonClicked.connect(self.set_trigger_state)
+
+        self.exposure_time = round(float(self.exposure_lineEdit.text()), 2)
         self.exposure_lineEdit.editingFinished.connect(self.update_exposure)
         self.exposure_pushButton.clicked.connect(self.set_exposure)
 
-        self.capture_mode = CaptureMode.CONTINUOUS
-        self.mode_buttonGroup.buttonClicked.connect(self.set_trigger_state)
-        self.trigger_buttonGroup.buttonClicked.connect(self.set_trigger_state)
-        self.acquire_mode = AcquireMode.STOPPED
-
+        self.driver = None
+        self.serial_number = ''
         self.imaging_systems = dict()
         self.populate_imaging_systems()
         self.imaging_system = None
