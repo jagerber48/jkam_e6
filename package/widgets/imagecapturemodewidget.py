@@ -13,6 +13,7 @@ class TriggerMode(Enum):
     TRIGGERED = 0
     CONTINUOUS = 1
 
+
 class LockMode(Enum):
     UNLOCKED = 0
     LOCKED = 1

@@ -54,13 +54,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.analyze_signal.connect(self.roi_analyzer_widget.analyze)
 
         self.imaging_mode = None
-        self.image_capture_buttonGroup.buttonClicked.connect(self.set_imaging_mode)
+        # self.image_capture_buttonGroup.buttonClicked.connect(self.set_imaging_mode)
         self.camera_control_widget.started_signal.connect(self.lock_imaging_mode)
         self.camera_control_widget.stopped_signal.connect(self.unlock_imaging_mode)
         self.camera_control_widget.armed_signal.connect(self.armed)
         self.camera_control_widget.disarmed_signal.connect(self.disarmed)
         self.camera_control_widget.trigger_mode_toggled_signal.connect(self.trigger_mode_changed)
-        self.set_imaging_mode()
+        # self.set_imaging_mode()
 
         self.savebox_widget.save_single_pushButton.clicked.connect(self.save_frames)
         self.video_frame = None
