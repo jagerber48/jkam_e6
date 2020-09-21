@@ -48,7 +48,7 @@ class GuppyObject(QtCore.QObject):
 		self.cam.openCamera(1)
 		
 		self.cam.runFeatureCommand('AcquisitionStop') #Ensure acquisition is stopped, so we can write properties
-		self.cam.TriggerMode = 'Off'
+		self.cam.CaptureMode = 'Off'
 		self.cam.PixelFormat = 'Mono16'
 
 	def isOpen(self):

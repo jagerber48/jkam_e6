@@ -2,7 +2,7 @@ from enum import Enum
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget
 from package.ui.imagecapturemodewidget_ui import Ui_ImageCaptureModeWidget
-from package.widgets.cameracontrolwidget import TriggerMode
+from package.widgets.cameracontrolwidget import CaptureMode
 
 
 class ImagingMode(Enum):
@@ -24,7 +24,7 @@ class ImageCaptureModeWidget(QWidget, Ui_ImageCaptureModeWidget):
         self.setupUi(self)
 
         self.lock_mode = LockMode.UNLOCKED
-        self.trigger_mode = TriggerMode.TRIGGERED
+        self.trigger_mode = CaptureMode.TRIGGERED
         self.imaging_mode = ImagingMode.VIDEO
         self.set_state()
         self.image_capture_buttonGroup.buttonClicked.connect(self.set_imaging_mode)
@@ -40,11 +40,11 @@ class ImageCaptureModeWidget(QWidget, Ui_ImageCaptureModeWidget):
 
     def set_trigger_mode(self, trigger_mode):
         self.trigger_mode = trigger_mode
-        if self.trigger_mode is TriggerMode.CONTINUOUS:
+        if self.trigger_mode is CaptureMode.CONTINUOUS:
             self.video_mode_radioButton.setChecked(True)
             self.absorption_mode_radioButton.setEnabled(False)
             self.fluorescence_mode_radioButton.setEnabled(False)
-        elif self.trigger_mode is TriggerMode.TRIGGERED:
+        elif self.trigger_mode is CaptureMode.TRIGGERED:
             self.video_mode_radioButton.setEnabled(True)
             self.absorption_mode_radioButton.setEnabled(True)
             self.fluorescence_mode_radioButton.setEnabled(True)

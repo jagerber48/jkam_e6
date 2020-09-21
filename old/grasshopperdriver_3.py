@@ -101,10 +101,10 @@ class GrasshopperDriver(QObject):
         print(f'EXPOSURE TIME set to {exposure_time_result:.4f} ms')
 
     def trigger_on(self):
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
+        self.cam.CaptureMode.SetValue(PySpin.TriggerMode_On)
 
     def trigger_off(self):
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_Off)
+        self.cam.CaptureMode.SetValue(PySpin.TriggerMode_Off)
 
     def close_connection(self):
         if self.armed:
@@ -144,5 +144,5 @@ class GrasshopperDriver(QObject):
         self.cam.TriggerActivation.SetValue(PySpin.TriggerActivation_RisingEdge)
         self.cam.TriggerSource.SetValue(PySpin.TriggerSelector_FrameStart)
         self.cam.TriggerSource.SetValue(PySpin.TriggerSource_Line0)
-        self.cam.TriggerMode.SetValue(PySpin.TriggerMode_On)
+        self.cam.CaptureMode.SetValue(PySpin.TriggerMode_On)
         self.cam.AcquisitionMode.SetValue(PySpin.AcquisitionMode_Continuous)
