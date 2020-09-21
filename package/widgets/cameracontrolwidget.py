@@ -134,9 +134,9 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         # self.disable_trigger_controls()
 
     def toggle_arm(self):
-        if not self.armed:
+        if self.arm_mode is ArmMode.DISARMED:
             self.arm()
-        else:
+        elif self.arm_mode is ArmMode.ARMED:
             self.disarm()
 
     def start(self):
@@ -176,7 +176,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.stop()
 
     def set_trigger_state(self):
-        if self.arm_mode is ArmMode.DISARMED:
+        if self.arm_mode is ArmMode.ARMED:
             self.continuous_radioButton.setEnabled(True)
             self.triggered_radioButton.setEnabled(True)
             if self.acquire_mode is AcquireMode.STOPPED:
@@ -202,9 +202,13 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
                 self.triggered_radioButton.setEnabled(False)
                 self.software_trigger_radioButton.setEnabled(False)
                 self.hardware_trigger_radioButton.setEnabled(False)
-        elif self.arm_mode is ArmMode.ARMED:
+        if self.arm_mode is ArmMode.DISARMED:
             self.continuous_radioButton.setEnabled(False)
             self.triggered_radioButton.setEnabled(False)
+            self.software_trigger_radioButton.setEnabled(False)
+            self.hardware_trigger_radioButton.setEnabled(False)
+
+
     #
     # def toggle_trigger_mode(self):
     #     if self.continuous_radioButton.isChecked():
