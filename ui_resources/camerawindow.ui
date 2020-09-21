@@ -152,7 +152,7 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
          <item row="0" column="1">
-          <widget class="RoiAnalyzer" name="roi_analyzer_widget" native="true"/>
+          <widget class="RoiIntegrationAnalyzer" name="roi_analyzer_widget" native="true"/>
          </item>
         </layout>
        </widget>
@@ -212,9 +212,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>RoiAnalyzer</class>
+   <class>RoiIntegrationAnalyzer</class>
    <extends>QWidget</extends>
-   <header>package.widgets.AnalysisWidgets</header>
+   <header>package.analyzers.roiintegrationanalyzer</header>
    <container>1</container>
   </customwidget>
   <customwidget>

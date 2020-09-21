@@ -2,19 +2,15 @@ from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtCore import pyqtSignal
 from package.ui.cameracontrolwidget_ui import Ui_CameraControlWidget
 from package.data import camerasettings
-import time
 
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     # TODO: Calls to JKamGenDriver could be done through signals so that JKamGenDriver could operate in its own thread
-    # TODO: Functionality to choose between different serial numbers and drivers
     """
     This widget essentially serves as a ui for a jkamgendriver. It handles receiving user inputs to change camera
     settings such as camera state (arm/disarm, start/stop acquisition), trigger mode, and exposure time. It also
     receives and passes frames through the frame_received_signal signal.
     """
-    grasshopper_sn = '17491535'  # Spare Camera for testing
-    # grasshopper_sn = '18431942'  # Side Imaging
     frame_received_signal = pyqtSignal(object)
     armed_signal = pyqtSignal()
     disarmed_signal = pyqtSignal()

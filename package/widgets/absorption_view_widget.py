@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 from package.ui.absorption_view_widget_ui import Ui_AbsorptionViewWidget
 from package.ui.absorption_parameters_widget_ui import Ui_AbsorptionParametersWidget
-from package.widgets.AnalysisWidgets import AbsorptionAnalyzer
+from package.analyzers.absorptionanalyzer import AbsorptionAnalyzer
 
 
 class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):

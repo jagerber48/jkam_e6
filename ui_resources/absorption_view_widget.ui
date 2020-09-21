@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>AbsorptionViewWidget</class>
  <widget class="QWidget" name="AbsorptionViewWidget">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>675</width>
-    <height>493</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -50,6 +42,16 @@
              <width>75</width>
              <height>16777215</height>
             </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="saturated_checkBox">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check this box to include high saturation parameter calculation in absorption calculation. Relies on more calibrations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Saturated?</string>
            </property>
           </widget>
          </item>

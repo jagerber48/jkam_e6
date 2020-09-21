@@ -119,7 +119,10 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
                     self.run_pushButton.setChecked(False)
                     return
             elif not self.data_path.exists():
-                self.data_path.mkdir(parents=True)
+                try:
+                    self.data_path.mkdir(parents=True)
+                except FileNotFoundError as e:
+                    print(e)
             self.toggle_enable_editing(False)
             self.run_pushButton.setText('Stop Run')
             self.autosaving = True

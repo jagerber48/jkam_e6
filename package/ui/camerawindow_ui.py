@@ -98,7 +98,7 @@ class Ui_CameraWindow(object):
         self.roi_analyzer_frame.setObjectName("roi_analyzer_frame")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.roi_analyzer_frame)
         self.gridLayout_4.setObjectName("gridLayout_4")
-        self.roi_analyzer_widget = RoiAnalyzer(self.roi_analyzer_frame)
+        self.roi_analyzer_widget = RoiIntegrationAnalyzer(self.roi_analyzer_frame)
         self.roi_analyzer_widget.setObjectName("roi_analyzer_widget")
         self.gridLayout_4.addWidget(self.roi_analyzer_widget, 0, 1, 1, 1)
         self.mode_analysis_gridLayout.addWidget(self.roi_analyzer_frame, 1, 1, 1, 1)
@@ -125,7 +125,7 @@ class Ui_CameraWindow(object):
         self.absorption_mode_radioButton.setText(_translate("CameraWindow", "Absorption"))
         self.video_mode_radioButton.setText(_translate("CameraWindow", "Video"))
         self.fluorescence_mode_radioButton.setText(_translate("CameraWindow", "Fluorescence"))
-from package.widgets.AnalysisWidgets import RoiAnalyzer
+from package.analyzers.roiintegrationanalyzer import RoiIntegrationAnalyzer
 from package.widgets.absorption_view_widget import AbsorptionViewWidget
 from package.widgets.cameracontrolwidget import CameraControlWidget
 from package.widgets.fluorescence_view_widget import FluorescenceViewWidget

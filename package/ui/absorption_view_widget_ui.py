@@ -14,7 +14,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_AbsorptionViewWidget(object):
     def setupUi(self, AbsorptionViewWidget):
         AbsorptionViewWidget.setObjectName("AbsorptionViewWidget")
-        AbsorptionViewWidget.resize(675, 493)
         self.gridLayout = QtWidgets.QGridLayout(AbsorptionViewWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.tabWidget = QtWidgets.QTabWidget(AbsorptionViewWidget)
@@ -40,6 +39,9 @@ class Ui_AbsorptionViewWidget(object):
         self.pulse_time_lineEdit.setMaximumSize(QtCore.QSize(75, 16777215))
         self.pulse_time_lineEdit.setObjectName("pulse_time_lineEdit")
         self.horizontalLayout.addWidget(self.pulse_time_lineEdit)
+        self.saturated_checkBox = QtWidgets.QCheckBox(self.N_tab)
+        self.saturated_checkBox.setObjectName("saturated_checkBox")
+        self.horizontalLayout.addWidget(self.saturated_checkBox)
         self.detuning_label = QtWidgets.QLabel(self.N_tab)
         self.detuning_label.setObjectName("detuning_label")
         self.horizontalLayout.addWidget(self.detuning_label)
@@ -97,8 +99,10 @@ class Ui_AbsorptionViewWidget(object):
         _translate = QtCore.QCoreApplication.translate
         AbsorptionViewWidget.setWindowTitle(_translate("AbsorptionViewWidget", "Form"))
         self.pulse_time_label.setText(_translate("AbsorptionViewWidget", "Imaging Pulse Time (us):"))
+        self.saturated_checkBox.setToolTip(_translate("AbsorptionViewWidget", "<html><head/><body><p>Check this box to include high saturation parameter calculation in absorption calculation. Relies on more calibrations.</p></body></html>"))
+        self.saturated_checkBox.setText(_translate("AbsorptionViewWidget", "Saturated?"))
         self.detuning_label.setText(_translate("AbsorptionViewWidget", "Detuning (MHz):"))
-        self.imaging_parameters_pushButton.setText(_translate("AbsorptionViewWidget", "See Imaging Parameters"))
+        self.imaging_parameters_pushButton.setText(_translate("AbsorptionViewWidget", "Imaging Parameters"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.N_tab), _translate("AbsorptionViewWidget", "Atom Number"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.OD_tab), _translate("AbsorptionViewWidget", "Optical Density"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.atom_tab), _translate("AbsorptionViewWidget", "With Atoms Image"))

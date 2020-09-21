@@ -1,7 +1,6 @@
 from package.ui.fluorescence_view_widget_ui import Ui_FluorescenceViewWidget
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
-from package.widgets.AnalysisWidgets import AbsorptionAnalyzer
 
 
 class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
