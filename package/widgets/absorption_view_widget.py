@@ -7,6 +7,8 @@ from package.analyzers.absorptionanalyzer import AbsorptionAnalyzer
 
 
 class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
+    # TODO: making detuning and pulse_time functional
+    # TODO: Add reset functionality
     analysis_complete_signal = pyqtSignal()
 
     def __init__(self, parent=None):

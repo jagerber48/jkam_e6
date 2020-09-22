@@ -4,6 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 
 
 class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
+    # TODO: Parameter View
     analysis_complete_signal = pyqtSignal()
 
     def __init__(self, parent=None):
@@ -37,10 +38,6 @@ class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
             self.ref_frame = frame
             image_view = self.reference_view_editor.imageview
             image_view.setImage(self.ref_frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
-
-            # self.diff_frame, self.number_frame = self.analyzer.absorption_od_and_number(self.atom_frame,
-            #                                                                             self.ref_frame,
-            #                                                                             self.dark_frame)
 
             self.diff_frame = self.atom_frame - self.ref_frame
             self.number_frame = 1 * self.diff_frame
