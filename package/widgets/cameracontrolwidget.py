@@ -41,7 +41,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
 
         self.driver = None
         self.serial_number = ''
-        self.imaging_systems = dict()
+        self.imaging_systems_dict = dict()
         self.populate_imaging_systems()
         self.imaging_system = None
 
@@ -70,22 +70,15 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def populate_imaging_systems(self):
         for system in camerasettings.imaging_system_list:
             self.camera_comboBox.addItem(system.name)
-            self.imaging_systems[system.name] = system
+            self.imaging_systems_dict[system.name] = system
 
     def load_driver(self):
+        self.unload_driver()
         if self.camera_comboBox.currentIndex() != 0:
             imaging_system_name = self.camera_comboBox.currentText()
-            self.imaging_system = self.imaging_systems[imaging_system_name]
+            self.imaging_system = self.imaging_systems_dict[imaging_system_name]
             self.serial_number = self.imaging_system.camera_serial_number
             self.driver = self.imaging_system.camera_type.driver
-            try:
-                self.software_trigger_pushButton.disconnect()
-            except TypeError:
-                pass
-            try:
-                self.driver.frame_captured_signal.disconnect()
-            except TypeError:
-                pass
             self.software_trigger_pushButton.clicked.connect(self.driver.execute_software_trigger)
             self.driver.frame_captured_signal.connect(self.frame_received_signal.emit)
         elif self.camera_comboBox.currentIndex() == 0:
@@ -93,28 +86,37 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.driver = None
             self.serial_number = ''
 
-    def arm(self):
+    def unload_driver(self):
         try:
-            self.arm_pushButton.setText('Arming')
-            QApplication.processEvents()
+            self.software_trigger_pushButton.disconnect()
+        except TypeError:
+            pass
+        try:
+            self.driver.frame_captured_signal.disconnect()
+        except TypeError:
+            pass
+        self.driver = None
+        self.serial_number = ''
+
+    def arm(self):
+        self.arm_pushButton.setText('Arming')
+        QApplication.processEvents()
+        try:
             self.load_driver()
             self.driver.arm_camera(self.serial_number)
             self.armed = True
-            self.serial_label.setText(f'Serial Number: {self.serial_number}')
-            self.arm_pushButton.setText('Disarm Camera')
-            self.camera_comboBox.setEnabled(False)
             self.start_pushButton.setEnabled(True)
             self.exposure_pushButton.setEnabled(True)
             self.set_exposure()
-
+            self.camera_comboBox.setEnabled(False)
+            self.arm_pushButton.setText('Disarm Camera')
+            self.serial_label.setText(f'Serial Number: {self.serial_number}')
             self.continuous_radioButton.setEnabled(True)
             self.triggered_radioButton.setEnabled(True)
             if self.continuous_radioButton.isChecked():
                 self.continuous_toggled(True)
             elif self.triggered_radioButton.isChecked():
                 self.triggered_toggled(True)
-            # self.set_trigger_state()
-
             self.armed_signal.emit()
         except Exception as e:
             print('Error while trying to ARM camera')
@@ -127,23 +129,23 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
                 if self.driver.acquiring:
                     self.stop()
                 self.driver.disarm_camera()
-                self.armed = False
-                self.camera_comboBox.setEnabled(True)
-                self.disarmed_signal.emit()
             except Exception as e:
                 print('Error while trying to DISARM camera')
                 print(e)
                 self.abort()
-        self.serial_label.setText(f'Serial Number: xxxxxxxx')
+        self.armed = False
         self.arm_pushButton.setChecked(False)
-        self.arm_pushButton.setText('Arm Camera')
         self.start_pushButton.setEnabled(False)
         self.exposure_pushButton.setEnabled(False)
-
+        self.camera_comboBox.setEnabled(True)
+        self.arm_pushButton.setText('Arm Camera')
+        self.serial_label.setText(f'Serial Number: xxxxxxxx')
         self.continuous_radioButton.setEnabled(False)
         self.triggered_radioButton.setEnabled(False)
         self.software_trigger_radioButton.setEnabled(False)
         self.hardware_trigger_radioButton.setEnabled(False)
+        self.unload_driver()
+        self.disarmed_signal.emit()
 
     def toggle_arm(self):
         if not self.armed:
@@ -155,7 +157,6 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         try:
             self.driver.start_acquisition()
             self.start_pushButton.setText('Stop Camera')
-
             self.continuous_radioButton.setEnabled(False)
             self.triggered_radioButton.setEnabled(False)
             self.software_trigger_radioButton.setEnabled(False)
