@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ImageCaptureModeWidget(object):
     def setupUi(self, ImageCaptureModeWidget):
         ImageCaptureModeWidget.setObjectName("ImageCaptureModeWidget")
-        ImageCaptureModeWidget.resize(168, 145)
+        ImageCaptureModeWidget.resize(147, 128)
         self.gridLayout = QtWidgets.QGridLayout(ImageCaptureModeWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.frame = QtWidgets.QFrame(ImageCaptureModeWidget)
@@ -42,6 +42,10 @@ class Ui_ImageCaptureModeWidget(object):
         self.image_capture_buttonGroup.addButton(self.video_mode_radioButton)
         self.gridLayout_2.addWidget(self.video_mode_radioButton, 3, 0, 1, 1)
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout.addItem(spacerItem, 1, 0, 1, 1)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout.addItem(spacerItem1, 0, 1, 1, 1)
 
         self.retranslateUi(ImageCaptureModeWidget)
         QtCore.QMetaObject.connectSlotsByName(ImageCaptureModeWidget)
