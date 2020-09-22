@@ -1,10 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QApplication
-from PyQt5.QtGui import QPalette
 from PyQt5.QtCore import pyqtSignal
 from package.ui.cameracontrolwidget_ui import Ui_CameraControlWidget
 from package.data import camerasettings
-
-white_palette = QPalette
 
 
 class CameraControlWidget(QWidget, Ui_CameraControlWidget):
