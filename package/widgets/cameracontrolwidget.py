@@ -64,11 +64,11 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     def unload_driver(self):
         try:
             self.software_trigger_pushButton.disconnect()
-        except TypeError:
+        except (AttributeError, TypeError):
             pass
         try:
             self.driver.frame_captured_signal.disconnect()
-        except TypeError:
+        except (AttributeError, TypeError):
             pass
         self.driver = None
         self.serial_number = ''
