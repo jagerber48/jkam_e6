@@ -45,28 +45,6 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.populate_imaging_systems()
         self.imaging_system = None
 
-    def continuous_toggled(self, checked):
-        if checked:
-            self.software_trigger_radioButton.setEnabled(False)
-            self.hardware_trigger_radioButton.setEnabled(False)
-            self.continuous_enabled_signal.emit()
-            self.driver.trigger_off()
-
-    def triggered_toggled(self, checked):
-        if checked:
-            self.software_trigger_radioButton.setEnabled(True)
-            self.hardware_trigger_radioButton.setEnabled(True)
-            self.trigger_enabled_signal.emit()
-            self.driver.trigger_on()
-
-    def hardware_trigger_toggled(self, checked):
-        if checked:
-            self.driver.set_hardware_trigger()
-
-    def software_trigger_toggled(self, checked):
-        if checked:
-            self.driver.set_software_trigger()
-
     def populate_imaging_systems(self):
         for system in camerasettings.imaging_system_list:
             self.camera_comboBox.addItem(system.name)
@@ -192,6 +170,28 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.start()
         else:
             self.stop()
+
+    def continuous_toggled(self, checked):
+        if checked:
+            self.software_trigger_radioButton.setEnabled(False)
+            self.hardware_trigger_radioButton.setEnabled(False)
+            self.continuous_enabled_signal.emit()
+            self.driver.trigger_off()
+
+    def triggered_toggled(self, checked):
+        if checked:
+            self.software_trigger_radioButton.setEnabled(True)
+            self.hardware_trigger_radioButton.setEnabled(True)
+            self.trigger_enabled_signal.emit()
+            self.driver.trigger_on()
+
+    def hardware_trigger_toggled(self, checked):
+        if checked:
+            self.driver.set_hardware_trigger()
+
+    def software_trigger_toggled(self, checked):
+        if checked:
+            self.driver.set_software_trigger()
 
     def exposure_edited(self):
         self.exposure_lineEdit.setStyleSheet("QLineEdit {background-color: #FFAAAA;}")
