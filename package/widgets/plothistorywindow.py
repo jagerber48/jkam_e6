@@ -22,7 +22,7 @@ class PlotHistoryWindow(QMainWindow, Ui_PlotHistoryWindow):
         self.history_max = self.history.max()
 
         self.history_PlotWidget.disableAutoRange()
-        self.history_plot = self.history_PlotWidget.plot()
+        self.history_plot = self.history_PlotWidget.plot(pen=None, symbolBrush='w')
         self.history_plot.setPen(width=2)
         self.history_PlotWidget.setXRange(0, self.num_history)
 
