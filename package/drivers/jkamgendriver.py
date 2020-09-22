@@ -31,7 +31,6 @@ class JKamGenDriver(QObject):
         self.serial_number = ''
         self.exposure_time = 0
 
-        self.connected = False
         self.armed = False
         self.acquiring = False
         self._trigger_enabled = False
@@ -99,7 +98,6 @@ class JKamGenDriver(QObject):
 
     def open_connection(self):
         self._open_connection()
-        print('Connection OPENED')
 
     def close_connection(self):
         if self.armed:
@@ -107,7 +105,6 @@ class JKamGenDriver(QObject):
         del self.cam
         self.cam = None
         self._close_connection()
-        self.connected = False
         print('Connection CLOSED')
 
     def grab_frame(self):

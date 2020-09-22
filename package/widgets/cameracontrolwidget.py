@@ -16,7 +16,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
     disarmed_signal = pyqtSignal()
     started_signal = pyqtSignal()
     continuous_enabled_signal = pyqtSignal()
-    trigger_enabled_signal = pyqtSignal()
+    triggered_enabled_signal = pyqtSignal()
 
     def __init__(self, parent=None):
         super(CameraControlWidget, self).__init__(parent=parent)
@@ -179,7 +179,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         if checked:
             self.software_trigger_radioButton.setEnabled(True)
             self.hardware_trigger_radioButton.setEnabled(True)
-            self.trigger_enabled_signal.emit()
+            self.triggered_enabled_signal.emit()
             self.driver.trigger_on()
 
     def hardware_trigger_toggled(self, checked):

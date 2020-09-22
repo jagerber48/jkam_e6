@@ -6,6 +6,7 @@ from package.drivers.jkamgendriver import JKamGenDriver
 class GrasshopperDriver(JKamGenDriver):
     def _open_connection(self):
         self.system = PySpin.System.GetInstance()
+        print('Connected to Grasshopper driver')
 
     def _close_connection(self):
         self.system.ReleaseInstance()
