@@ -79,10 +79,8 @@ class AndorDriver(JKamGenDriver):
     def _load_default_settings(self, cam):
         self.system.set_enum_string(cam, "SimplePreAmpGainControl", "12-bit (low noise)")
         self.system.set_enum_string(cam, "PixelEncoding", "Mono12")
-        self.system.set_enum_string(cam, "SimplePreAmpGainControl", "16 -bit (low noise)")
-        self.system.set_enum_string(cam, "PixelEncoding", "Mono12")
-        # self.system.set_enum_string(cam, "PixelReadoutRate", "12-bit (low noise)")
         # self.system.set_enum_string(cam, "SimplePreAmpGainControl", "16-bit (low noise & high well capacity)")
+        # self.system.set_enum_string(cam, "PixelEncoding", "Mono16")
         self.system.set_enum_string(cam, "AOIBinning", "8x8")
         self.system.set_enum_string(cam, 'CycleMode', 'Continuous')
 
