@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ImageViewEditor(object):
     def setupUi(self, ImageViewEditor):
         ImageViewEditor.setObjectName("ImageViewEditor")
-        ImageViewEditor.resize(565, 422)
+        ImageViewEditor.resize(590, 422)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -66,7 +66,7 @@ class Ui_ImageViewEditor(object):
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.settings_verticalLayout.addItem(spacerItem1)
         self.gridLayout.addLayout(self.settings_verticalLayout, 0, 1, 1, 1)
-        self.imageview = ImageView(ImageViewEditor)
+        self.imageview = CamView(ImageViewEditor)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(2)
         sizePolicy.setVerticalStretch(1)
@@ -94,7 +94,7 @@ class Ui_ImageViewEditor(object):
         self.cmap_comboBox.setItemText(1, _translate("ImageViewEditor", "gray"))
         self.cmap_comboBox.setItemText(2, _translate("ImageViewEditor", "viridis"))
         self.cmap_comboBox.setItemText(3, _translate("ImageViewEditor", "false2"))
-from pyqtgraph import ImageView
+from package.widgets.camview import CamView
 
 
 if __name__ == "__main__":

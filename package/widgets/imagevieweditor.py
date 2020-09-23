@@ -9,13 +9,14 @@ class ImageViewEditor(QWidget, Ui_ImageViewEditor):
         super(ImageViewEditor, self).__init__(parent=parent)
         self.setupUi(self)
 
-        self.imageview.ui.roiBtn.hide()
-        self.imageview.ui.menuBtn.hide()
-        v_line = pg.InfiniteLine(angle=90, movable=True)
-        h_line = pg.InfiniteLine(angle=0, movable=True)
-        self.imageview.addItem(v_line, ignoreBounds=True)
-        self.imageview.addItem(h_line, ignoreBounds=True)
+        # self.imageview.ui.roiBtn.hide()
+        # self.imageview.ui.menuBtn.hide()
+        # v_line = pg.InfiniteLine(angle=90, movable=True)
+        # h_line = pg.InfiniteLine(angle=0, movable=True)
+        # self.imageview.addItem(v_line, ignoreBounds=True)
+        # self.imageview.addItem(h_line, ignoreBounds=True)
 
+        self.imageview = self.imageview.imageview
         self.levels = (0, 255)
         self.read_levels()
 
