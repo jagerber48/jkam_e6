@@ -79,6 +79,8 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         try:
             self.load_driver()
             self.driver.arm_camera(self.serial_number)
+            if self.driver is None:
+                return
             self.armed = True
             self.start_pushButton.setEnabled(True)
             self.exposure_pushButton.setEnabled(True)

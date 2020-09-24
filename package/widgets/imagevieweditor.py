@@ -16,7 +16,7 @@ class ImageViewEditor(QWidget, Ui_ImageViewEditor):
         # self.imageview.addItem(v_line, ignoreBounds=True)
         # self.imageview.addItem(h_line, ignoreBounds=True)
 
-        self.imageview = self.imageview.imageview
+        self.imageview = self.camview.imageview
         self.levels = (0, 255)
         self.read_levels()
 
