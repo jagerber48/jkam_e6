@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_SaveBoxWidget(object):
     def setupUi(self, SaveBoxWidget):
         SaveBoxWidget.setObjectName("SaveBoxWidget")
-        SaveBoxWidget.resize(339, 395)
+        SaveBoxWidget.resize(220, 320)
         self.gridLayout = QtWidgets.QGridLayout(SaveBoxWidget)
         self.gridLayout.setObjectName("gridLayout")
         self.frame = QtWidgets.QFrame(SaveBoxWidget)
@@ -64,6 +64,7 @@ class Ui_SaveBoxWidget(object):
         self.run_name_lineEdit.setObjectName("run_name_lineEdit")
         self.gridLayout_4.addWidget(self.run_name_lineEdit, 3, 1, 1, 1)
         self.data_root_value_label = QtWidgets.QLabel(self.build_dir_tab)
+        self.data_root_value_label.setText("")
         self.data_root_value_label.setObjectName("data_root_value_label")
         self.gridLayout_4.addWidget(self.data_root_value_label, 1, 1, 1, 1)
         self.run_name_label = QtWidgets.QLabel(self.build_dir_tab)
@@ -73,6 +74,7 @@ class Ui_SaveBoxWidget(object):
         self.data_root_label.setObjectName("data_root_label")
         self.gridLayout_4.addWidget(self.data_root_label, 1, 0, 1, 1)
         self.daily_path_value_label = QtWidgets.QLabel(self.build_dir_tab)
+        self.daily_path_value_label.setText("")
         self.daily_path_value_label.setObjectName("daily_path_value_label")
         self.gridLayout_4.addWidget(self.daily_path_value_label, 2, 1, 1, 1)
         self.data_root_pushButton = QtWidgets.QPushButton(self.build_dir_tab)
@@ -92,6 +94,7 @@ class Ui_SaveBoxWidget(object):
         font = QtGui.QFont()
         font.setPointSize(8)
         self.data_dir_label.setFont(font)
+        self.data_dir_label.setText("")
         self.data_dir_label.setObjectName("data_dir_label")
         self.gridLayout_2.addWidget(self.data_dir_label, 2, 0, 1, 3)
         self.gridLayout.addWidget(self.frame, 0, 0, 2, 2)
@@ -111,15 +114,12 @@ class Ui_SaveBoxWidget(object):
         self.file_prefix_label.setText(_translate("SaveBoxWidget", "File Prefix:"))
         self.daily_path_label.setText(_translate("SaveBoxWidget", "Daily Data Path:"))
         self.run_name_lineEdit.setText(_translate("SaveBoxWidget", "run1"))
-        self.data_root_value_label.setText(_translate("SaveBoxWidget", "Y:\\expdata-e6\\data\\"))
         self.run_name_label.setText(_translate("SaveBoxWidget", "Run Name:"))
         self.data_root_label.setText(_translate("SaveBoxWidget", "Data Root:"))
-        self.daily_path_value_label.setText(_translate("SaveBoxWidget", "2020\\09\\12\\data\\"))
         self.data_root_pushButton.setText(_translate("SaveBoxWidget", "Select Data Root"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.build_dir_tab), _translate("SaveBoxWidget", "Build Data Dir"))
         self.select_data_pushButton.setText(_translate("SaveBoxWidget", "Select Data Directory"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.select_dir_tab), _translate("SaveBoxWidget", "Select Data Dir"))
-        self.data_dir_label.setText(_translate("SaveBoxWidget", "Y:\\expdata-e6\\data\\2020\\09\\12\\data\\run1\\"))
 
 
 if __name__ == "__main__":

@@ -67,6 +67,7 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         month = f'{today.month:02d}'
         day = f'{today.day:02d}'
         self.daily_data_path = Path(year, month, day, 'data')
+        self.daily_path_value_label.setText(str(self.daily_data_path))
 
     def set_run_path(self):
         if self.run_path != Path(self.run_name_lineEdit.text()):
