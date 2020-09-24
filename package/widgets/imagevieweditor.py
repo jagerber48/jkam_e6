@@ -19,6 +19,7 @@ class ImageViewEditor(QWidget, Ui_ImageViewEditor):
         self.imageview = self.camview.imageview
         self.levels = (0, 255)
         self.read_levels()
+        self.image_data = None
 
         self.histogram = self.imageview.getHistogramWidget().item
         self.histogram.setHistogramRange(self.levels[0], self.levels[1])
@@ -29,6 +30,10 @@ class ImageViewEditor(QWidget, Ui_ImageViewEditor):
         self.fullscale_pushButton.clicked.connect(self.set_fullscale)
         self.customscale_pushButton.clicked.connect(self.set_customscale)
         self.cmap_comboBox.activated.connect(self.set_cmap)
+
+    def setImage(self, img, *args, **kwargs):
+        self.camview.setImage(img, *args, **kwargs)
+        self.image_data = img
 
     def read_levels(self):
         try:

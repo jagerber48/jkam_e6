@@ -73,9 +73,11 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def display_video_frame(self, frame):
         self.video_frame = frame
-        image_view = self.videovieweditor.imageview
-        image_view.setImage(self.video_frame, autoRange=False,
-                            autoLevels=False, autoHistogramRange=False)
+        self.videovieweditor.setImage(self.video_frame, autoRange=False,
+                                      autoLevels=False, autoHistogramRange=False)
+        # image_view = self.videovieweditor.imageview
+        # image_view.setImage(self.video_frame, autoRange=False,
+        #                     autoLevels=False, autoHistogramRange=False)
         self.on_all_frames_received()
 
     def display_absorption_frame(self, frame):

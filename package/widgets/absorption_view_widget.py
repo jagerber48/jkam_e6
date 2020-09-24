@@ -26,6 +26,7 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
             image_view = editor.imageview
             image_view.getView().setXLink(self.N_view_editor.imageview.getView())
             image_view.getView().setYLink(self.N_view_editor.imageview.getView())
+            editor.camview.crosshair_moved_signal.connect(self.share_crosshair)
 
         self.analyzer = None
         self.analyzer_loaded = False
@@ -37,6 +38,10 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
         self.number_frame = None
 
         self.imaging_parameters_pushButton.setCheckable(False)
+
+    def share_crosshair(self, evt):
+        for editor in self.editor_list:
+            editor.camview.mouse_moved(evt, signal=False)
 
     def process_frame(self, frame):
         self.frame_count += 1
