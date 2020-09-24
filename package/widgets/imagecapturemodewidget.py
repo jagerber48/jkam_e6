@@ -31,7 +31,7 @@ class ImageCaptureModeWidget(QWidget, Ui_ImageCaptureModeWidget):
         self.state_set_signal.emit(self.imaging_mode)
 
     def continuous_enabled(self):
-        self.absorption_mode_radioButton.setEnabled(True)
+        self.video_mode_radioButton.setEnabled(True)
         self.absorption_mode_radioButton.setEnabled(False)
         self.fluorescence_mode_radioButton.setEnabled(False)
         self.video_mode_radioButton.setChecked(True)

@@ -161,9 +161,9 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         self.continuous_radioButton.setEnabled(True)
         self.triggered_radioButton.setEnabled(True)
         if self.continuous_radioButton.isChecked():
-            self.continuous_toggled(True)
+            self.continuous_toggled(True, aborting=aborting)
         elif self.triggered_radioButton.isChecked():
-            self.triggered_toggled(True)
+            self.triggered_toggled(True, aborting=aborting)
 
     def toggle_start(self):
         if not self.driver.acquiring:
@@ -171,19 +171,21 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         else:
             self.stop()
 
-    def continuous_toggled(self, checked):
+    def continuous_toggled(self, checked, aborting=False):
         if checked:
             self.software_trigger_radioButton.setEnabled(False)
             self.hardware_trigger_radioButton.setEnabled(False)
             self.continuous_enabled_signal.emit()
-            self.driver.trigger_off()
+            if not aborting:
+                self.driver.trigger_off()
 
-    def triggered_toggled(self, checked):
+    def triggered_toggled(self, checked, aborting=False):
         if checked:
             self.software_trigger_radioButton.setEnabled(True)
             self.hardware_trigger_radioButton.setEnabled(True)
             self.triggered_enabled_signal.emit()
-            self.driver.trigger_on()
+            if not aborting:
+                self.driver.trigger_on()
 
     def hardware_trigger_toggled(self, checked):
         if checked:
