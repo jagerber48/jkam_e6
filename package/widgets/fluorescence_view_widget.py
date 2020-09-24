@@ -20,6 +20,7 @@ class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
             image_view = editor.imageview
             image_view.getView().setXLink(self.N_view_editor.imageview.getView())
             image_view.getView().setYLink(self.N_view_editor.imageview.getView())
+            editor.camview.crosshair_moved_signal.connect(self.share_crosshair)
 
         self.analyzer = None
         self.frame_count = 0
@@ -28,27 +29,29 @@ class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
         self.diff_frame = None
         self.number_frame = None
 
+    def share_crosshair(self, evt):
+        for editor in self.editor_list:
+            editor.camview.mouse_moved(evt, signal=False)
+
     def process_frame(self, frame):
         self.frame_count += 1
         if self.frame_count == 1:
             self.atom_frame = frame
-            image_view = self.atom_view_editor.imageview
-            image_view.setImage(self.atom_frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+            self.atom_view_editor.setImage(self.atom_frame, autoRange=False, autoLevels=False,
+                                           autoHistogramRange=False)
         elif self.frame_count == 2:
             self.ref_frame = frame
-            image_view = self.reference_view_editor.imageview
-            image_view.setImage(self.ref_frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+            self.reference_view_editor.setImage(self.ref_frame, autoRange=False, autoLevels=False,
+                                                autoHistogramRange=False)
 
             self.diff_frame = self.atom_frame - self.ref_frame
             self.number_frame = 1 * self.diff_frame
 
-            image_view = self.diff_view_editor.imageview
-            image_view.setImage(self.diff_frame, autoRange=False, autoLevels=False,
-                                autoHistogramRange=False)
+            self.diff_view_editor.setImage(self.diff_frame, autoRange=False, autoLevels=False,
+                                           autoHistogramRange=False)
 
-            image_view = self.N_view_editor.imageview
-            image_view.setImage(self.number_frame, autoRange=False, autoLevels=False,
-                                autoHistogramRange=False)
+            self.N_view_editor.setImage(self.number_frame, autoRange=False, autoLevels=False,
+                                        autoHistogramRange=False)
             self.frame_count = 0
             self.analysis_complete_signal.emit()
         else:

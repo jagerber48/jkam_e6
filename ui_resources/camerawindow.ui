@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>459</height>
+    <width>413</width>
+    <height>533</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,65 +15,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="2">
-     <layout class="QVBoxLayout" name="savebox_verticalLayout">
-      <item>
-       <widget class="SaveBoxWidget" name="savebox_widget" native="true"/>
-      </item>
-      <item>
-       <spacer name="verticalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
-    <item row="1" column="0">
-     <layout class="QGridLayout" name="mode_analysis_gridLayout">
-      <item row="0" column="0" colspan="2">
-       <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
-      </item>
-      <item row="2" column="0" colspan="2">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="0">
-       <widget class="ImageCaptureModeWidget" name="imagecapturemodewidget" native="true"/>
-      </item>
-      <item row="1" column="1">
-       <widget class="RoiIntegrationAnalyzer" name="roi_analyzer_widget" native="true"/>
-      </item>
-     </layout>
-    </item>
-    <item row="1" column="1">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
     <item row="0" column="0" colspan="3">
      <widget class="QStackedWidget" name="view_stackedWidget">
       <property name="sizePolicy">
@@ -81,9 +22,6 @@
         <horstretch>1</horstretch>
         <verstretch>1</verstretch>
        </sizepolicy>
-      </property>
-      <property name="currentIndex">
-       <number>2</number>
       </property>
       <widget class="QWidget" name="imageview_page">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -108,6 +46,69 @@
       </widget>
      </widget>
     </item>
+    <item row="1" column="0" colspan="3">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <layout class="QGridLayout" name="mode_analysis_gridLayout">
+        <item row="0" column="0" colspan="2">
+         <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0">
+         <widget class="ImageCaptureModeWidget" name="imagecapturemodewidget" native="true"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="RoiIntegrationAnalyzer" name="roi_analyzer_widget" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="savebox_verticalLayout">
+        <item>
+         <widget class="SaveBoxWidget" name="savebox_widget" native="true"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -115,8 +116,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
-     <height>26</height>
+     <width>413</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -168,7 +169,4 @@
  </customwidgets>
  <resources/>
  <connections/>
- <buttongroups>
-  <buttongroup name="image_capture_buttonGroup"/>
- </buttongroups>
 </ui>
