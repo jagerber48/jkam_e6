@@ -38,18 +38,19 @@ class CamView(QtWidgets.QWidget):
             return
         scene_pos = evt.scenePos()
         view_pos = self.imageitem.getViewBox().mapSceneToView(scene_pos)
-        i, j = view_pos.y(), view_pos.x()
+        i, j = view_pos.x(), view_pos.y()
 
         pixel_text = f'Pixel: ({i:.0f}, {j:.0f})'
+        value_text = 'Value: None'
         if self.image_data is not None:
-            print(self.image_data.shape)
-            value = self.image_data[i, j]
-            value_text = f'Value: {value:.2f}'
-        else:
-            value_text = 'Value: None'
+            image_data_xrange = self.image_data.shape[0]
+            image_data_yrange = self.image_data.shape[1]
+            if (0 <= i <= image_data_xrange) and (0 <= j <= image_data_yrange):
+                value = self.image_data[int(i), int(j)]
+                value_text = f'Value: {value:.2f}'
         self.label.setText(f'{pixel_text} {value_text}')
-        self.h_line.setPos(i)
-        self.v_line.setPos(j)
+        self.v_line.setPos(i)
+        self.h_line.setPos(j)
         if signal:
             self.crosshair_moved_signal.emit(evt)
 

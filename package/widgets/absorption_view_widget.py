@@ -48,26 +48,26 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
         if self.frame_count == 1:
             self.atom_frame = frame
             image_view = self.atom_view_editor.imageview
-            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+            image_view.setImage(np.transpose(frame), autoRange=False, autoLevels=False, autoHistogramRange=False)
         elif self.frame_count == 2:
             self.bright_frame = frame
             image_view = self.bright_view_editor.imageview
-            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+            image_view.setImage(np.transpose(frame), autoRange=False, autoLevels=False, autoHistogramRange=False)
         elif self.frame_count == 3:
             self.dark_frame = frame
             image_view = self.dark_view_editor.imageview
-            image_view.setImage(frame, autoRange=False, autoLevels=False, autoHistogramRange=False)
+            image_view.setImage(np.transpose(frame), autoRange=False, autoLevels=False, autoHistogramRange=False)
 
             self.od_frame, self.number_frame = self.analyzer.absorption_od_and_number(self.atom_frame,
                                                                                       self.bright_frame,
                                                                                       self.dark_frame)
 
             image_view = self.OD_view_editor.imageview
-            image_view.setImage(self.od_frame, autoRange=False, autoLevels=False,
+            image_view.setImage(np.transpose(self.od_frame), autoRange=False, autoLevels=False,
                                 autoHistogramRange=False)
 
             image_view = self.N_view_editor.imageview
-            image_view.setImage(self.number_frame, autoRange=False, autoLevels=False,
+            image_view.setImage(np.transpose(self.number_frame), autoRange=False, autoLevels=False,
                                 autoHistogramRange=False)
             self.frame_count = 0
             self.analysis_complete_signal.emit()
@@ -103,10 +103,11 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
         self.analyzer_loaded = True
 
     def unload_analyzer(self):
-        self.imaging_parameters_pushButton.clicked.disconnect()
-        self.close_parameters()
-        self.imaging_parameters_pushButton.setCheckable(False)
-        del self.analyzer
+        if self.analyzer is not None:
+            self.imaging_parameters_pushButton.clicked.disconnect()
+            self.close_parameters()
+            self.imaging_parameters_pushButton.setCheckable(False)
+            del self.analyzer
         self.analyzer = None
 
 
