@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import QWidget
-import pyqtgraph as pg
 from package.ui.imageview_editor_ui import Ui_ImageViewEditor
 from package.imagedata.colormaps import cmap_dict
 
@@ -8,13 +7,6 @@ class ImageViewEditor(QWidget, Ui_ImageViewEditor):
     def __init__(self, parent=None):
         super(ImageViewEditor, self).__init__(parent=parent)
         self.setupUi(self)
-
-        # self.imageview.ui.roiBtn.hide()
-        # self.imageview.ui.menuBtn.hide()
-        # v_line = pg.InfiniteLine(angle=90, movable=True)
-        # h_line = pg.InfiniteLine(angle=0, movable=True)
-        # self.imageview.addItem(v_line, ignoreBounds=True)
-        # self.imageview.addItem(h_line, ignoreBounds=True)
 
         self.imageview = self.camview.imageview
         self.levels = (0, 255)

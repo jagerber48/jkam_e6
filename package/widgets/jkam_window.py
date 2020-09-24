@@ -27,7 +27,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     # TODO: Documentation
     # TODO: Saving and storing of cameras and settings
     # TODO: Gaussian Fit Analysis
-    # TODO: More default settings to load in Andordriver
     # TODO: ROI imaging/saving to save on data storage?
     """
     Camera GUI. Includes visualization of image captures, camera controls and trigger configuration,
@@ -76,9 +75,6 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.video_frame = frame
         self.videovieweditor.setImage(np.transpose(self.video_frame), autoRange=False,
                                       autoLevels=False, autoHistogramRange=False)
-        # image_view = self.videovieweditor.imageview
-        # image_view.setImage(self.video_frame, autoRange=False,
-        #                     autoLevels=False, autoHistogramRange=False)
         self.on_all_frames_received()
 
     def display_absorption_frame(self, frame):
