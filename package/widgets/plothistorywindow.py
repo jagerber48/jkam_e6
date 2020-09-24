@@ -1,6 +1,7 @@
 import numpy as np
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import pyqtSignal
+from pyqtgraph import mkPen
 from package.ui.plothistorywindow_ui import Ui_PlotHistoryWindow
 
 
@@ -22,8 +23,8 @@ class PlotHistoryWindow(QMainWindow, Ui_PlotHistoryWindow):
         self.history_max = self.history.max()
 
         self.history_PlotWidget.disableAutoRange()
-        self.history_plot = self.history_PlotWidget.plot(pen=None, symbolBrush='w')
-        self.history_plot.setPen(width=2)
+        self.history_plot = self.history_PlotWidget.plot(pen=mkPen(width=0.5) , symbolBrush='w', symbolSize=4)
+        # self.history_plot.setPen(width=2)
         self.history_PlotWidget.setXRange(0, self.num_history)
 
         plot_item = self.history_PlotWidget.getPlotItem()

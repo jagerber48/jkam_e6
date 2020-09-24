@@ -9,15 +9,17 @@ class ImageViewEditor(QWidget, Ui_ImageViewEditor):
         super(ImageViewEditor, self).__init__(parent=parent)
         self.setupUi(self)
 
-        self.imageview.ui.roiBtn.hide()
-        self.imageview.ui.menuBtn.hide()
-        v_line = pg.InfiniteLine(angle=90, movable=True)
-        h_line = pg.InfiniteLine(angle=0, movable=True)
-        self.imageview.addItem(v_line, ignoreBounds=True)
-        self.imageview.addItem(h_line, ignoreBounds=True)
+        # self.imageview.ui.roiBtn.hide()
+        # self.imageview.ui.menuBtn.hide()
+        # v_line = pg.InfiniteLine(angle=90, movable=True)
+        # h_line = pg.InfiniteLine(angle=0, movable=True)
+        # self.imageview.addItem(v_line, ignoreBounds=True)
+        # self.imageview.addItem(h_line, ignoreBounds=True)
 
+        self.imageview = self.camview.imageview
         self.levels = (0, 255)
         self.read_levels()
+        self.image_data = None
 
         self.histogram = self.imageview.getHistogramWidget().item
         self.histogram.setHistogramRange(self.levels[0], self.levels[1])
@@ -28,6 +30,10 @@ class ImageViewEditor(QWidget, Ui_ImageViewEditor):
         self.fullscale_pushButton.clicked.connect(self.set_fullscale)
         self.customscale_pushButton.clicked.connect(self.set_customscale)
         self.cmap_comboBox.activated.connect(self.set_cmap)
+
+    def setImage(self, img, *args, **kwargs):
+        self.camview.setImage(img, *args, **kwargs)
+        self.image_data = img
 
     def read_levels(self):
         try:

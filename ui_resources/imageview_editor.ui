@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>565</width>
+    <width>590</width>
     <height>422</height>
    </rect>
   </property>
@@ -153,7 +153,7 @@
     </layout>
    </item>
    <item row="0" column="0">
-    <widget class="ImageView" name="imageview" native="true">
+    <widget class="CamView" name="camview" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>2</horstretch>
@@ -172,9 +172,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ImageView</class>
+   <class>CamView</class>
    <extends>QWidget</extends>
-   <header>pyqtgraph</header>
+   <header>package.widgets.camview</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

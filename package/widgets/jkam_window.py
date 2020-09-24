@@ -12,6 +12,7 @@ There are plans to implement a Gaussian fit analyzer.
 Original program by Jonathan Kohler.
 Updated by Justin Gerber (2020) - gerberja@berkeley.edu
 """
+import numpy as np
 import sys
 import ctypes
 from PyQt5.QtCore import pyqtSignal
@@ -73,9 +74,11 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def display_video_frame(self, frame):
         self.video_frame = frame
-        image_view = self.videovieweditor.imageview
-        image_view.setImage(self.video_frame, autoRange=False,
-                            autoLevels=False, autoHistogramRange=False)
+        self.videovieweditor.setImage(np.transpose(self.video_frame), autoRange=False,
+                                      autoLevels=False, autoHistogramRange=False)
+        # image_view = self.videovieweditor.imageview
+        # image_view.setImage(self.video_frame, autoRange=False,
+        #                     autoLevels=False, autoHistogramRange=False)
         self.on_all_frames_received()
 
     def display_absorption_frame(self, frame):

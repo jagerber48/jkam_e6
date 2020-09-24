@@ -79,7 +79,7 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
         try:
             self.load_driver()
             if self.driver is None:
-                print('No driver loaded')
+                self.arm_pushButton.setText('Arm Camera')
                 return
             self.driver.arm_camera(self.serial_number)
             self.armed = True
@@ -184,10 +184,6 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.hardware_trigger_radioButton.setEnabled(True)
             self.triggered_enabled_signal.emit()
             self.driver.trigger_on()
-            if self.hardware_trigger_radioButton.isChecked():
-                self.driver.set_hardware_trigger()
-            elif self.software_trigger_radioButton.isChecked():
-                self.driver.set_software_trigger()
 
     def hardware_trigger_toggled(self, checked):
         if checked:

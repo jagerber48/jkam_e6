@@ -82,7 +82,6 @@ class GrasshopperDriver(JKamGenDriver):
         try:
             image_result = cam.GetNextImage(PySpin.EVENT_TIMEOUT_INFINITE)
             frame = image_result.GetNDArray().astype(int)
-            frame = np.transpose(frame)
             image_result.Release()
             return frame
         except PySpin.SpinnakerException:
