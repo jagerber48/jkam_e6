@@ -82,30 +82,18 @@ class AndorDriver(JKamGenDriver):
         self.sdk3.set_enum_string(cam, "PixelEncoding", "Mono12")
         # self.system.set_enum_string(cam, "SimplePreAmpGainControl", "16-bit (low noise & high well capacity)")
         # self.system.set_enum_string(cam, "PixelEncoding", "Mono16")
+
         self.sdk3.set_enum_string(cam, "AOIBinning", "8x8")
         # self.sdk3.set_enum_string(cam, "AOIBinning", "4x4")
         # self.sdk3.set_enum_string(cam, "AOIBinning", "1x1")
+
         self.sdk3.set_enum_string(cam, 'CycleMode', 'Continuous')
-        print(f'temp = {self.sdk3.get_float(cam, "SensorTemperature")}')
-        print(self.sdk3.get_enum_string(cam, 'TemperatureStatus'))
-        print(f"temp control = {self.sdk3.get_enum_string(cam, 'TemperatureControl')}")
-        print(self.sdk3.set_bool(cam, 'SensorCooling', False))
-        print(self.sdk3.get_enum_string(cam, 'TemperatureStatus'))
-        print(f'spurious noise filter = {self.sdk3.get_bool(cam, "SpuriousNoiseFilter")}')
+
+        self.sdk3.set_bool(cam, 'SensorCooling', True)
         self.sdk3.set_bool(cam, 'SpuriousNoiseFilter', False)
-        print(f'RollingShutterGlobalClear = {self.sdk3.get_bool(cam, "RollingShutterGlobalClear")}')
         self.sdk3.set_bool(cam, 'RollingShutterGlobalClear', True)
-        print(self.sdk3.get_enum_string_options(cam, 'PixelReadoutRate'))
         self.sdk3.set_enum_string(cam, 'PixelReadoutRate', '270 MHz')
-        print(f'AuxiliaryOutSource = {self.sdk3.get_enum_string(cam, "AuxiliaryOutSource")}')
         self.sdk3.set_enum_string(cam, "AuxiliaryOutSource", 'FireAny')
-        # import time
-        # time.sleep(10)
-        # print(f'temp = {self.sdk3.get_float(cam, "SensorTemperature")}')
-        # time.sleep(10)
-        # print(f'temp = {self.sdk3.get_float(cam, "SensorTemperature")}')
-
-
 
         self.imageSizeBytes = self.sdk3.get_int(cam, "ImageSizeBytes")
         print("    Queuing Buffer (size", self.imageSizeBytes, ")")
