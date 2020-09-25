@@ -17,12 +17,14 @@ class RoiIntegrationWorker(QThread):
         self.bg_subtract = False
 
     def run(self):
-        roi_sig_data = self.roi_sig.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
+        roi_slice = self.roi_sig.getArraySlice(self.imageview.image, self.imageview.getImageItem())[0]
+        roi_sig_data = self.imageview.image[roi_slice]
         roi_sig_sum = np.nansum(roi_sig_data)
         pixel_num_sig = roi_sig_data.size
         result = roi_sig_sum
         if self.roi_bg is not None and self.bg_subtract:
-            roi_bg_data = self.roi_bg.getArrayRegion(self.imageview.image, self.imageview.getImageItem())
+            roi_bg_slice = self.roi_bg.getArraySlice(self.imageview.image, self.imageview.getImageItem())[0]
+            roi_bg_data = self.imageview.image[roi_bg_slice]
             pixel_num_bg = roi_bg_data.size
             roi_bg_mean = np.nansum(roi_bg_data) / pixel_num_bg
             result = roi_sig_sum - roi_bg_mean * pixel_num_sig

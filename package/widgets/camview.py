@@ -24,6 +24,8 @@ class CamView(QtWidgets.QWidget):
         self.h_line = pg.InfiniteLine(angle=0, movable=False)
         self.imageview.addItem(self.v_line, ignoreBounds=True)
         self.imageview.addItem(self.h_line, ignoreBounds=True)
+        self.crosshair_x = 0
+        self.crosshair_y = 0
 
         self.imageitem.scene().sigMouseClicked.connect(self.mouse_moved)
         self.image_data = None
@@ -32,27 +34,43 @@ class CamView(QtWidgets.QWidget):
     def setImage(self, img, *args, **kwargs):
         self.imageview.setImage(img, *args, **kwargs)
         self.image_data = img
+        self.set_crosshair(self.crosshair_x, self.crosshair_y)
 
     def mouse_moved(self, evt, signal=True):
         if not (evt.button() == 1 and evt.double() is True):
             return
         scene_pos = evt.scenePos()
         view_pos = self.imageitem.getViewBox().mapSceneToView(scene_pos)
-        i, j = view_pos.x(), view_pos.y()
+        self.crosshair_x, self.crosshair_y = int(view_pos.x()), int(view_pos.y())
+        self.set_crosshair(self.crosshair_x, self.crosshair_y)
+        # pixel_text = f'Pixel: ({self.crosshair_x:.0f}, {j:.0f})'
+        # value_text = 'Value: None'
+        # if self.image_data is not None:
+        #     image_data_xrange = self.image_data.shape[0]
+        #     image_data_yrange = self.image_data.shape[1]
+        #     if (0 <= self.crosshair_x <= image_data_xrange) and (0 <= self.crosshair_y <= image_data_yrange):
+        #         value = self.image_data[self.crosshair_x, int(self.crosshair_y)]
+        #         value_text = f'Value: {value:.2f}'
+        # self.label.setText(f'{pixel_text} {value_text}')
+        # self.v_line.setPos(self.crosshair_x)
+        # self.h_line.setPos(self.crosshair_y)
+        if signal:
+            self.crosshair_moved_signal.emit(evt)
 
-        pixel_text = f'Pixel: ({i:.0f}, {j:.0f})'
+    def set_crosshair(self, x, y):
+        x = int(x)
+        y = int(y)
+        pixel_text = f'Pixel: ({x}, {y})'
         value_text = 'Value: None'
         if self.image_data is not None:
             image_data_xrange = self.image_data.shape[0]
             image_data_yrange = self.image_data.shape[1]
-            if (0 <= i <= image_data_xrange) and (0 <= j <= image_data_yrange):
-                value = self.image_data[int(i), int(j)]
+            if (0 <= x <= image_data_xrange) and (0 <= y <= image_data_yrange):
+                value = self.image_data[x, y]
                 value_text = f'Value: {value:.2f}'
         self.label.setText(f'{pixel_text} {value_text}')
-        self.v_line.setPos(i)
-        self.h_line.setPos(j)
-        if signal:
-            self.crosshair_moved_signal.emit(evt)
+        self.v_line.setPos(x + 0.5)
+        self.h_line.setPos(y + 0.5)
 
 
 if __name__ == '__main__':

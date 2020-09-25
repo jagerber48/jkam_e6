@@ -186,6 +186,10 @@ class CameraControlWidget(QWidget, Ui_CameraControlWidget):
             self.triggered_enabled_signal.emit()
             if not aborting:
                 self.driver.trigger_on()
+                if self.hardware_trigger_radioButton.isChecked():
+                    self.hardware_trigger_toggled(True)
+                if self.software_trigger_radioButton.isChecked():
+                    self.software_trigger_toggled(True)
 
     def hardware_trigger_toggled(self, checked):
         if checked:
