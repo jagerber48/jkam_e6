@@ -59,6 +59,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
         self.savebox_widget.save_single_pushButton.clicked.connect(self.save_frames)
         self.video_frame = None
+        self.imaging_system = None
         self.show()
 
     def on_capture(self, frame):
@@ -117,11 +118,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.savebox_widget.mode = self.savebox_widget.ModeType.FLUORESCENCE
 
     def armed(self):
-        imaging_system = self.camera_control_widget.imaging_system
-        self.absorption_view_widget.load_analyzer(atom=RbAtom, imaging_system=imaging_system)
+        self.imaging_system = self.camera_control_widget.imaging_system
+        self.absorption_view_widget.load_analyzer(atom=RbAtom, imaging_system=self.imaging_system)
+        self.savebox_widget.arm(imaging_system=self.imaging_system)
 
     def disarmed(self):
         self.absorption_view_widget.unload_analyzer()
+        self.savebox_widget.disarm()
 
     def verify_autosave(self):
         if not self.camera_control_widget.continuous_radioButton.isChecked() and self.savebox_widget.autosaving:

@@ -23,14 +23,16 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         self.data_root_path = self.default_root
         data_root_string = get_abbreviated_path_string(self.data_root_path, max_len=30)
         self.data_root_value_label.setText(data_root_string)
-        self.daily_data_path = None
-        self.run_path = None
-        self.data_path = None
-        self.file_path = None
+        self.daily_data_path = Path('')
+        self.run_path = Path('')
+        self.data_path = Path('')
+        self.imaging_system_path = Path('')
+        self.file_path = Path('')
         self.file_number = 1
         self.file_prefix = ''
         self.file_suffix = '.h5'
         self.file_name = ''
+        self.imaging_system = None
 
         self.mode = self.ModeType.SINGLE
         self.autosaving = False
@@ -50,6 +52,7 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         self.build_data_path()
         self.build_file_name()
         self.set_file_path()
+        self.disarm()
 
     def select_data_root(self):
         selected_directory = QFileDialog.getExistingDirectory(None, "Select Directory")
@@ -72,13 +75,13 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
     def set_run_path(self):
         if self.run_path != Path(self.run_name_lineEdit.text()):
             self.run_path = Path(self.run_name_lineEdit.text())
-            self.file_number_spinBox.setValue(1)
+            self.file_number_spinBox.setValue(0)
             self.file_number = self.file_number_spinBox.value()
 
     def build_data_path(self):
         self.set_daily_data_path()
         self.set_run_path()
-        self.data_path = Path(self.data_root_path, self.daily_data_path, self.run_path)
+        self.data_path = Path(self.data_root_path, self.daily_data_path, self.run_path, self.imaging_system_path)
         data_dir_label_string = get_abbreviated_path_string(self.data_path)
         self.data_dir_label.setText(data_dir_label_string)
         self.set_file_path()
@@ -163,10 +166,11 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         self.increment_file_number()
 
     def save_h5_single_frame(self, frame, timestamp=None):
-        with h5py.File(str(self.file_path), 'w') as hf:
-            hf.create_dataset("frame", data=frame.astype('uint16'))
-            if timestamp is not None:
-                hf.attrs['timestamp'] = timestamp.isoformat()
+        if frame is not None:
+            with h5py.File(str(self.file_path), 'w') as hf:
+                hf.create_dataset("frame", data=frame.astype('uint16'))
+                if timestamp is not None:
+                    hf.attrs['timestamp'] = timestamp.isoformat()
 
     def save_h5_absorption_frames(self, atom_frame, bright_frame, dark_frame, timestamp=None):
         with h5py.File(str(self.file_path), 'w') as hf:
@@ -182,6 +186,21 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
             hf.create_dataset("reference_frame", data=reference_frame.astype('uint16'))
             if timestamp is not None:
                 hf.attrs['timestamp'] = timestamp.isoformat()
+
+    def arm(self, imaging_system):
+        self.save_single_pushButton.setEnabled(True)
+        self.run_pushButton.setEnabled(True)
+        self.imaging_system = imaging_system
+        imaging_system_name = imaging_system.name
+        self.imaging_system_path = Path(imaging_system_name)
+        self.imaging_system_value_label.setText(imaging_system_name)
+
+    def disarm(self):
+        self.save_single_pushButton.setEnabled(False)
+        self.run_pushButton.setEnabled(False)
+        self.imaging_system = None
+        self.imaging_system_path = Path('')
+        self.imaging_system_value_label.setText('')
 
 
 def get_abbreviated_path_string(path, max_len=50):
