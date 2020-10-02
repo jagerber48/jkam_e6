@@ -87,7 +87,11 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     def on_all_frames_received(self):
         self.analyze_signal.emit()
         if self.verify_autosave():
-            self.save_frames()
+            try:
+                self.save_frames()
+            except OSError as e:
+                print('error saving frame')
+                print(e)
 
     def save_frames(self):
         if self.imaging_mode is ImagingMode.VIDEO:
