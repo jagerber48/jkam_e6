@@ -43,6 +43,7 @@ class JKamGenDriver(QObject):
         self.cam = self._arm_camera(serial_number)
         self._load_default_settings(self.cam)
         self.armed = True
+        self.serial_number = serial_number
         print(f'ARMED Camera with serial number: {self.serial_number}')
 
     def disarm_camera(self):
