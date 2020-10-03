@@ -2,6 +2,8 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal
 import pyqtgraph as pg
 
+pg.setConfigOptions(imageAxisOrder='row-major')
+
 
 class CamView(QtWidgets.QWidget):
     crosshair_moved_signal = pyqtSignal(object)
@@ -43,17 +45,6 @@ class CamView(QtWidgets.QWidget):
         view_pos = self.imageitem.getViewBox().mapSceneToView(scene_pos)
         self.crosshair_x, self.crosshair_y = int(view_pos.x()), int(view_pos.y())
         self.set_crosshair(self.crosshair_x, self.crosshair_y)
-        # pixel_text = f'Pixel: ({self.crosshair_x:.0f}, {j:.0f})'
-        # value_text = 'Value: None'
-        # if self.image_data is not None:
-        #     image_data_xrange = self.image_data.shape[0]
-        #     image_data_yrange = self.image_data.shape[1]
-        #     if (0 <= self.crosshair_x <= image_data_xrange) and (0 <= self.crosshair_y <= image_data_yrange):
-        #         value = self.image_data[self.crosshair_x, int(self.crosshair_y)]
-        #         value_text = f'Value: {value:.2f}'
-        # self.label.setText(f'{pixel_text} {value_text}')
-        # self.v_line.setPos(self.crosshair_x)
-        # self.h_line.setPos(self.crosshair_y)
         if signal:
             self.crosshair_moved_signal.emit(evt)
 

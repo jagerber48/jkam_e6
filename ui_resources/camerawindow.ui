@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>413</width>
-    <height>533</height>
+    <width>449</width>
+    <height>554</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,8 +50,8 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <layout class="QGridLayout" name="mode_analysis_gridLayout">
-        <item row="0" column="0" colspan="2">
-         <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
+        <item row="1" column="0">
+         <widget class="ImageCaptureModeWidget" name="imagecapturemodewidget" native="true"/>
         </item>
         <item row="2" column="0" colspan="2">
          <spacer name="verticalSpacer">
@@ -66,11 +66,14 @@
           </property>
          </spacer>
         </item>
-        <item row="1" column="0">
-         <widget class="ImageCaptureModeWidget" name="imagecapturemodewidget" native="true"/>
-        </item>
         <item row="1" column="1">
          <widget class="RoiIntegrationAnalyzer" name="roi_analyzer_widget" native="true"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="GaussianFitAnalyzer" name="gaussian2d_analyzer_widget" native="true"/>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
         </item>
        </layout>
       </item>
@@ -116,8 +119,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>413</width>
-     <height>21</height>
+     <width>449</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -164,6 +167,12 @@
    <class>ImageCaptureModeWidget</class>
    <extends>QWidget</extends>
    <header>package.widgets.imagecapturemodewidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>GaussianFitAnalyzer</class>
+   <extends>QWidget</extends>
+   <header>package.analyzers.gaussianfitanalyzer</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

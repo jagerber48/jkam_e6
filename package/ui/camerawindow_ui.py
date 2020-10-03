@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_CameraWindow(object):
     def setupUi(self, CameraWindow):
         CameraWindow.setObjectName("CameraWindow")
-        CameraWindow.resize(413, 533)
+        CameraWindow.resize(449, 554)
         self.centralwidget = QtWidgets.QWidget(CameraWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -55,17 +55,20 @@ class Ui_CameraWindow(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.mode_analysis_gridLayout = QtWidgets.QGridLayout()
         self.mode_analysis_gridLayout.setObjectName("mode_analysis_gridLayout")
-        self.camera_control_widget = CameraControlWidget(self.centralwidget)
-        self.camera_control_widget.setObjectName("camera_control_widget")
-        self.mode_analysis_gridLayout.addWidget(self.camera_control_widget, 0, 0, 1, 2)
-        spacerItem = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.mode_analysis_gridLayout.addItem(spacerItem, 2, 0, 1, 2)
         self.imagecapturemodewidget = ImageCaptureModeWidget(self.centralwidget)
         self.imagecapturemodewidget.setObjectName("imagecapturemodewidget")
         self.mode_analysis_gridLayout.addWidget(self.imagecapturemodewidget, 1, 0, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.mode_analysis_gridLayout.addItem(spacerItem, 2, 0, 1, 2)
         self.roi_analyzer_widget = RoiIntegrationAnalyzer(self.centralwidget)
         self.roi_analyzer_widget.setObjectName("roi_analyzer_widget")
         self.mode_analysis_gridLayout.addWidget(self.roi_analyzer_widget, 1, 1, 1, 1)
+        self.gaussian2d_analyzer_widget = GaussianFitAnalyzer(self.centralwidget)
+        self.gaussian2d_analyzer_widget.setObjectName("gaussian2d_analyzer_widget")
+        self.mode_analysis_gridLayout.addWidget(self.gaussian2d_analyzer_widget, 1, 2, 1, 1)
+        self.camera_control_widget = CameraControlWidget(self.centralwidget)
+        self.camera_control_widget.setObjectName("camera_control_widget")
+        self.mode_analysis_gridLayout.addWidget(self.camera_control_widget, 0, 0, 1, 3)
         self.horizontalLayout.addLayout(self.mode_analysis_gridLayout)
         self.savebox_verticalLayout = QtWidgets.QVBoxLayout()
         self.savebox_verticalLayout.setObjectName("savebox_verticalLayout")
@@ -80,7 +83,7 @@ class Ui_CameraWindow(object):
         self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 3)
         CameraWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(CameraWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 413, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 449, 26))
         self.menubar.setObjectName("menubar")
         CameraWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(CameraWindow)
@@ -93,6 +96,7 @@ class Ui_CameraWindow(object):
     def retranslateUi(self, CameraWindow):
         _translate = QtCore.QCoreApplication.translate
         CameraWindow.setWindowTitle(_translate("CameraWindow", "jkam"))
+from package.analyzers.gaussianfitanalyzer import GaussianFitAnalyzer
 from package.analyzers.roiintegrationanalyzer import RoiIntegrationAnalyzer
 from package.widgets.absorption_view_widget import AbsorptionViewWidget
 from package.widgets.cameracontrolwidget import CameraControlWidget

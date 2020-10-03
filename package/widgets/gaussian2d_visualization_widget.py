@@ -1,6 +1,7 @@
 import numpy as np
 from uncertainties import ufloat
 from enum import Enum
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QLabel, QSpacerItem, QSizePolicy
 import pyqtgraph as pg
 
@@ -73,12 +74,13 @@ class Gaussian2DPlot(pg.PlotItem):
 
 
 class FitVisualizationWindow(QWidget):
+    window_close_signal = pyqtSignal()
+
     def __init__(self, parent=None):
         super(FitVisualizationWindow, self).__init__(parent=parent)
         self.fit_struct = None
         self.setupUi()
         self.setup_plots()
-        self.show()
 
     def setupUi(self):
         self.resize(800, 800)
@@ -92,9 +94,12 @@ class FitVisualizationWindow(QWidget):
     def setup_plots(self):
         self.data_plot = Gaussian2DPlot()
         self.pgGraphicsLayout.addItem(self.data_plot, 0, 0, 1, 1)
+        self.data_plot.getViewBox().invertY()
 
         self.model_plot = Gaussian2DPlot()
         self.pgGraphicsLayout.addItem(self.model_plot, 1, 1, 1, 1)
+        self.model_plot.getViewBox().invertY()
+
         self.model_plot.setXLink(self.data_plot.getViewBox())
         self.model_plot.setYLink(self.data_plot.getViewBox())
 
@@ -105,6 +110,8 @@ class FitVisualizationWindow(QWidget):
         self.vertical_cut_plot = GaussianIntegrateAxisPlot()
         self.pgGraphicsLayout.addItem(self.vertical_cut_plot, 0, 1, 1, 1)
         self.vertical_cut_plot.setYLink(self.data_plot.getViewBox())
+        self.vertical_cut_plot.getViewBox().invertY()
+
 
     def update_text_display(self):
         clearLayout(self.text_display_verticalLayout)
@@ -137,6 +144,10 @@ class FitVisualizationWindow(QWidget):
                                       sx=sx, sy=sy)
         self.data_plot.autoRange()
         self.update_text_display()
+
+    def closeEvent(self, event):
+        self.window_close_signal.emit()
+        return super().closeEvent(event)
 
 
 def clearLayout(layout):
