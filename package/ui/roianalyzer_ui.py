@@ -14,10 +14,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_RoiAnalyzer(object):
     def setupUi(self, RoiAnalyzer):
         RoiAnalyzer.setObjectName("RoiAnalyzer")
-        RoiAnalyzer.resize(169, 105)
+        RoiAnalyzer.resize(228, 134)
         self.gridLayout_2 = QtWidgets.QGridLayout(RoiAnalyzer)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout_2.addItem(spacerItem, 1, 0, 1, 1)
         self.frame = QtWidgets.QFrame(RoiAnalyzer)
         self.frame.setFrameShape(QtWidgets.QFrame.Box)
@@ -35,7 +35,7 @@ class Ui_RoiAnalyzer(object):
         self.bg_subtract_checkBox.setObjectName("bg_subtract_checkBox")
         self.gridLayout.addWidget(self.bg_subtract_checkBox, 2, 0, 1, 1)
         self.gridLayout_2.addWidget(self.frame, 0, 0, 1, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem1 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_2.addItem(spacerItem1, 0, 1, 1, 1)
 
         self.retranslateUi(RoiAnalyzer)

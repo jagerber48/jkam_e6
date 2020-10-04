@@ -55,7 +55,8 @@ class GaussianFitAnalyzer(QWidget, Ui_GaussianFitAnalyzer):
 
     def remove_roi(self):
         try:
-            self.imageview.removeItem(self.analyzer.roi)
+            self.imageview.removeItem(self.roi)
+            self.roi = None
             self.worker.roi = None
         except AttributeError:
             pass

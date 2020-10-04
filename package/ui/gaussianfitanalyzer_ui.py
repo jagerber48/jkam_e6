@@ -17,7 +17,7 @@ class Ui_GaussianFitAnalyzer(object):
         GaussianFitAnalyzer.resize(206, 104)
         self.gridLayout = QtWidgets.QGridLayout(GaussianFitAnalyzer)
         self.gridLayout.setObjectName("gridLayout")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem, 0, 1, 1, 1)
         self.frame = QtWidgets.QFrame(GaussianFitAnalyzer)
         self.frame.setFrameShape(QtWidgets.QFrame.Box)
@@ -32,7 +32,7 @@ class Ui_GaussianFitAnalyzer(object):
         self.enable_checkBox.setObjectName("enable_checkBox")
         self.verticalLayout.addWidget(self.enable_checkBox)
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
-        spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem1 = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem1, 1, 0, 1, 1)
 
         self.retranslateUi(GaussianFitAnalyzer)

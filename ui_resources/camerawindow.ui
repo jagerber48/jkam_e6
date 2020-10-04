@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>449</width>
-    <height>554</height>
+    <width>498</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <item row="0" column="0" colspan="3">
      <widget class="QStackedWidget" name="view_stackedWidget">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>1</horstretch>
         <verstretch>1</verstretch>
        </sizepolicy>
@@ -49,11 +49,24 @@
     <item row="1" column="0" colspan="3">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <layout class="QGridLayout" name="mode_analysis_gridLayout">
-        <item row="1" column="0">
-         <widget class="ImageCaptureModeWidget" name="imagecapturemodewidget" native="true"/>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
         </item>
-        <item row="2" column="0" colspan="2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="ImageCaptureModeWidget" name="imagecapturemodewidget" native="true"/>
+          </item>
+          <item>
+           <widget class="RoiIntegrationAnalyzer" name="roi_analyzer_widget" native="true"/>
+          </item>
+          <item>
+           <widget class="GaussianFitAnalyzer" name="gaussian2d_analyzer_widget" native="true"/>
+          </item>
+         </layout>
+        </item>
+        <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -66,34 +79,12 @@
           </property>
          </spacer>
         </item>
-        <item row="1" column="1">
-         <widget class="RoiIntegrationAnalyzer" name="roi_analyzer_widget" native="true"/>
-        </item>
-        <item row="1" column="2">
-         <widget class="GaussianFitAnalyzer" name="gaussian2d_analyzer_widget" native="true"/>
-        </item>
-        <item row="0" column="0" colspan="3">
-         <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
-        </item>
        </layout>
       </item>
       <item>
        <layout class="QVBoxLayout" name="savebox_verticalLayout">
         <item>
          <widget class="SaveBoxWidget" name="savebox_widget" native="true"/>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </item>
@@ -104,8 +95,8 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
-          <height>20</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
        </spacer>
@@ -119,7 +110,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>449</width>
+     <width>498</width>
      <height>26</height>
     </rect>
    </property>
