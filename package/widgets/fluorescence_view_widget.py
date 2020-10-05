@@ -33,6 +33,13 @@ class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
         for editor in self.editor_list:
             editor.camview.mouse_moved(evt, signal=False)
 
+    def reset(self):
+        self.atom_frame = None
+        self.ref_frame = None
+        self.diff_frame = None
+        self.number_frame = None
+        self.frame_count = 0
+
     def process_frame(self, frame):
         self.frame_count += 1
         if self.frame_count == 1:
@@ -56,8 +63,4 @@ class FluorescenceViewWidget(QWidget, Ui_FluorescenceViewWidget):
             self.analysis_complete_signal.emit()
         else:
             print('ERROR: too many frames')
-            self.atom_frame = None
-            self.ref_frame = None
-            self.diff_frame = None
-            self.number_frame = None
-            self.frame_count = 0
+            self.reset()
