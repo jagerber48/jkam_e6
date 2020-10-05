@@ -7,17 +7,21 @@ from package.widgets.gaussian2d_visualization_widget import FitVisualizationWind
 
 
 class GaussianFitWorker(QThread):
-    analysis_complete_signal = pyqtSignal(dict)
+    analysis_complete_signal = pyqtSignal(dict, float, float)
 
     def __init__(self):
         super(GaussianFitWorker, self).__init__()
         self.roi = None
 
     def run(self):
-        roi_slice = self.roi.getArraySlice(self.imageview.image, self.imageview.getImageItem())[0]
+        roi_loc_y, roi_loc_x = self.roi.getArraySlice(self.imageview.image, self.imageview.getImageItem(),
+                                                      returnSlice=False)[0]
+        roi_slice = tuple((slice(roi_loc_y[0], roi_loc_y[1]), slice(roi_loc_x[0], roi_loc_x[1])))
         roi_data = self.imageview.image[roi_slice]
         fit_struct = fit_gaussian2d(roi_data)
-        self.analysis_complete_signal.emit(fit_struct)
+        x_offset = roi_loc_x[0]
+        y_offset = roi_loc_y[0]
+        self.analysis_complete_signal.emit(fit_struct, x_offset, y_offset)
 
 
 class GaussianFitAnalyzer(QWidget, Ui_GaussianFitAnalyzer):
@@ -31,7 +35,7 @@ class GaussianFitAnalyzer(QWidget, Ui_GaussianFitAnalyzer):
         self.enable_checkBox.clicked.connect(self.toggle_enable)
         self.gaussian_fit_window = FitVisualizationWindow()
         self.gaussian_fit_window.window_close_signal.connect(self.window_closed)
-        self.worker.analysis_complete_signal.connect(lambda x: self.gaussian_fit_window.update(x))
+        self.worker.analysis_complete_signal.connect(self.gaussian_fit_window.update)
 
     def analyze(self):
         if self.enabled:
