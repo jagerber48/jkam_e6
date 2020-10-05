@@ -49,6 +49,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
         self.imaging_mode = None
         self.imagecapturemodewidget.state_set_signal.connect(self.set_imaging_mode)
+        self.camera_control_widget.started_signal.connect(self.absorption_view_widget.reset)
+        self.camera_control_widget.started_signal.connect(self.fluorescence_view_widget.reset)
         self.camera_control_widget.started_signal.connect(self.imagecapturemodewidget.started)
         self.camera_control_widget.continuous_enabled_signal.connect(self.imagecapturemodewidget.continuous_enabled)
         self.camera_control_widget.triggered_enabled_signal.connect(self.imagecapturemodewidget.triggered_enabled)

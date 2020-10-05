@@ -43,6 +43,14 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
         for editor in self.editor_list:
             editor.camview.mouse_moved(evt, signal=False)
 
+    def reset(self):
+        self.atom_frame = None
+        self.bright_frame = None
+        self.dark_frame = None
+        self.od_frame = None
+        self.number_frame = None
+        self.frame_count = 0
+
     def process_frame(self, frame):
         self.frame_count += 1
         if self.frame_count == 1:
@@ -71,12 +79,7 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
             self.analysis_complete_signal.emit()
         else:
             print('ERROR: too many frames')
-            self.atom_frame = None
-            self.bright_frame = None
-            self.dark_frame = None
-            self.od_frame = None
-            self.number_frame = None
-            self.frame_count = 0
+            self.reset()
 
     def show_parameters(self):
         self.parameters_window.show()
