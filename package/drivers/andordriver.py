@@ -91,7 +91,12 @@ class AndorDriver(JKamGenDriver):
 
         self.sdk3.set_bool(cam, 'SensorCooling', True)
         self.sdk3.set_bool(cam, 'SpuriousNoiseFilter', False)
+
+        '''
+        Critical for timing, see Zyla manual 2.6.2.10 on Rolling Shutter Global Clear
+        '''
         self.sdk3.set_bool(cam, 'RollingShutterGlobalClear', True)
+
         self.sdk3.set_enum_string(cam, 'PixelReadoutRate', '270 MHz')
         self.sdk3.set_enum_string(cam, "AuxiliaryOutSource", 'FireAny')
 

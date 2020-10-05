@@ -194,6 +194,8 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         imaging_system_name = imaging_system.name
         self.imaging_system_path = Path(imaging_system_name)
         self.imaging_system_value_label.setText(imaging_system_name)
+        self.build_data_path()
+        self.build_file_name()
 
     def disarm(self):
         self.save_single_pushButton.setEnabled(False)
