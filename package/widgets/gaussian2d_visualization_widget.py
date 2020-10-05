@@ -18,7 +18,7 @@ class GaussianIntegrateAxisPlot(pg.PlotItem):
         super(GaussianIntegrateAxisPlot, self).__init__(*args, **kwargs)
         self.setMouseEnabled(x=False, y=False)
 
-    def update(self, data_img, model_img, slice_axis, sx, sy):
+    def update(self, data_img, model_img, slice_axis, sx, sy, offset=0):
         """
         Integrate data along 1 axis of data_img and model_img and plot result.
         For horizontal slice integrate along vertical axis and flip y-axis to put slice plot underneath image in
@@ -32,18 +32,18 @@ class GaussianIntegrateAxisPlot(pg.PlotItem):
             integrate_axis = 1
             data_cut_data = np.sum(data_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sx ** 2)
             model_cut_data = np.sum(model_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sx ** 2)
-            self.plot(data_cut_data, range(y_range),
+            self.plot(data_cut_data, offset + np.arange(y_range),
                       pen=pg.mkPen(width=0.5), symbolBrush='w', symbolSize=5)
-            self.plot(model_cut_data, range(y_range), pen=pg.mkPen('r'))
+            self.plot(model_cut_data, offset + np.arange(y_range), pen=pg.mkPen('r'))
 
         elif slice_axis == SliceAxisType.HORIZONTAL:
             x_range = data_img.shape[1]
             integrate_axis = 0
             data_cut_data = np.sum(data_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sy ** 2)
             model_cut_data = np.sum(model_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sy ** 2)
-            self.plot(range(x_range), data_cut_data,
+            self.plot(offset + np.arange(x_range), data_cut_data,
                       pen=pg.mkPen(width=0.5), symbolBrush='w', symbolSize=5)
-            self.plot(range(x_range), model_cut_data, pen=pg.mkPen('b'))
+            self.plot(offset + np.arange(x_range), model_cut_data, pen=pg.mkPen('b'))
             self.invertY(True)
 
 
@@ -113,7 +113,6 @@ class FitVisualizationWindow(QWidget):
         self.vertical_cut_plot.setYLink(self.data_plot.getViewBox())
         self.vertical_cut_plot.getViewBox().invertY()
 
-
     def update_text_display(self):
         clearLayout(self.text_display_verticalLayout)
 
@@ -140,9 +139,9 @@ class FitVisualizationWindow(QWidget):
         self.data_plot.update(data_img, x0, y0, angle, x_offset=x_offset, y_offset=y_offset)
         self.model_plot.update(model_img, x0, y0, angle, x_offset=x_offset, y_offset=y_offset)
         self.horizontal_cut_plot.update(data_img, model_img, slice_axis=SliceAxisType.HORIZONTAL,
-                                        sx=sx, sy=sy)
+                                        sx=sx, sy=sy, offset=x_offset)
         self.vertical_cut_plot.update(data_img, model_img, slice_axis=SliceAxisType.VERTICAL,
-                                      sx=sx, sy=sy)
+                                      sx=sx, sy=sy, offset=y_offset)
         self.data_plot.autoRange()
         self.update_text_display()
 
