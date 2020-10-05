@@ -47,25 +47,25 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
         self.frame_count += 1
         if self.frame_count == 1:
             self.atom_frame = frame
-            self.atom_view_editor.setImage(np.transpose(frame), autoRange=False, autoLevels=False,
+            self.atom_view_editor.setImage(frame, autoRange=False, autoLevels=False,
                                            autoHistogramRange=False)
         elif self.frame_count == 2:
             self.bright_frame = frame
-            self.bright_view_editor.setImage(np.transpose(frame), autoRange=False, autoLevels=False,
+            self.bright_view_editor.setImage(frame, autoRange=False, autoLevels=False,
                                              autoHistogramRange=False)
         elif self.frame_count == 3:
             self.dark_frame = frame
-            self.dark_view_editor.setImage(np.transpose(frame), autoRange=False, autoLevels=False,
+            self.dark_view_editor.setImage(frame, autoRange=False, autoLevels=False,
                                            autoHistogramRange=False)
 
             self.od_frame, self.number_frame = self.analyzer.absorption_od_and_number(self.atom_frame,
                                                                                       self.bright_frame,
                                                                                       self.dark_frame)
 
-            self.OD_view_editor.setImage(np.transpose(self.od_frame), autoRange=False, autoLevels=False,
+            self.OD_view_editor.setImage(self.od_frame, autoRange=False, autoLevels=False,
                                          autoHistogramRange=False)
 
-            self.N_view_editor.setImage(np.transpose(self.number_frame), autoRange=False, autoLevels=False,
+            self.N_view_editor.setImage(self.number_frame, autoRange=False, autoLevels=False,
                                         autoHistogramRange=False)
             self.frame_count = 0
             self.analysis_complete_signal.emit()

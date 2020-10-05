@@ -99,7 +99,7 @@ class RoiIntegrationAnalyzer(QWidget, Ui_RoiAnalyzer):
             self.toggle_enable()
 
     def create_roi(self, pen='w'):
-        roi = pg.RectROI((200, 200), (200, 200), pen=pen)
+        roi = pg.RectROI((0, 0), (50, 50), pen=pen)
         roi.addScaleHandle([1, 1], [0, 0])
         roi.addScaleHandle([0, 0], [1, 1])
         self.analyzer.imageview.addItem(roi)

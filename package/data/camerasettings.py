@@ -1,6 +1,7 @@
 import numpy as np
 from package.drivers.grasshopperdriver import GrasshopperDriver
 from package.drivers.andordriver import AndorDriver
+from package.drivers.simulatedcamdriver import SimulatedCamDriver
 
 
 class GrasshopperCamera:
@@ -26,6 +27,15 @@ class AndorCamera:
 
     bit_conversion = 2**0  # No truncation or padding
     total_gain = bit_conversion * adu_conversion * quantum_efficiency  # Number of recoreded digital counts per photon
+
+
+class SimulatedCamera:
+    driver = SimulatedCamDriver()
+    pixel_area = 5e-6 ** 2
+    quantum_efficiency = 1
+    adu_conversion = 1
+    bit_conversion = 1
+    total_gain = bit_conversion * adu_conversion * quantum_efficiency
 
 
 class SideImagingSystem:
@@ -56,6 +66,13 @@ class HighNASystem:
     magnification = 50
 
 
+class SimulatedCameraSystem:
+    name = 'Simulated Camera System'
+    camera_serial_number = 'simcam8675309'
+    camera_type = SimulatedCamera()
+    magnification = 1
+
+
 class RbAtom:
     cross_section = 2.907e-13  # m^2 - Steck Rubidium 87 D Line Data
     linewidth = 2 * np.pi * 6.07e6  # Hz -  Steck Rubidium 87 D Line Data
@@ -63,4 +80,5 @@ class RbAtom:
     transition_freq = 2 * np.pi * 384.230e12  # Hz - D2 Transition
 
 
-imaging_system_list = [SideImagingSystem(), MOTImagingSystem(), HighNASystem(), SpareGrasshopper()]
+imaging_system_list = [SideImagingSystem(), MOTImagingSystem(), HighNASystem(),
+                       SpareGrasshopper(), SimulatedCameraSystem()]

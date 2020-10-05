@@ -45,6 +45,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.absorption_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
         self.fluorescence_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
         self.analyze_signal.connect(self.roi_analyzer_widget.analyze)
+        self.analyze_signal.connect(self.gaussian2d_analyzer_widget.analyze)
 
         self.imaging_mode = None
         self.imagecapturemodewidget.state_set_signal.connect(self.set_imaging_mode)
@@ -74,7 +75,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def display_video_frame(self, frame):
         self.video_frame = frame
-        self.videovieweditor.setImage(np.transpose(self.video_frame), autoRange=False,
+        self.videovieweditor.setImage(self.video_frame, autoRange=False,
                                       autoLevels=False, autoHistogramRange=False)
         self.on_all_frames_received()
 
@@ -87,7 +88,11 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
     def on_all_frames_received(self):
         self.analyze_signal.emit()
         if self.verify_autosave():
-            self.save_frames()
+            try:
+                self.save_frames()
+            except OSError as e:
+                print('error saving frame')
+                print(e)
 
     def save_frames(self):
         if self.imaging_mode is ImagingMode.VIDEO:
@@ -107,14 +112,17 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         if self.imaging_mode is ImagingMode.VIDEO:
             self.view_stackedWidget.setCurrentIndex(0)
             self.roi_analyzer_widget.set_imageview(self.videovieweditor.imageview)
+            self.gaussian2d_analyzer_widget.set_imageview(self.videovieweditor.imageview)
             self.savebox_widget.mode = self.savebox_widget.ModeType.SINGLE
         elif self.imaging_mode is ImagingMode.ABSORPTION:
             self.view_stackedWidget.setCurrentIndex(1)
             self.roi_analyzer_widget.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
+            self.gaussian2d_analyzer_widget.set_imageview(self.absorption_view_widget.N_view_editor.imageview)
             self.savebox_widget.mode = self.savebox_widget.ModeType.ABSORPTION
         elif self.imaging_mode is ImagingMode.FLUORESCENCE:
             self.view_stackedWidget.setCurrentIndex(2)
             self.roi_analyzer_widget.set_imageview(self.fluorescence_view_widget.N_view_editor.imageview)
+            self.gaussian2d_analyzer_widget.set_imageview(self.fluorescence_view_widget.N_view_editor.imageview)
             self.savebox_widget.mode = self.savebox_widget.ModeType.FLUORESCENCE
 
     def armed(self):
