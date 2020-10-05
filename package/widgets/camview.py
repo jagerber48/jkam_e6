@@ -39,6 +39,12 @@ class CamView(QtWidgets.QWidget):
         self.set_crosshair(self.crosshair_x, self.crosshair_y)
 
     def mouse_moved(self, evt, signal=True):
+        """
+        Capture mouse click event and center curson on the pixel where the mouse clicked. scene_pos seems to be
+        returned in column major order. That is,
+        1st coordinate is horizontal (column) index (x) and
+        2nd coordinate is vertical (row) index (y)
+        """
         if not (evt.button() == 1 and evt.double() is True):
             return
         scene_pos = evt.scenePos()
@@ -49,15 +55,21 @@ class CamView(QtWidgets.QWidget):
             self.crosshair_moved_signal.emit(evt)
 
     def set_crosshair(self, x, y):
+        """
+        set crosshair to position x, y
+        Here the arrays use row major order:
+        1st index is vertical (row) index (x) and
+        2nd index is horizontal (column) index (y)
+        """
         x = int(x)
         y = int(y)
-        pixel_text = f'Pixel: ({x}, {y})'
+        pixel_text = f'Pixel: ({y}, {x})'
         value_text = 'Value: None'
         if self.image_data is not None:
-            image_data_xrange = self.image_data.shape[0]
-            image_data_yrange = self.image_data.shape[1]
+            image_data_xrange = self.image_data.shape[1]
+            image_data_yrange = self.image_data.shape[0]
             if (0 <= x <= image_data_xrange) and (0 <= y <= image_data_yrange):
-                value = self.image_data[x, y]
+                value = self.image_data[y, x]
                 value_text = f'Value: {value:.2f}'
         self.label.setText(f'{pixel_text} {value_text}')
         self.v_line.setPos(x + 0.5)
