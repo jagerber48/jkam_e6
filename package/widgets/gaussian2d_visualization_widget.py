@@ -63,8 +63,9 @@ class Gaussian2DPlot(pg.PlotItem):
         self.y_line = pg.InfiniteLine((0, 0), angle=90, movable=False, pen='y')
         self.addItem(self.y_line)
 
-    def update(self, img, x0, y0, angle):
+    def update(self, img, x0, y0, angle, x_offset=0, y_offset=0):
         self.image_item.setImage(img)
+        self.image_item.setPos(x_offset, y_offset)
         self.v_line.setPos((x0, y0))
         self.h_line.setPos((x0, y0))
         self.x_line.setPos((x0, y0))
@@ -126,18 +127,18 @@ class FitVisualizationWindow(QWidget):
             self.text_display_verticalLayout.addWidget(label)
         self.text_display_verticalLayout.addItem(QSpacerItem(14, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
-    def update(self, fit_struct=None):
+    def update(self, fit_struct=None, x_offset=0, y_offset=0):
         if fit_struct is not None:
             self.fit_struct = fit_struct
-        x0 = self.fit_struct['x0']['val']
-        y0 = self.fit_struct['y0']['val']
+        x0 = self.fit_struct['x0']['val'] + x_offset
+        y0 = self.fit_struct['y0']['val'] + y_offset
         sx = self.fit_struct['sx']['val']
         sy = self.fit_struct['sy']['val']
         angle = self.fit_struct['angle']['val']
         data_img = self.fit_struct['data_img']
         model_img = self.fit_struct['model_img']
-        self.data_plot.update(data_img, x0, y0, angle)
-        self.model_plot.update(model_img, x0, y0, angle)
+        self.data_plot.update(data_img, x0, y0, angle, x_offset=x_offset, y_offset=y_offset)
+        self.model_plot.update(model_img, x0, y0, angle, x_offset=x_offset, y_offset=y_offset)
         self.horizontal_cut_plot.update(data_img, model_img, slice_axis=SliceAxisType.HORIZONTAL,
                                         sx=sx, sy=sy)
         self.vertical_cut_plot.update(data_img, model_img, slice_axis=SliceAxisType.VERTICAL,
