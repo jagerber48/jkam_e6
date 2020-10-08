@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>737</width>
-    <height>719</height>
+    <width>753</width>
+    <height>801</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,6 +36,19 @@
           </item>
           <item>
            <widget class="GaussianFitAnalyzer" name="gaussian2d_analyzer_widget" native="true"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -124,7 +137,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>737</width>
+     <width>753</width>
      <height>26</height>
     </rect>
    </property>
