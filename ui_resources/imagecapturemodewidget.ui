@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>203</width>
-    <height>164</height>
+    <width>194</width>
+    <height>185</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,16 +40,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QRadioButton" name="fluorescence_mode_radioButton">
-        <property name="text">
-         <string>Fluorescence</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">image_capture_buttonGroup</string>
-        </attribute>
-       </widget>
-      </item>
       <item row="3" column="0">
        <widget class="QRadioButton" name="video_mode_radioButton">
         <property name="text">
@@ -63,6 +53,40 @@
         </attribute>
        </widget>
       </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="fluorescence_mode_radioButton">
+        <property name="text">
+         <string>Fluorescence</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">image_capture_buttonGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QRadioButton" name="multishot_mode_radioButton">
+          <property name="text">
+           <string>Multishot</string>
+          </property>
+          <attribute name="buttonGroup">
+           <string notr="true">image_capture_buttonGroup</string>
+          </attribute>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="multishot_spinBox">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>8</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
    </item>
@@ -71,12 +95,24 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
     </spacer>
    </item>
    <item row="0" column="1">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
      </property>
     </spacer>
    </item>

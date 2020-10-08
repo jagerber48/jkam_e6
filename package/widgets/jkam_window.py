@@ -73,6 +73,8 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.display_absorption_frame(frame)
         elif self.imaging_mode is ImagingMode.FLUORESCENCE:
             self.display_fluorescence_frame(frame)
+        elif self.imaging_mode is ImagingMode.MULTISHOT:
+            self.display_multishot_frame(frame)
         self.frame_received_signal.connect(self.on_capture)
 
     def display_video_frame(self, frame):
@@ -86,6 +88,9 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def display_fluorescence_frame(self, frame):
         self.fluorescence_view_widget.process_frame(frame)
+
+    def display_multishot_frame(self, frame):
+        self.multishot_view_widget.process_frame(frame)
 
     def on_all_frames_received(self):
         self.analyze_signal.emit()
@@ -108,6 +113,9 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             atom_frame = self.fluorescence_view_widget.atom_frame
             ref_frame = self.fluorescence_view_widget.ref_frame
             self.savebox_widget.save(atom_frame, ref_frame)
+        if self.imaging_mode is ImagingMode.MULTISHOT:
+            frame_list = self.multishot_view_widget.frame_list
+            self.savebox_widget.save(frame_list)
 
     def set_imaging_mode(self, imaging_mode):
         self.imaging_mode = imaging_mode
@@ -126,6 +134,13 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
             self.roi_analyzer_widget.set_imageview(self.fluorescence_view_widget.N_view_editor.imageview)
             self.gaussian2d_analyzer_widget.set_imageview(self.fluorescence_view_widget.N_view_editor.imageview)
             self.savebox_widget.mode = self.savebox_widget.ModeType.FLUORESCENCE
+        elif self.imaging_mode is ImagingMode.MULTISHOT:
+            self.view_stackedWidget.setCurrentIndex(3)
+            num_frames = self.imagecapturemodewidget.multishot_spinBox.value()
+            self.multishot_view_widget.setup_frames(num_frames)
+            self.roi_analyzer_widget.set_imageview(self.multishot_view_widget.editor_list[0].imageview)
+            self.gaussian2d_analyzer_widget.set_imageview(self.multishot_view_widget.editor_list[0].imageview)
+            self.savebox_widget.mode = self.savebox_widget.ModeType.MULTISHOT
 
     def armed(self):
         self.imaging_system = self.camera_control_widget.imaging_system

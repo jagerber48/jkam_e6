@@ -8,6 +8,7 @@ class ImagingMode(Enum):
     VIDEO = 0
     ABSORPTION = 1
     FLUORESCENCE = 2
+    MULTISHOT = 3
 
 
 class ImageCaptureModeWidget(QWidget, Ui_ImageCaptureModeWidget):
@@ -28,12 +29,15 @@ class ImageCaptureModeWidget(QWidget, Ui_ImageCaptureModeWidget):
             self.imaging_mode = ImagingMode.ABSORPTION
         elif self.fluorescence_mode_radioButton.isChecked():
             self.imaging_mode = ImagingMode.FLUORESCENCE
+        elif self.multishot_mode_radioButton.isChecked():
+            self.imaging_mode = ImagingMode.MULTISHOT
         self.state_set_signal.emit(self.imaging_mode)
 
     def continuous_enabled(self):
         self.video_mode_radioButton.setEnabled(True)
         self.absorption_mode_radioButton.setEnabled(False)
         self.fluorescence_mode_radioButton.setEnabled(False)
+        self.multishot_mode_radioButton.setEnabled(False)
         self.video_mode_radioButton.setChecked(True)
         self.imaging_mode = ImagingMode.VIDEO
         self.state_set_signal.emit(self.imaging_mode)
@@ -42,13 +46,16 @@ class ImageCaptureModeWidget(QWidget, Ui_ImageCaptureModeWidget):
         self.video_mode_radioButton.setEnabled(True)
         self.absorption_mode_radioButton.setEnabled(True)
         self.fluorescence_mode_radioButton.setEnabled(True)
+        self.multishot_mode_radioButton.setEnabled(True)
 
     def started(self):
         self.video_mode_radioButton.setEnabled(False)
         self.absorption_mode_radioButton.setEnabled(False)
         self.fluorescence_mode_radioButton.setEnabled(False)
+        self.multishot_mode_radioButton.setEnabled(False)
 
     def disarmed(self):
         self.video_mode_radioButton.setEnabled(True)
         self.absorption_mode_radioButton.setEnabled(True)
         self.fluorescence_mode_radioButton.setEnabled(True)
+        self.multishot_mode_radioButton.setEnabled(True)
