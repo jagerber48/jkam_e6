@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>498</width>
-    <height>578</height>
+    <width>753</width>
+    <height>801</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,54 +15,40 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" colspan="3">
-     <widget class="QStackedWidget" name="view_stackedWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>1</horstretch>
-        <verstretch>1</verstretch>
-       </sizepolicy>
-      </property>
-      <widget class="QWidget" name="imageview_page">
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="ImageViewEditor" name="videovieweditor" native="true"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="absorption_view_page">
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="2">
-         <widget class="AbsorptionViewWidget" name="absorption_view_widget" native="true"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="fluorescence_view_page">
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0">
-         <widget class="FluorescenceViewWidget" name="fluorescence_view_widget" native="true"/>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
     <item row="1" column="0" colspan="3">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="CameraControlWidget" name="camera_control_widget" native="true"/>
+          </item>
           <item>
            <widget class="ImageCaptureModeWidget" name="imagecapturemodewidget" native="true"/>
           </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="RoiIntegrationAnalyzer" name="roi_analyzer_widget" native="true"/>
           </item>
           <item>
            <widget class="GaussianFitAnalyzer" name="gaussian2d_analyzer_widget" native="true"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -103,6 +89,47 @@
       </item>
      </layout>
     </item>
+    <item row="0" column="0" colspan="3">
+     <widget class="QStackedWidget" name="view_stackedWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>1</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="currentIndex">
+       <number>3</number>
+      </property>
+      <widget class="QWidget" name="imageview_page">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="ImageViewEditor" name="videovieweditor" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="absorption_view_page">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="2">
+         <widget class="AbsorptionViewWidget" name="absorption_view_widget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="fluorescence_view_page">
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="0">
+         <widget class="FluorescenceViewWidget" name="fluorescence_view_widget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="multishot_view_page">
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="MultishotViewWidget" name="multishot_view_widget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -110,7 +137,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>498</width>
+     <width>753</width>
      <height>26</height>
     </rect>
    </property>
@@ -164,6 +191,12 @@
    <class>GaussianFitAnalyzer</class>
    <extends>QWidget</extends>
    <header>package.analyzers.gaussianfitanalyzer</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MultishotViewWidget</class>
+   <extends>QWidget</extends>
+   <header>package.widgets.multishot_view_widget</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

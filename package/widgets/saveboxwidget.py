@@ -15,6 +15,7 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         SINGLE = 0
         ABSORPTION = 1
         FLUORESCENCE = 2
+        MULTISHOT = 3
 
     def __init__(self, parent=None):
         super(SaveBoxWidget, self).__init__(parent=parent)
@@ -144,7 +145,8 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
     def save(self, *args):
         # Only verify file path existence for single shot saves. For autosaving the path is verified when the
         # run is started.
-        self.build_data_path()
+        if self.tabWidget.currentIndex() == 0:
+            self.build_data_path()
         self.build_file_name()
         if not self.autosaving:
             if self.file_path.exists():
@@ -163,6 +165,8 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
             self.save_h5_absorption_frames(*args)
         if self.mode == self.ModeType.FLUORESCENCE:
             self.save_h5_fluorescence_frames(*args)
+        if self.mode == self.ModeType.MULTISHOT:
+            self.save_h5_multishot_frames(*args)
         self.increment_file_number()
 
     def save_h5_single_frame(self, frame, timestamp=None):
@@ -171,6 +175,9 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
                 hf.create_dataset("frame", data=frame.astype('uint16'))
                 if timestamp is not None:
                     hf.attrs['timestamp'] = timestamp.isoformat()
+                else:
+                    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
+                    hf.attrs['timestamp'] = timestamp
 
     def save_h5_absorption_frames(self, atom_frame, bright_frame, dark_frame, timestamp=None):
         with h5py.File(str(self.file_path), 'w') as hf:
@@ -179,6 +186,9 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
             hf.create_dataset("dark_frame", data=dark_frame.astype('uint16'))
             if timestamp is not None:
                 hf.attrs['timestamp'] = timestamp.isoformat()
+            else:
+                timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
+                hf.attrs['timestamp'] = timestamp
 
     def save_h5_fluorescence_frames(self, atom_frame, reference_frame, timestamp=None):
         with h5py.File(str(self.file_path), 'w') as hf:
@@ -186,6 +196,19 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
             hf.create_dataset("reference_frame", data=reference_frame.astype('uint16'))
             if timestamp is not None:
                 hf.attrs['timestamp'] = timestamp.isoformat()
+            else:
+                timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
+                hf.attrs['timestamp'] = timestamp
+
+    def save_h5_multishot_frames(self, frame_list, timestamp=None):
+        with h5py.File(str(self.file_path), 'w') as hf:
+            for idx, frame in enumerate(frame_list):
+                hf.create_dataset(f"frame {idx:d}", data=frame.astype('uint16'))
+            if timestamp is not None:
+                hf.attrs['timestamp'] = timestamp.isoformat()
+            else:
+                timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
+                hf.attrs['timestamp'] = timestamp
 
     def arm(self, imaging_system):
         self.save_single_pushButton.setEnabled(True)
