@@ -83,9 +83,9 @@ class AndorDriver(JKamGenDriver):
         # self.system.set_enum_string(cam, "SimplePreAmpGainControl", "16-bit (low noise & high well capacity)")
         # self.system.set_enum_string(cam, "PixelEncoding", "Mono16")
 
-        self.sdk3.set_enum_string(cam, "AOIBinning", "8x8")
+        # self.sdk3.set_enum_string(cam, "AOIBinning", "8x8")
         # self.sdk3.set_enum_string(cam, "AOIBinning", "4x4")
-        # self.sdk3.set_enum_string(cam, "AOIBinning", "1x1")
+        self.sdk3.set_enum_string(cam, "AOIBinning", "1x1")
 
         self.sdk3.set_enum_string(cam, 'CycleMode', 'Continuous')
 
