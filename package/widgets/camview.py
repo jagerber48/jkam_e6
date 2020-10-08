@@ -68,7 +68,7 @@ class CamView(QtWidgets.QWidget):
         if self.image_data is not None:
             image_data_xrange = self.image_data.shape[1]
             image_data_yrange = self.image_data.shape[0]
-            if (0 <= x <= image_data_xrange) and (0 <= y <= image_data_yrange):
+            if (0 <= x < image_data_xrange) and (0 <= y < image_data_yrange):
                 value = self.image_data[y, x]
                 value_text = f'Value: {value:.2f}'
         self.label.setText(f'{pixel_text} {value_text}')
