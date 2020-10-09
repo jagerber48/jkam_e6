@@ -31,9 +31,9 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
         self.analyzer = None
         self.analyzer_loaded = False
         self.frame_count = 0
-        self.atom_frame = None
-        self.bright_frame = None
-        self.dark_frame = None
+        self.atom_frame_dict = None
+        self.bright_frame_dict = None
+        self.dark_frame_dict = None
         self.od_frame = None
         self.number_frame = None
 
@@ -44,31 +44,31 @@ class AbsorptionViewWidget(QWidget, Ui_AbsorptionViewWidget):
             editor.camview.mouse_moved(evt, signal=False)
 
     def reset(self):
-        self.atom_frame = None
-        self.bright_frame = None
-        self.dark_frame = None
+        self.atom_frame_dict = None
+        self.bright_frame_dict = None
+        self.dark_frame_dict = None
         self.od_frame = None
         self.number_frame = None
         self.frame_count = 0
 
-    def process_frame(self, frame):
+    def process_frame(self, frame_dict):
         self.frame_count += 1
         if self.frame_count == 1:
-            self.atom_frame = frame
-            self.atom_view_editor.setImage(frame, autoRange=False, autoLevels=False,
+            self.atom_frame_dict = frame_dict
+            self.atom_view_editor.setImage(self.atom_frame_dict['frame'], autoRange=False, autoLevels=False,
                                            autoHistogramRange=False)
         elif self.frame_count == 2:
-            self.bright_frame = frame
-            self.bright_view_editor.setImage(frame, autoRange=False, autoLevels=False,
+            self.bright_frame_dict = frame_dict
+            self.bright_view_editor.setImage(self.bright_frame_dict['frame'], autoRange=False, autoLevels=False,
                                              autoHistogramRange=False)
         elif self.frame_count == 3:
-            self.dark_frame = frame
-            self.dark_view_editor.setImage(frame, autoRange=False, autoLevels=False,
+            self.dark_frame_dict = frame_dict
+            self.dark_view_editor.setImage(self.dark_frame_dict['frame'], autoRange=False, autoLevels=False,
                                            autoHistogramRange=False)
 
-            self.od_frame, self.number_frame = self.analyzer.absorption_od_and_number(self.atom_frame,
-                                                                                      self.bright_frame,
-                                                                                      self.dark_frame)
+            self.od_frame, self.number_frame = self.analyzer.absorption_od_and_number(self.atom_frame_dict['frame'],
+                                                                                      self.bright_frame_dict['frame'],
+                                                                                      self.dark_frame_dict['frame'])
 
             self.OD_view_editor.setImage(self.od_frame, autoRange=False, autoLevels=False,
                                          autoHistogramRange=False)

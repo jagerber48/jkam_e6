@@ -127,4 +127,4 @@ class SimulatedCamDriver(JKamGenDriver):
         return frame
 
     def _load_default_settings(self, cam):
-        pass
+        self.frame_dict['metadata']['simulated metadata'] = 'Follow the white rabbit...'

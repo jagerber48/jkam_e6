@@ -12,7 +12,7 @@ There are plans to implement a Gaussian fit analyzer.
 Original program by Jonathan Kohler.
 Updated by Justin Gerber (2020) - gerberja@berkeley.edu
 """
-import numpy as np
+import copy
 import sys
 import ctypes
 from PyQt5.QtCore import pyqtSignal
@@ -61,36 +61,38 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.camera_control_widget.disarmed_signal.connect(self.disarmed)
 
         self.savebox_widget.save_single_pushButton.clicked.connect(self.save_frames)
-        self.video_frame = None
+        self.video_frame_dict = None
         self.imaging_system = None
         self.show()
 
-    def on_capture(self, frame):
+    def on_capture(self, frame_dict_in):
+        frame_dict = copy.deepcopy(frame_dict_in)
         self.frame_received_signal.disconnect(self.on_capture)
         if self.imaging_mode is ImagingMode.VIDEO:
-            self.display_video_frame(frame)
+            self.display_video_frame(frame_dict)
         elif self.imaging_mode is ImagingMode.ABSORPTION:
-            self.display_absorption_frame(frame)
+            self.display_absorption_frame(frame_dict)
         elif self.imaging_mode is ImagingMode.FLUORESCENCE:
-            self.display_fluorescence_frame(frame)
+            self.display_fluorescence_frame(frame_dict)
         elif self.imaging_mode is ImagingMode.MULTISHOT:
-            self.display_multishot_frame(frame)
+            self.display_multishot_frame(frame_dict)
         self.frame_received_signal.connect(self.on_capture)
 
-    def display_video_frame(self, frame):
-        self.video_frame = frame
-        self.videovieweditor.setImage(self.video_frame, autoRange=False,
+    def display_video_frame(self, frame_dict):
+        self.video_frame_dict = frame_dict
+        video_frame = self.video_frame_dict['frame']
+        self.videovieweditor.setImage(video_frame, autoRange=False,
                                       autoLevels=False, autoHistogramRange=False)
         self.on_all_frames_received()
 
-    def display_absorption_frame(self, frame):
-        self.absorption_view_widget.process_frame(frame)
+    def display_absorption_frame(self, frame_dict):
+        self.absorption_view_widget.process_frame(frame_dict)
 
-    def display_fluorescence_frame(self, frame):
-        self.fluorescence_view_widget.process_frame(frame)
+    def display_fluorescence_frame(self, frame_dict):
+        self.fluorescence_view_widget.process_frame(frame_dict)
 
-    def display_multishot_frame(self, frame):
-        self.multishot_view_widget.process_frame(frame)
+    def display_multishot_frame(self, frame_dict):
+        self.multishot_view_widget.process_frame(frame_dict)
 
     def on_all_frames_received(self):
         self.analyze_signal.emit()
@@ -103,19 +105,19 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
     def save_frames(self):
         if self.imaging_mode is ImagingMode.VIDEO:
-            self.savebox_widget.save(self.video_frame)
+            self.savebox_widget.save(self.video_frame_dict)
         if self.imaging_mode is ImagingMode.ABSORPTION:
-            atom_frame = self.absorption_view_widget.atom_frame
-            bright_frame = self.absorption_view_widget.bright_frame
-            dark_frame = self.absorption_view_widget.dark_frame
-            self.savebox_widget.save(atom_frame, bright_frame, dark_frame)
+            atom_frame_dict = self.absorption_view_widget.atom_frame_dict
+            bright_frame_dict = self.absorption_view_widget.bright_frame_dict
+            dark_frame_dict = self.absorption_view_widget.dark_frame_dict
+            self.savebox_widget.save(atom_frame_dict, bright_frame_dict, dark_frame_dict)
         if self.imaging_mode is ImagingMode.FLUORESCENCE:
-            atom_frame = self.fluorescence_view_widget.atom_frame
-            ref_frame = self.fluorescence_view_widget.ref_frame
-            self.savebox_widget.save(atom_frame, ref_frame)
+            atom_frame_dict = self.fluorescence_view_widget.atom_frame_dict
+            ref_frame_dict = self.fluorescence_view_widget.ref_frame_dict
+            self.savebox_widget.save(atom_frame_dict, ref_frame_dict)
         if self.imaging_mode is ImagingMode.MULTISHOT:
-            frame_list = self.multishot_view_widget.frame_list
-            self.savebox_widget.save(frame_list)
+            frame_dict_list = self.multishot_view_widget.frame_dict_list
+            self.savebox_widget.save(frame_dict_list)
 
     def set_imaging_mode(self, imaging_mode):
         self.imaging_mode = imaging_mode

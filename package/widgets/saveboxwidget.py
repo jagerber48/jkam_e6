@@ -169,46 +169,39 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
             self.save_h5_multishot_frames(*args)
         self.increment_file_number()
 
-    def save_h5_single_frame(self, frame, timestamp=None):
-        if frame is not None:
+    def save_h5_single_frame(self, frame_dict):
+        if frame_dict is not None:
             with h5py.File(str(self.file_path), 'w') as hf:
-                hf.create_dataset("frame", data=frame.astype('uint16'))
-                if timestamp is not None:
-                    hf.attrs['timestamp'] = timestamp.isoformat()
-                else:
-                    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
-                    hf.attrs['timestamp'] = timestamp
+                hf.create_dataset('frame', data=frame_dict['frame'].astype('uint16'))
+                for key, value in frame_dict['metadata'].items():
+                    hf['frame'].attrs[key] = value
 
-    def save_h5_absorption_frames(self, atom_frame, bright_frame, dark_frame, timestamp=None):
+    def save_h5_absorption_frames(self, atom_frame_dict, bright_frame_dict, dark_frame_dict):
+        frames_dict = {'atom_frame': atom_frame_dict,
+                       'bright_frame': bright_frame_dict,
+                       'dark_frame': dark_frame_dict}
         with h5py.File(str(self.file_path), 'w') as hf:
-            hf.create_dataset("atom_frame", data=atom_frame.astype('uint16'))
-            hf.create_dataset("bright_frame", data=bright_frame.astype('uint16'))
-            hf.create_dataset("dark_frame", data=dark_frame.astype('uint16'))
-            if timestamp is not None:
-                hf.attrs['timestamp'] = timestamp.isoformat()
-            else:
-                timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
-                hf.attrs['timestamp'] = timestamp
+            for frame_name, frame_dict in frames_dict.items():
+                hf.create_dataset(frame_name, data=frame_dict['frame'].astype('uint16'))
+                for key, value in frame_dict['metadata'].items():
+                    hf[frame_name].attrs[key] = value
 
-    def save_h5_fluorescence_frames(self, atom_frame, reference_frame, timestamp=None):
+    def save_h5_fluorescence_frames(self, atom_frame_dict, reference_frame_dict):
+        frames_dict = {'atom_frame': atom_frame_dict,
+                       'ref_frame': reference_frame_dict}
         with h5py.File(str(self.file_path), 'w') as hf:
-            hf.create_dataset("atom_frame", data=atom_frame.astype('uint16'))
-            hf.create_dataset("reference_frame", data=reference_frame.astype('uint16'))
-            if timestamp is not None:
-                hf.attrs['timestamp'] = timestamp.isoformat()
-            else:
-                timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
-                hf.attrs['timestamp'] = timestamp
+            for frame_name, frame_dict in frames_dict.items():
+                hf.create_dataset(frame_name, data=frame_dict['frame'].astype('uint16'))
+                for key, value in frame_dict['metadata'].items():
+                    hf[frame_name].attrs[key] = value
 
-    def save_h5_multishot_frames(self, frame_list, timestamp=None):
+    def save_h5_multishot_frames(self, frame_dict_list):
         with h5py.File(str(self.file_path), 'w') as hf:
-            for idx, frame in enumerate(frame_list):
-                hf.create_dataset(f"frame {idx:d}", data=frame.astype('uint16'))
-            if timestamp is not None:
-                hf.attrs['timestamp'] = timestamp.isoformat()
-            else:
-                timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
-                hf.attrs['timestamp'] = timestamp
+            for idx, frame_dict in enumerate(frame_dict_list):
+                frame_name = f'frame-{idx:02d}'
+                hf.create_dataset(frame_name, data=frame_dict['frame'].astype('uint16'))
+                for key, value in frame_dict['metadata'].items():
+                    hf[frame_name].attrs[key] = value
 
     def arm(self, imaging_system):
         self.save_single_pushButton.setEnabled(True)
@@ -217,7 +210,8 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
         imaging_system_name = imaging_system.name
         self.imaging_system_path = Path(imaging_system_name)
         self.imaging_system_value_label.setText(imaging_system_name)
-        self.build_data_path()
+        if self.tabWidget.currentIndex() == 0:
+            self.build_data_path()
         self.build_file_name()
 
     def disarm(self):

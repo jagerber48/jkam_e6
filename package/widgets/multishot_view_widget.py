@@ -12,7 +12,7 @@ class MultishotViewWidget(QtWidgets.QWidget):
 
         self.tab_list = []
         self.editor_list = []
-        self.frame_list = []
+        self.frame_dict_list = []
         self.n_frames = 0
         self.curr_frame = 0
 
@@ -31,9 +31,9 @@ class MultishotViewWidget(QtWidgets.QWidget):
     def reset(self):
         self.curr_frame = 0
 
-    def process_frame(self, frame):
-        self.frame_list[self.curr_frame] = frame
-        self.editor_list[self.curr_frame].setImage(frame, autoRange=False, autoLevels=False,
+    def process_frame(self, frame_dict):
+        self.frame_dict_list[self.curr_frame] = frame_dict
+        self.editor_list[self.curr_frame].setImage(frame_dict['frame'], autoRange=False, autoLevels=False,
                                                    autoHistogramRange=False)
         self.curr_frame += 1
         if self.curr_frame == self.n_frames:
@@ -54,7 +54,7 @@ class MultishotViewWidget(QtWidgets.QWidget):
         new_view_editor = ImageViewEditor(new_tab)
         gridLayout.addWidget(new_view_editor, 0, 0, 1, 1)
         self.editor_list.append(new_view_editor)
-        self.frame_list.append(None)
+        self.frame_dict_list.append(None)
         self.tabWidget.addTab(new_tab, f'Frame {new_tab_index:d}')
         self.link_views()
 
@@ -64,7 +64,7 @@ class MultishotViewWidget(QtWidgets.QWidget):
             tab.deleteLater()
         self.tab_list = []
         self.editor_list = []
-        self.frame_list = []
+        self.frame_dict_list = []
         self.n_frames = 0
         self.curr_frame = 0
 

@@ -1,3 +1,4 @@
+import datetime
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
 
@@ -34,6 +35,10 @@ class JKamGenDriver(QObject):
         self.acquiring = False
         self._trigger_enabled = False
 
+        self.frame_dict = dict()
+        self.frame_dict['frame'] = None
+        self.frame_dict['metadata'] = dict()
+
     def arm_camera(self, serial_number):
         """
         Establish communication with camera and initialize for acquisition
@@ -68,9 +73,10 @@ class JKamGenDriver(QObject):
 
     def set_exposure_time(self, exposure_time):
         """
-        Set camera exposure time to exposure_time. exposure_time express in ms
+        Set camera exposure time to exposure_time. exposure_time expressed in ms
         """
         self.exposure_time = self._set_exposure_time(self.cam, exposure_time)
+        self.frame_dict['metadata']['exposure'] = self.exposure_time
         print(f'EXPOSURE TIME set to {self.exposure_time:.4f} ms')
 
     def trigger_on(self):
@@ -108,8 +114,11 @@ class JKamGenDriver(QObject):
 
     def grab_frame(self):
         frame = self._grab_frame(self.cam)
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %f')
+        self.frame_dict['frame'] = frame
+        self.frame_dict['metadata']['timestamp'] = timestamp
         if frame is not None:
-            self.frame_captured_signal.emit(frame)
+            self.frame_captured_signal.emit(self.frame_dict)
 
     def _open_connection(self):
         """
