@@ -30,8 +30,8 @@ class GaussianIntegrateAxisPlot(pg.PlotItem):
         if slice_axis == SliceAxisType.VERTICAL:
             y_range = data_img.shape[0]
             integrate_axis = 1
-            data_cut_data = np.sum(data_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sx ** 2)
-            model_cut_data = np.sum(model_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sx ** 2)
+            data_cut_data = np.nansum(data_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sx ** 2)
+            model_cut_data = np.nansum(model_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sx ** 2)
             self.plot(data_cut_data, offset + np.arange(y_range),
                       pen=pg.mkPen(width=0.5), symbolBrush='w', symbolSize=5)
             self.plot(model_cut_data, offset + np.arange(y_range), pen=pg.mkPen('r'))
@@ -39,8 +39,8 @@ class GaussianIntegrateAxisPlot(pg.PlotItem):
         elif slice_axis == SliceAxisType.HORIZONTAL:
             x_range = data_img.shape[1]
             integrate_axis = 0
-            data_cut_data = np.sum(data_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sy ** 2)
-            model_cut_data = np.sum(model_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sy ** 2)
+            data_cut_data = np.nansum(data_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sy ** 2)
+            model_cut_data = np.nansum(model_img, axis=integrate_axis) / np.sqrt(2 * np.pi * sy ** 2)
             self.plot(offset + np.arange(x_range), data_cut_data,
                       pen=pg.mkPen(width=0.5), symbolBrush='w', symbolSize=5)
             self.plot(offset + np.arange(x_range), model_cut_data, pen=pg.mkPen('b'))

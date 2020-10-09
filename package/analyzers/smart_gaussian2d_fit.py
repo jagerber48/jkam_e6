@@ -15,14 +15,14 @@ def gaussian_2d(x, y, x0=0, y0=0, sx=1, sy=1, amp=1, offset=0, angle=0, x_slope=
 
 def img_moments(img):
     y_inds, x_inds = np.indices(img.shape)
-    tot = img.sum()
+    tot = np.nansum(img)
     if tot <= 0:
         raise ValueError('Integrated image intensity is negative, image may be too noisy. '
                          'Image statistics cannot be calculated.')
-    x0 = np.sum(img*x_inds)/tot
-    y0 = np.sum(img*y_inds)/tot
-    varx = np.sum(img * (x_inds - x0)**2) / tot
-    vary = np.sum(img * (y_inds - y0)**2) / tot
+    x0 = np.nansum(img*x_inds)/tot
+    y0 = np.nansum(img*y_inds)/tot
+    varx = np.nansum(img * (x_inds - x0)**2) / tot
+    vary = np.nansum(img * (y_inds - y0)**2) / tot
     if varx <= 0 or vary <= 0:
         raise ValueError('varx or vary is negative, image may be too noisy. '
                          'Image statistics cannot be calculated.')
@@ -34,8 +34,8 @@ def img_moments(img):
 def get_guess_values(img, quiet=True):
     x_range = img.shape[1]
     y_range = img.shape[0]
-    amp_guess = img.max()-img.min()
-    offset_guess = img.min()
+    amp_guess = np.nanmax(img) - np.nanmin(img)
+    offset_guess = np.nanmin(img)
     try:
         x0_guess, y0_guess, sx_guess, sy_guess = img_moments(img)
     except ValueError as e:
@@ -190,9 +190,9 @@ def fit_gaussian2d(img, zoom=1.0, angle_offset=0.0, fix_lin_slope=False, fix_ang
         p_guess = np.append(p_guess, [0, 0])
 
     def img_cost_func(x):
-        return np.ravel(gaussian_2d(x_coords * zoom, y_coords * zoom,
-                                    *x, **lock_params)
-                        - img_downsampled)
+        return np.nan_to_num(np.ravel(gaussian_2d(x_coords * zoom, y_coords * zoom,
+                                      *x, **lock_params)
+                             - img_downsampled))
     lsq_struct = least_squares(img_cost_func, p_guess, verbose=0)
 
     popt = lsq_struct['x']
