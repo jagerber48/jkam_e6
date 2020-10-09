@@ -113,7 +113,7 @@ class FitVisualizationWindow(QWidget):
         self.vertical_cut_plot.setYLink(self.data_plot.getViewBox())
         self.vertical_cut_plot.getViewBox().invertY()
 
-    def update_text_display(self):
+    def update_text_display(self, x_offset=0, y_offset=0):
         clearLayout(self.text_display_verticalLayout)
 
         self.text_display_verticalLayout.addItem(QSpacerItem(14, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
@@ -121,6 +121,10 @@ class FitVisualizationWindow(QWidget):
             label = QLabel()
             val = round(self.fit_struct[key]['val'], 3)
             std = round(self.fit_struct[key]['std'], 3)
+            if key == 'x0':
+                val += x_offset
+            if key == 'y0':
+                val += y_offset
             val_str = ufloat(val, std)
             label.setText(f'{str(key)} = {val_str}')
             self.text_display_verticalLayout.addWidget(label)
@@ -143,7 +147,7 @@ class FitVisualizationWindow(QWidget):
         self.vertical_cut_plot.update(data_img, model_img, slice_axis=SliceAxisType.VERTICAL,
                                       sx=sx, sy=sy, offset=y_offset)
         self.data_plot.autoRange()
-        self.update_text_display()
+        self.update_text_display(x_offset=x_offset, y_offset=y_offset)
 
     def closeEvent(self, event):
         self.window_close_signal.emit()
