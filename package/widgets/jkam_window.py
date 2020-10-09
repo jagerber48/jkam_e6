@@ -53,7 +53,9 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
         self.camera_control_widget.started_signal.connect(self.fluorescence_view_widget.reset)
         self.camera_control_widget.started_signal.connect(self.imagecapturemodewidget.started)
         self.camera_control_widget.continuous_enabled_signal.connect(self.imagecapturemodewidget.continuous_enabled)
+        self.camera_control_widget.continuous_enabled_signal.connect(self.gaussian2d_analyzer_widget.continuous_enabled)
         self.camera_control_widget.triggered_enabled_signal.connect(self.imagecapturemodewidget.triggered_enabled)
+        self.camera_control_widget.triggered_enabled_signal.connect(self.gaussian2d_analyzer_widget.triggered_enabled)
         self.camera_control_widget.disarmed_signal.connect(self.imagecapturemodewidget.disarmed)
         self.imagecapturemodewidget.set_imaging_mode()
 

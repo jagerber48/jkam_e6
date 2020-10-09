@@ -80,6 +80,15 @@ class GaussianFitAnalyzer(QWidget, Ui_GaussianFitAnalyzer):
             self.worker.imageview = self.imageview
             self.toggle_enable()
 
+    def continuous_enabled(self):
+        self.gaussian_fit_window.close()
+        self.disable()
+        self.enable_checkBox.setChecked(False)
+        self.enable_checkBox.setEnabled(False)
+
+    def triggered_enabled(self):
+        self.enable_checkBox.setEnabled(True)
+
     def window_closed(self):
         self.disable()
         self.enable_checkBox.setChecked(False)
