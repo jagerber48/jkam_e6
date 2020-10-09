@@ -60,6 +60,8 @@ class MultishotViewWidget(QtWidgets.QWidget):
 
     def clear_tabs(self):
         self.tabWidget.clear()
+        for tab in self.tab_list:
+            tab.deleteLater()
         self.tab_list = []
         self.editor_list = []
         self.frame_list = []

@@ -168,11 +168,11 @@ def fit_gaussian2d(img, zoom=1.0, angle_offset=0.0, fix_lin_slope=False, fix_ang
     val_ub : float
         Upper limit of confidence interval
     """
-
-    img_downsampled = scipy.ndimage.interpolation.zoom(img, 1 / zoom)
+    img = np.nan_to_num(img)
+    # img_downsampled = scipy.ndimage.interpolation.zoom(img, 1 / zoom)
     if not quiet:
         print(f'Image downsampled by factor: {zoom:.1f}')
-    y_coords, x_coords = np.indices(img_downsampled.shape)
+    y_coords, x_coords = np.indices(img.shape)
 
     p_guess = get_guess_values(img, quiet=quiet)
     param_keys = ['x0', 'y0', 'sx', 'sy', 'amp', 'offset']
@@ -191,8 +191,8 @@ def fit_gaussian2d(img, zoom=1.0, angle_offset=0.0, fix_lin_slope=False, fix_ang
 
     def img_cost_func(x):
         return np.nan_to_num(np.ravel(gaussian_2d(x_coords * zoom, y_coords * zoom,
-                                      *x, **lock_params)
-                             - img_downsampled))
+                                                  *x, **lock_params)
+                             - img))
     lsq_struct = least_squares(img_cost_func, p_guess, verbose=0)
 
     popt = lsq_struct['x']
@@ -223,7 +223,7 @@ def fit_gaussian2d(img, zoom=1.0, angle_offset=0.0, fix_lin_slope=False, fix_ang
 
         popt_dict['angle'] = angle
 
-    n_data_points = img_downsampled.shape[0]*img_downsampled.shape[1]
+    n_data_points = img.shape[0]*img.shape[1]
     n_fit_parameters = len(popt_dict)
     dof = n_data_points - n_fit_parameters
     sigma_squared = 2 * cost / dof
