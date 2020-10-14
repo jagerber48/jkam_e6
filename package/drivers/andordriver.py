@@ -86,15 +86,23 @@ class AndorDriver(JKamGenDriver):
         '''
         I believe AOI uses row major format for specifying width, height, left and top.
         '''
-        # self.sdk3.set_int(cam, "AOIWidth", 100)
-        # self.sdk3.set_int(cam, "AOIHeight", 100)
-        # self.sdk3.set_int(cam, "AOILeft", 1000)
-        # self.sdk3.set_int(cam, "AOITop", 1000)
+        aoi_width = 100
+        aoi_height = 100
+        aoi_left = 1000
+        aoi_top = 1000
+        self.sdk3.set_int(cam, "AOIWidth", aoi_width)
+        self.sdk3.set_int(cam, "AOIHeight", aoi_height)
+        self.sdk3.set_int(cam, "AOILeft", aoi_left)
+        self.sdk3.set_int(cam, "AOITop", aoi_top)
+        self.frame_dict['metadata']['AOIWidth']= aoi_width
+        self.frame_dict['metadata']['AOIHeight']= aoi_height
+        self.frame_dict['metadata']['AOILeft']= aoi_left
+        self.frame_dict['metadata']['AOITop']= aoi_top
 
         # self.sdk3.set_int(cam, "AOI")
-        self.sdk3.set_enum_string(cam, "AOIBinning", "8x8")
+        # self.sdk3.set_enum_string(cam, "AOIBinning", "8x8")
         # self.sdk3.set_enum_string(cam, "AOIBinning", "4x4")
-        # self.sdk3.set_enum_string(cam, "AOIBinning", "1x1")
+        self.sdk3.set_enum_string(cam, "AOIBinning", "1x1")
 
         self.sdk3.set_enum_string(cam, 'CycleMode', 'Continuous')
 

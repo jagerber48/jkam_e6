@@ -188,7 +188,7 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
 
     def save_h5_fluorescence_frames(self, atom_frame_dict, reference_frame_dict):
         frames_dict = {'atom_frame': atom_frame_dict,
-                       'ref_frame': reference_frame_dict}
+                       'reference_frame': reference_frame_dict}
         with h5py.File(str(self.file_path), 'w') as hf:
             for frame_name, frame_dict in frames_dict.items():
                 hf.create_dataset(frame_name, data=frame_dict['frame'].astype('uint16'))

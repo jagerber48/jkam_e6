@@ -128,6 +128,9 @@ class FitVisualizationWindow(QWidget):
             val_str = ufloat(val, std)
             label.setText(f'{str(key)} = {val_str}')
             self.text_display_verticalLayout.addWidget(label)
+        label = QLabel()
+        label.setText(f'NGauss = {self.fit_struct["NGauss"]:.3e}')
+        self.text_display_verticalLayout.addWidget(label)
         self.text_display_verticalLayout.addItem(QSpacerItem(14, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
     def update(self, fit_struct=None, x_offset=0, y_offset=0):
