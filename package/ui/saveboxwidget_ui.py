@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_SaveBoxWidget(object):
     def setupUi(self, SaveBoxWidget):
         SaveBoxWidget.setObjectName("SaveBoxWidget")
-        SaveBoxWidget.resize(281, 428)
+        SaveBoxWidget.resize(235, 396)
         self.gridLayout = QtWidgets.QGridLayout(SaveBoxWidget)
         self.gridLayout.setObjectName("gridLayout")
         spacerItem = QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -124,7 +124,7 @@ class Ui_SaveBoxWidget(object):
         self.file_number_label.setText(_translate("SaveBoxWidget", "File Number:"))
         self.file_prefix_lineEdit.setText(_translate("SaveBoxWidget", "jkam_capture"))
         self.daily_path_label.setText(_translate("SaveBoxWidget", "Daily Data Path:"))
-        self.run_name_lineEdit.setText(_translate("SaveBoxWidget", "run1"))
+        self.run_name_lineEdit.setText(_translate("SaveBoxWidget", "run0"))
         self.run_name_label.setText(_translate("SaveBoxWidget", "Run Name:"))
         self.data_root_label.setText(_translate("SaveBoxWidget", "Data Root:"))
         self.data_root_pushButton.setText(_translate("SaveBoxWidget", "Select Data Root"))

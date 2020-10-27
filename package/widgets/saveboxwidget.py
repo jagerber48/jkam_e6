@@ -145,7 +145,7 @@ class SaveBoxWidget(QWidget, Ui_SaveBoxWidget):
     def save(self, *args):
         # Only verify file path existence for single shot saves. For autosaving the path is verified when the
         # run is started.
-        if self.tabWidget.currentIndex() == 0:
+        if self.tabWidget.currentIndex() == 0 and not self.autosaving:
             self.build_data_path()
         self.build_file_name()
         if not self.autosaving:
