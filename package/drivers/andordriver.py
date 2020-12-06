@@ -57,7 +57,8 @@ class AndorDriver(JKamGenDriver):
         self.sdk3.set_enum_string(cam, 'TriggerMode', 'External')
 
     def _set_software_trigger(self, cam):
-        self.sdk3.set_enum_string(cam, 'TriggerMode', 'Software')
+        self.sdk3.set_enum_string(cam, 'TriggerMo'
+                                       'de', 'Software')
 
     def _execute_software_trigger(self, cam):
         self.sdk3.command(cam, 'SoftwareTrigger')
@@ -86,10 +87,25 @@ class AndorDriver(JKamGenDriver):
         '''
         I believe AOI uses row major format for specifying width, height, left and top.
         '''
-        aoi_width = 100
-        aoi_height = 100
-        aoi_left = 1000
-        aoi_top = 1000
+        # aoi_width = 100
+        # aoi_height = 100
+        # aoi_left = 1000
+        # aoi_top = 1000
+        # self.sdk3.set_int(cam, "AOIWidth", aoi_width)
+        # self.sdk3.set_int(cam, "AOIHeight", aoi_height)
+        # self.sdk3.set_int(cam, "AOILeft", aoi_left)
+        # self.sdk3.set_int(cam, "AOITop", aoi_top)
+        # self.frame_dict['metadata']['AOIWidth']= aoi_width
+        # self.frame_dict['metadata']['AOIHeight']= aoi_height
+        # self.frame_dict['metadata']['AOILeft']= aoi_left
+        # self.frame_dict['metadata']['AOITop']= aoi_top
+        '''
+        I believe AOI uses row major format for specifying width, height, left and top.
+        '''
+        aoi_width = 50
+        aoi_height = 300
+        aoi_left = 1030
+        aoi_top = 950
         self.sdk3.set_int(cam, "AOIWidth", aoi_width)
         self.sdk3.set_int(cam, "AOIHeight", aoi_height)
         self.sdk3.set_int(cam, "AOILeft", aoi_left)

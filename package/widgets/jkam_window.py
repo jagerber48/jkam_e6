@@ -44,6 +44,7 @@ class JKamWindow(QMainWindow, Ui_CameraWindow):
 
         self.absorption_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
         self.fluorescence_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
+        self.multishot_view_widget.analysis_complete_signal.connect(self.on_all_frames_received)
         self.analyze_signal.connect(self.roi_analyzer_widget.analyze)
         self.analyze_signal.connect(self.gaussian2d_analyzer_widget.analyze)
 

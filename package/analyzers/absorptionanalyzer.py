@@ -60,7 +60,7 @@ class AbsorptionAnalyzer(QObject):
                                       detuning=0):
         detuning_factor = 1 + (2 * detuning / self.linewidth) ** 2
         column_density_below_sat = (detuning_factor / self.cross_section) * optical_density
-        column_area = self.pixel_area / self.magnification  # size of a pixel in object plane
+        column_area = self.pixel_area / self.magnification**2  # size of a pixel in object plane
         column_number = column_area * column_density_below_sat
         return column_number
 
@@ -77,8 +77,8 @@ class AbsorptionAnalyzer(QObject):
                                 (hbar * self.transition_frequency) / (self.pixel_area * image_pulse_time))
 
         # convert detected intensity to intensity before and after atoms
-        intensity_out = atom_intensity_det / efficiency_path / self.magnification
-        intensity_in = bright_intensity_det / efficiency_path / self.magnification
+        intensity_out = atom_intensity_det / efficiency_path / self.magnification**2
+        intensity_in = bright_intensity_det / efficiency_path / self.magnification**2
 
         # convert intensity in and out to resonant saturation parameter in and out
         s0_out = intensity_out / self.saturation_intensity
@@ -88,6 +88,6 @@ class AbsorptionAnalyzer(QObject):
         column_density = (s0_in - s0_out) / self.cross_section
 
         # calculate column atom number from column_density and column_area
-        column_area = self.pixel_area / self.magnification  # size of a pixel in the object plane
+        column_area = self.pixel_area / self.magnification**2  # size of a pixel in the object plane
         column_number = column_density * column_area
         return column_number
