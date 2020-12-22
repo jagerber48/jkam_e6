@@ -49,7 +49,7 @@ class Ui_ImageCaptureModeWidget(object):
         self.horizontalLayout.addWidget(self.multishot_mode_radioButton)
         self.multishot_spinBox = QtWidgets.QSpinBox(self.frame)
         self.multishot_spinBox.setMinimum(1)
-        self.multishot_spinBox.setMaximum(8)
+        self.multishot_spinBox.setMaximum(20)
         self.multishot_spinBox.setObjectName("multishot_spinBox")
         self.horizontalLayout.addWidget(self.multishot_spinBox)
         self.gridLayout_2.addLayout(self.horizontalLayout, 4, 0, 1, 1)
