@@ -103,17 +103,17 @@ class AndorDriver(JKamGenDriver):
         I believe AOI uses row major format for specifying width, height, left and top.
         '''
         aoi_width = 50
-        aoi_height = 300
-        aoi_left = 1030
-        aoi_top = 950
+        aoi_height = 350
+        aoi_left = 1040
+        aoi_top = 900
         self.sdk3.set_int(cam, "AOIWidth", aoi_width)
         self.sdk3.set_int(cam, "AOIHeight", aoi_height)
         self.sdk3.set_int(cam, "AOILeft", aoi_left)
         self.sdk3.set_int(cam, "AOITop", aoi_top)
-        self.frame_dict['metadata']['AOIWidth']= aoi_width
-        self.frame_dict['metadata']['AOIHeight']= aoi_height
-        self.frame_dict['metadata']['AOILeft']= aoi_left
-        self.frame_dict['metadata']['AOITop']= aoi_top
+        self.frame_dict['metadata']['AOIWidth'] = aoi_width
+        self.frame_dict['metadata']['AOIHeight'] = aoi_height
+        self.frame_dict['metadata']['AOILeft'] = aoi_left
+        self.frame_dict['metadata']['AOITop'] = aoi_top
 
         # self.sdk3.set_int(cam, "AOI")
         # self.sdk3.set_enum_string(cam, "AOIBinning", "8x8")
